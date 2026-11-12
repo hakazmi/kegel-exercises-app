@@ -35,6 +35,7 @@ Do not hard-code prices or trial length; they come from the store products via R
 Do not add other packages without asking.
 
 - Flutter stable, Dart 3
+- material_ui (required: this Flutter SDK moved Material out of the framework; do not import `package:flutter/material.dart`)
 - flutter_riverpod (no code generation)
 - go_router
 - drift + shared_preferences
@@ -44,8 +45,8 @@ Do not add other packages without asking.
 - wakelock_plus
 - flutter_svg
 - url_launcher
-- firebase_core + firebase_analytics + firebase_crashlytics
 - flutter_localizations / intl
+- firebase_core + firebase_analytics + firebase_crashlytics — **not in pubspec until Prompt 11** (Analytics, Crashlytics, privacy)
 
 ## Architecture
 

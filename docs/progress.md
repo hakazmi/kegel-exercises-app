@@ -3,7 +3,7 @@
 Checklist for Prompts 0–13. Tick each step when it ships.
 
 - [x] **Prompt 0** — Rules and docs
-- [ ] **Prompt 1** — Scaffold, design system, router
+- [x] **Prompt 1** — Scaffold, design system, router
 - [ ] **Prompt 2** — Data layer, content, plan rules
 - [ ] **Prompt 3** — Onboarding O1-O6
 - [ ] **Prompt 4** — Tutorial T1 and pre-session S1
@@ -13,6 +13,6 @@ Checklist for Prompts 0–13. Tick each step when it ships.
 - [ ] **Prompt 8** — Learn and Settings L1, L2, X1
 - [ ] **Prompt 9** — Reminders
 - [ ] **Prompt 10** — Paywall and RevenueCat
-- [ ] **Prompt 11** — Analytics, Crashlytics, privacy
+- [ ] **Prompt 11** — Analytics, Crashlytics, privacy (re-add firebase_core, firebase_analytics, firebase_crashlytics)
 - [ ] **Prompt 12** — QA hardening
 - [ ] **Prompt 13** — Android release build

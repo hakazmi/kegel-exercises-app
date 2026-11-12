@@ -1,0 +1,26 @@
+{
+  "@@locale": "en",
+  "appName": "Kegel Exercises",
+  "@appName": {
+    "description": "Temporary display name; keep in sync with AppConstants.displayName"
+  },
+  "tabToday": "Today",
+  "tabProgress": "Progress",
+  "tabLearn": "Learn",
+  "commonBack": "Back",
+  "commonNext": "Next",
+  "commonContinue": "Continue",
+  "commonClose": "Close",
+  "commonCancel": "Cancel",
+  "commonConfirm": "Confirm",
+  "placeholderScreen": "{id} · {name}",
+  "@placeholderScreen": {
+    "placeholders": {
+      "id": {"type": "String"},
+      "name": {"type": "String"}
+    }
+  },
+  "placeholderHint": "Placeholder — real UI comes in later steps.",
+  "devGalleryTitle": "Widget gallery",
+  "devGalleryOpen": "Open widget gallery"
+}
