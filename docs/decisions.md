@@ -14,3 +14,7 @@ One line per decision the product spec does not cover. Format: `YYYY-MM-DD — D
 2026-11-12 — Light scaffold background set to `#F5F7F6` and borders to `#DCE3E0` from screenshots (pending token approval in docs/design/tokens.md).
 2026-11-12 — Remove firebase_core / firebase_analytics / firebase_crashlytics until Prompt 11 (unused; heavy iOS firebase-ios-sdk). Keep purchases_flutter.
 2026-11-12 — Contrast AA: textSecondary `#66706B` kept. Disabled controls and decorative ring track are WCAG-exempt: buttonDisabled `#CBD2D0`, textDisabledLabel `#6F7974`, textDisabled `#9AA39F` (icons), sessionRingTrack `#2A3430`.
+2026-11-12 — Drift codegen helpers allowed: `drift_dev`, `build_runner`, `path`, `path_provider`, `sqlite3_flutter_libs` (dev deps where appropriate).
+2026-11-12 — Sessions table includes `kind` (strengthening|breathing|relaxation) in addition to the spec column list so the daily strengthening cap can be enforced.
+2026-11-12 — Weekly rest day defaults to Sunday via `UserProfile.restWeekday` (ISO 7), changeable later in Settings. Spec does not name the day.
+2026-11-12 — Rest day never applies until the user has completed at least one session, so install-on-rest-weekday still gets a normal Level 1 Day 1.

@@ -4,7 +4,7 @@ Checklist for Prompts 0–13. Tick each step when it ships.
 
 - [x] **Prompt 0** — Rules and docs
 - [x] **Prompt 1** — Scaffold, design system, router
-- [ ] **Prompt 2** — Data layer, content, plan rules
+- [x] **Prompt 2** — Data layer, content, plan rules
 - [ ] **Prompt 3** — Onboarding O1-O6
 - [ ] **Prompt 4** — Tutorial T1 and pre-session S1
 - [ ] **Prompt 5** — Session engine and player S2-S4

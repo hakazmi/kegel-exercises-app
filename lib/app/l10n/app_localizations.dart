@@ -177,6 +177,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open widget gallery'**
   String get devGalleryOpen;
+
+  /// No description provided for @devDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Data debug'**
+  String get devDataTitle;
+
+  /// No description provided for @devDataOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open data debug'**
+  String get devDataOpen;
 }
 
 class _AppLocalizationsDelegate

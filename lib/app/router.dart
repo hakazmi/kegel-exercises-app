@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/dev/data_debug_screen.dart';
 import '../features/dev/widget_gallery_screen.dart';
 import '../features/shell/main_shell.dart';
 import '../features/shell/placeholder_screen.dart';
@@ -30,6 +31,7 @@ abstract final class AppRoutes {
   static const String article = '/learn/article';
   static const String settings = '/settings';
   static const String gallery = '/dev/gallery';
+  static const String dataDebug = '/dev/data';
 }
 
 /// Creates the app [GoRouter] with shell tabs and full-screen routes.
@@ -48,6 +50,7 @@ GoRouter createAppRouter() {
               nextRoutes: <RouteLink>[
                 RouteLink(AppRoutes.goal, 'O2 Goal'),
                 RouteLink(AppRoutes.gallery, 'Dev gallery'),
+                RouteLink(AppRoutes.dataDebug, 'Dev data'),
               ],
             );
           }
@@ -237,13 +240,20 @@ GoRouter createAppRouter() {
           );
         },
       ),
-      if (kDebugMode)
+      if (kDebugMode) ...<RouteBase>[
         GoRoute(
           path: AppRoutes.gallery,
           builder: (BuildContext context, GoRouterState state) {
             return const WidgetGalleryScreen();
           },
         ),
+        GoRoute(
+          path: AppRoutes.dataDebug,
+          builder: (BuildContext context, GoRouterState state) {
+            return const DataDebugScreen();
+          },
+        ),
+      ],
       StatefulShellRoute.indexedStack(
         builder: (
           BuildContext context,

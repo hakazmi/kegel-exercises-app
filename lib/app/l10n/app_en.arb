@@ -22,5 +22,7 @@
   },
   "placeholderHint": "Placeholder — real UI comes in later steps.",
   "devGalleryTitle": "Widget gallery",
-  "devGalleryOpen": "Open widget gallery"
+  "devGalleryOpen": "Open widget gallery",
+  "devDataTitle": "Data debug",
+  "devDataOpen": "Open data debug"
 }

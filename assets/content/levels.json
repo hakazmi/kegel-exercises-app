@@ -1,0 +1,60 @@
+{
+  "reviewedByPhysio": false,
+  "levels": [
+    {
+      "id": 1,
+      "name": "Start",
+      "dayStart": 1,
+      "dayEnd": 7,
+      "slowHolds": { "reps": 5, "holdSec": 3, "relaxSec": 3 },
+      "quickSqueezes": { "reps": 5, "squeezeSec": 1, "relaxSec": 2 },
+      "position": "lying_or_sitting",
+      "extras": [],
+      "dailyBreathingSec": 120
+    },
+    {
+      "id": 2,
+      "name": "Build",
+      "dayStart": 8,
+      "dayEnd": 14,
+      "slowHolds": { "reps": 8, "holdSec": 5, "relaxSec": 5 },
+      "quickSqueezes": { "reps": 8, "squeezeSec": 1, "relaxSec": 2 },
+      "position": "sitting",
+      "extras": [],
+      "dailyBreathingSec": 120
+    },
+    {
+      "id": 3,
+      "name": "Steady",
+      "dayStart": 15,
+      "dayEnd": 28,
+      "slowHolds": { "reps": 10, "holdSec": 7, "relaxSec": 7 },
+      "quickSqueezes": { "reps": 10, "squeezeSec": 1, "relaxSec": 2 },
+      "position": "sitting_and_standing",
+      "extras": [],
+      "dailyBreathingSec": 120
+    },
+    {
+      "id": 4,
+      "name": "Deep",
+      "dayStart": 29,
+      "dayEnd": 56,
+      "slowHolds": { "reps": 10, "holdSecMin": 8, "holdSecMax": 10, "relaxSec": 7 },
+      "quickSqueezes": { "reps": 12, "squeezeSec": 1, "relaxSec": 2 },
+      "position": "standing",
+      "extras": ["bridge_with_hold", "squat_with_coordination"],
+      "dailyBreathingSec": 120
+    },
+    {
+      "id": 5,
+      "name": "Maintain",
+      "dayStart": 57,
+      "dayEnd": null,
+      "slowHolds": { "reps": 10, "holdSec": 10, "relaxSec": 7 },
+      "quickSqueezes": { "reps": 15, "squeezeSec": 1, "relaxSec": 2 },
+      "position": "any",
+      "extras": ["standing_walking_holds", "the_knack"],
+      "dailyBreathingSec": 120
+    }
+  ]
+}

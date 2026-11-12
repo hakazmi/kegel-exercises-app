@@ -38,7 +38,7 @@ Do not add other packages without asking.
 - material_ui (required: this Flutter SDK moved Material out of the framework; do not import `package:flutter/material.dart`)
 - flutter_riverpod (no code generation)
 - go_router
-- drift + shared_preferences
+- drift + shared_preferences (+ drift_dev, build_runner, path, path_provider, sqlite3_flutter_libs)
 - purchases_flutter (RevenueCat)
 - flutter_local_notifications + timezone
 - flutter_tts (on-device voice cues)

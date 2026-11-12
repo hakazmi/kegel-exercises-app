@@ -1,0 +1,81 @@
+{
+  "reviewedByPhysio": false,
+  "tracks": [
+    {
+      "id": "general_bladder",
+      "name": "General and bladder",
+      "setBy": ["bladder_control", "general_pelvic_health"],
+      "changes": "Standard levels. The Knack from Level 3.",
+      "knackFromLevel": 3,
+      "strongHoldsFromLevel": null,
+      "bridgeSquatFromLevel": null,
+      "reverseKegelDailyFromLevel": null,
+      "extraBreathingDaily": false,
+      "gentlerHolds": false,
+      "blockedWithCatheter": false,
+      "strengthening": true,
+      "relaxationOnlyWeeks": null
+    },
+    {
+      "id": "erection_support",
+      "name": "Erection support",
+      "setBy": ["erection_support"],
+      "changes": "Standard levels. Strong holds from Level 3. Bridge and squat in Level 4.",
+      "knackFromLevel": null,
+      "strongHoldsFromLevel": 3,
+      "bridgeSquatFromLevel": 4,
+      "reverseKegelDailyFromLevel": null,
+      "extraBreathingDaily": false,
+      "gentlerHolds": false,
+      "blockedWithCatheter": false,
+      "strengthening": true,
+      "relaxationOnlyWeeks": null
+    },
+    {
+      "id": "ejaculation_control",
+      "name": "Ejaculation control",
+      "setBy": ["ejaculation_control"],
+      "changes": "Standard levels. Reverse Kegel and extra breathing every day from Level 1.",
+      "knackFromLevel": null,
+      "strongHoldsFromLevel": null,
+      "bridgeSquatFromLevel": null,
+      "reverseKegelDailyFromLevel": 1,
+      "extraBreathingDaily": true,
+      "gentlerHolds": false,
+      "blockedWithCatheter": false,
+      "strengthening": true,
+      "relaxationOnlyWeeks": null
+    },
+    {
+      "id": "after_prostate_surgery",
+      "name": "After prostate surgery",
+      "setBy": ["recovery_after_prostate_surgery"],
+      "changes": "Gentler holds: build to 10 seconds, relax for 4, up to 10 reps. The Knack from Level 2. Blocked while a catheter is in place.",
+      "knackFromLevel": 2,
+      "strongHoldsFromLevel": null,
+      "bridgeSquatFromLevel": null,
+      "reverseKegelDailyFromLevel": null,
+      "extraBreathingDaily": false,
+      "gentlerHolds": true,
+      "gentleHold": { "holdSecMax": 10, "relaxSec": 4, "repsMax": 10 },
+      "blockedWithCatheter": true,
+      "strengthening": true,
+      "relaxationOnlyWeeks": null
+    },
+    {
+      "id": "relaxation_first",
+      "name": "Relaxation first",
+      "setBy": ["pain_onboarding", "pain_after_session"],
+      "changes": "No strengthening. Daily breathing, reverse Kegel and stretches for 2 weeks. Then: If the pain has settled and a clinician agrees, you can start Level 1.",
+      "knackFromLevel": null,
+      "strongHoldsFromLevel": null,
+      "bridgeSquatFromLevel": null,
+      "reverseKegelDailyFromLevel": 1,
+      "extraBreathingDaily": true,
+      "gentlerHolds": false,
+      "blockedWithCatheter": false,
+      "strengthening": false,
+      "relaxationOnlyWeeks": 2
+    }
+  ]
+}

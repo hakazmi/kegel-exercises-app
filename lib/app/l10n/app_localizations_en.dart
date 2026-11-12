@@ -52,4 +52,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get devGalleryOpen => 'Open widget gallery';
+
+  @override
+  String get devDataTitle => 'Data debug';
+
+  @override
+  String get devDataOpen => 'Open data debug';
 }

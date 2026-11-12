@@ -1,0 +1,65 @@
+{
+  "reviewedByPhysio": false,
+  "exercises": [
+    {
+      "id": "slow_hold",
+      "name": "Slow hold",
+      "description": "Squeeze, hold, fully release",
+      "type": "strength"
+    },
+    {
+      "id": "quick_squeeze",
+      "name": "Quick squeeze",
+      "description": "Squeeze hard for 1 second, release at once",
+      "type": "strength"
+    },
+    {
+      "id": "strong_hold",
+      "name": "Strong hold",
+      "description": "Near-maximum squeeze, held",
+      "type": "strength"
+    },
+    {
+      "id": "standing_walking_holds",
+      "name": "Standing and walking holds",
+      "description": "Slow holds while upright, then while walking",
+      "type": "function"
+    },
+    {
+      "id": "bridge_with_hold",
+      "name": "Bridge with hold",
+      "description": "Squeeze, lift hips, hold, lower and release",
+      "type": "function"
+    },
+    {
+      "id": "squat_with_coordination",
+      "name": "Squat with coordination",
+      "description": "Relax going down, squeeze coming up",
+      "type": "function"
+    },
+    {
+      "id": "the_knack",
+      "name": "The Knack",
+      "description": "Squeeze just before a cough, lift or sneeze",
+      "type": "function"
+    },
+    {
+      "id": "diaphragmatic_breathing",
+      "name": "Diaphragmatic breathing",
+      "description": "Belly breath in as the pelvic floor lets go",
+      "type": "relaxation"
+    },
+    {
+      "id": "reverse_kegel",
+      "name": "Reverse Kegel",
+      "description": "Gently release and lengthen instead of squeezing",
+      "type": "relaxation"
+    },
+    {
+      "id": "childs_pose_happy_baby",
+      "name": "Child's pose and happy baby",
+      "description": "Held stretches, 1 to 3 minutes",
+      "type": "relaxation"
+    }
+  ]
+}
