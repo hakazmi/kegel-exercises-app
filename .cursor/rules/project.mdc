@@ -1,0 +1,96 @@
+---
+alwaysApply: true
+---
+
+# Project rules — Men's Kegel App
+
+## Product
+
+A pelvic floor trainer for adult men (18+).
+Temporary display name: "Kegel Exercises" — keep it in one place so it is easy to change.
+Guided sessions start within two minutes of install; day one is a real ~2-minute session.
+An 8-week-plus level plan covers bladder control, erection support, ejaculation control, post-prostate-surgery recovery, and general pelvic health.
+Safety and relaxation content is always free; Premium unlocks Levels 2–5 and goal-specific track content.
+All training data stays on the device; there is no account in v1.
+Wording and visuals stay clinical and non-sexual, including the store listing.
+One Flutter codebase for Android and iOS. First store release is Android; keep all code iOS-ready (no Android-only API without a platform check). iOS submission comes after Prompt 13.
+Do not hard-code prices or trial length; they come from the store products via RevenueCat.
+
+## Plan behaviour
+
+- "Mild discomfort" twice in a row only suggests stepping down a level. Never step down automatically.
+- Check-in baseline is offered once, after the third completed session overall, then every 4 weeks.
+
+## Principles
+
+- First rep within 2 minutes of install.
+- Ask only what changes the plan.
+- Claim only what we can source. No invented statistics, testimonials, endorsement logos or predicted results.
+- Relaxation and safety content is always free.
+- Data stays on the device. No account in v1.
+- Clinical, non-sexual wording and visuals everywhere, including the store listing.
+
+## Stack
+
+Do not add other packages without asking.
+
+- Flutter stable, Dart 3
+- flutter_riverpod (no code generation)
+- go_router
+- drift + shared_preferences
+- purchases_flutter (RevenueCat)
+- flutter_local_notifications + timezone
+- flutter_tts (on-device voice cues)
+- wakelock_plus
+- flutter_svg
+- url_launcher
+- firebase_core + firebase_analytics + firebase_crashlytics
+- flutter_localizations / intl
+
+## Architecture
+
+- Feature-first folders under `lib/features`; shared code in `lib/core`; app wiring in `lib/app`.
+- Screens only draw; logic lives in Riverpod notifiers and plain Dart classes.
+- The session engine is pure Dart with no Flutter imports.
+- Levels, exercises, tracks and articles live in `assets/content` as JSON or Markdown, never hard-coded in widgets.
+- All colours, spacing, radii and text styles come from `lib/app/theme/tokens.dart`.
+- All user-facing strings go in the ARB file.
+
+## Safety rules
+
+1. Pain at onboarding or after a session moves the user to relaxation only and shows a clinician note (O3, S4, H3).
+2. No exercises while a catheter is in place (O3, H1).
+3. Strengthening is capped at 3 sessions a day (H1).
+4. Every level has a weekly rest day and daily relaxation breathing (section 8).
+5. The "relax buttocks, thighs and stomach, keep breathing" cue appears in every session (S3).
+6. Stopping urine flow is described as a one-time test, never as an exercise (T1).
+7. No promise of results anywhere. Timelines say "results vary" (O6, Learn).
+8. A check-in that shows no change after 8 weeks suggests seeing a doctor (G2).
+9. The app never diagnoses. It does not label a user as having erectile dysfunction, premature ejaculation or any other condition from their answers.
+
+## Copy rules
+
+- Use the exact copy in the spec where it exists.
+- Never invent medical claims, statistics, testimonials or result promises.
+- Clinical, non-sexual wording only.
+- No emoji in the UI.
+
+## Privacy
+
+- Data stays on the device; no accounts.
+- Analytics may only carry the events and properties in spec section 14.
+- Safety answers, check-in scores and pain answers must never be sent anywhere.
+
+## Workflow
+
+- After every task run `flutter analyze` and `flutter test` and fix all issues.
+- Keep changes small.
+- If the spec is ambiguous or conflicts with these rules, stop and ask instead of guessing.
+- List anything skipped at the end of the reply.
+
+## Code style
+
+- Small widgets, const constructors.
+- No business logic in `build` methods.
+- Null safety and meaningful names.
+- A short doc comment on every public class.
