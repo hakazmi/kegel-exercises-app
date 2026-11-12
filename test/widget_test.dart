@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('app boots to welcome placeholder', (WidgetTester tester) async {
+  testWidgets('app boots to welcome onboarding', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -22,8 +22,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('O1'), findsWidgets);
-    expect(find.textContaining('Welcome'), findsWidgets);
+    expect(
+      find.text('Train your pelvic floor in a few minutes a day'),
+      findsOneWidget,
+    );
+    expect(find.text('Get started'), findsOneWidget);
     expect(AppConstants.displayName, 'Kegel Exercises');
   });
 }

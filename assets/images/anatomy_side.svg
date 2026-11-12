@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 180" width="260" height="180" fill="none">
+  <!-- Soft mint panel is drawn by Flutter; SVG is the figure only. -->
+  <!-- Bladder outline -->
+  <ellipse cx="104" cy="72" rx="36" ry="28" stroke="#9AA39F" stroke-width="2.5" fill="#EEF1F0"/>
+  <!-- Pubic bone (solid front curve) -->
+  <path d="M52 118 C58 96, 72 88, 88 92" stroke="#0E1412" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M52 118 C60 130, 78 138, 98 136" stroke="#0E1412" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Tailbone (dashed rear curve) -->
+  <path d="M148 94 C168 88, 186 98, 196 118" stroke="#0E1412" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 5" fill="none"/>
+  <path d="M148 136 C166 138, 184 132, 196 118" stroke="#0E1412" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 5" fill="none"/>
+  <!-- Pelvic floor sling -->
+  <path d="M88 128 C104 148, 144 148, 160 128" stroke="#0B7A4B" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <!-- Soft connective fill under bladder -->
+  <path d="M92 100 C108 118, 140 118, 156 100" stroke="#CBD2D0" stroke-width="2" fill="none"/>
+</svg>

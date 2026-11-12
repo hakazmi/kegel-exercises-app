@@ -45,11 +45,12 @@ class ProgressHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: AppSpacing.minTouchTarget),
+          Flexible(
             child: Text(
               '$step of $total',
               textAlign: TextAlign.end,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: AppTypography.caption.copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,

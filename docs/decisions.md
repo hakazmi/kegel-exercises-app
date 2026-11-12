@@ -18,3 +18,8 @@ One line per decision the product spec does not cover. Format: `YYYY-MM-DD — D
 2026-11-12 — Sessions table includes `kind` (strengthening|breathing|relaxation) in addition to the spec column list so the daily strengthening cap can be enforced.
 2026-11-12 — Weekly rest day defaults to Sunday via `UserProfile.restWeekday` (ISO 7), changeable later in Settings. Spec does not name the day.
 2026-11-12 — Rest day never applies until the user has completed at least one session, so install-on-rest-weekday still gets a normal Level 1 Day 1.
+2026-11-12 — O3 catheter path: save profile with catheter flag, skip O4–O6, set onboardingDone, go to H1 (blocked state in Prompt 6).
+2026-11-12 — O6 relaxation-first plan: distinct card (child.svg, "Relaxation · Weeks 1 to 2", daily breathing/stretches meta from PlanService minutes) and its own What-to-expect copy; other tracks keep Level 1 card with real track names (General and bladder, etc.).
+2026-11-12 — O3 safety messages sit in a pinned live-region panel between the options list and Next (max 40% height); surgery confirm label is "I understand".
+2026-11-12 — O3 catheter overrides other safety messages (panel shows catheter only; Continue to Today enabled); surgery "I understand" is a fixed row above Next; list keeps ≥3 option rows on 360×640 by shrinking the panel.
+2026-11-12 — Anatomy diagram labels are Flutter Text overlays on anatomy_side.svg (flutter_svg skips text); T1 replay via ?replay=1 does not set tutorialDone; S1 takes ?itemId= for the plan item.

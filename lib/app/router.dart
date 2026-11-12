@@ -1,11 +1,22 @@
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 
+import '../core/data/providers.dart';
+import '../core/domain/user_profile.dart';
 import '../features/dev/data_debug_screen.dart';
 import '../features/dev/widget_gallery_screen.dart';
+import '../features/onboarding/o1_welcome_screen.dart';
+import '../features/onboarding/o2_goal_screen.dart';
+import '../features/onboarding/o3_safety_screen.dart';
+import '../features/onboarding/o4_experience_screen.dart';
+import '../features/onboarding/o5_time_screen.dart';
+import '../features/onboarding/o6_plan_screen.dart';
+import '../features/session/s1_before_screen.dart';
 import '../features/shell/main_shell.dart';
 import '../features/shell/placeholder_screen.dart';
+import '../features/tutorial/t1_tutorial_screen.dart';
 import 'l10n/app_localizations.dart';
 
 /// Named route paths for the whole app map.
@@ -32,112 +43,94 @@ abstract final class AppRoutes {
   static const String settings = '/settings';
   static const String gallery = '/dev/gallery';
   static const String dataDebug = '/dev/data';
+
+  static const Set<String> onboarding = <String>{
+    welcome,
+    goal,
+    safety,
+    experience,
+    time,
+    plan,
+  };
 }
 
-/// Creates the app [GoRouter] with shell tabs and full-screen routes.
-GoRouter createAppRouter() {
+/// Riverpod-backed router with onboarding redirects.
+final routerProvider = Provider<GoRouter>((Ref ref) {
+  final ValueNotifier<int> refresh = ValueNotifier<int>(0);
+  ref.listen<UserProfile>(userProfileProvider, (UserProfile? previous, UserProfile next) {
+    refresh.value++;
+  });
+  ref.onDispose(refresh.dispose);
+
   return GoRouter(
     initialLocation: AppRoutes.welcome,
     debugLogDiagnostics: kDebugMode,
+    refreshListenable: refresh,
+    redirect: (BuildContext context, GoRouterState state) {
+      final bool done = ref.read(userProfileProvider).onboardingDone;
+      final String loc = state.matchedLocation;
+      final bool isOnboarding = AppRoutes.onboarding.contains(loc);
+      final bool isDev = loc.startsWith('/dev');
+
+      if (!done && !isOnboarding && !(kDebugMode && isDev)) {
+        return AppRoutes.welcome;
+      }
+      if (done && isOnboarding) {
+        return AppRoutes.today;
+      }
+      return null;
+    },
     routes: <RouteBase>[
       GoRoute(
         path: AppRoutes.welcome,
         builder: (BuildContext context, GoRouterState state) {
-          if (kDebugMode) {
-            return const PlaceholderScreen(
-              id: 'O1',
-              name: 'Welcome',
-              nextRoutes: <RouteLink>[
-                RouteLink(AppRoutes.goal, 'O2 Goal'),
-                RouteLink(AppRoutes.gallery, 'Dev gallery'),
-                RouteLink(AppRoutes.dataDebug, 'Dev data'),
-              ],
-            );
-          }
-          return const PlaceholderScreen(
-            id: 'O1',
-            name: 'Welcome',
-            nextRoutes: <RouteLink>[
-              RouteLink(AppRoutes.goal, 'O2 Goal'),
-            ],
-          );
+          return const O1WelcomeScreen();
         },
       ),
       GoRoute(
         path: AppRoutes.goal,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'O2',
-            name: 'Goal',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.safety, 'O3 Safety')],
-          );
+          return const O2GoalScreen();
         },
       ),
       GoRoute(
         path: AppRoutes.safety,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'O3',
-            name: 'Safety',
-            nextRoutes: <RouteLink>[
-              RouteLink(AppRoutes.experience, 'O4 Experience'),
-            ],
-          );
+          return const O3SafetyScreen();
         },
       ),
       GoRoute(
         path: AppRoutes.experience,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'O4',
-            name: 'Experience',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.time, 'O5 Time')],
-          );
+          return const O4ExperienceScreen();
         },
       ),
       GoRoute(
         path: AppRoutes.time,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'O5',
-            name: 'Time',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.plan, 'O6 Plan')],
-          );
+          return const O5TimeScreen();
         },
       ),
       GoRoute(
         path: AppRoutes.plan,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'O6',
-            name: 'Plan',
-            nextRoutes: <RouteLink>[
-              RouteLink(AppRoutes.tutorial, 'T1 Tutorial'),
-              RouteLink(AppRoutes.before, 'S1 Before (skip tutorial)'),
-            ],
-          );
+          return const O6PlanScreen();
         },
       ),
       GoRoute(
         path: AppRoutes.tutorial,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'T1',
-            name: 'Tutorial',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.before, 'S1 Before')],
-          );
+          final bool replay = state.uri.queryParameters['replay'] == '1' ||
+              state.uri.queryParameters['replay'] == 'true';
+          final String? next = state.uri.queryParameters['next'];
+          return T1TutorialScreen(replay: replay, nextPath: next);
         },
       ),
       GoRoute(
         path: AppRoutes.before,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'S1',
-            name: 'Before',
-            nextRoutes: <RouteLink>[
-              RouteLink(AppRoutes.countdown, 'S2 Countdown'),
-              RouteLink(AppRoutes.tutorial, 'T1 Tutorial'),
-            ],
+          return S1BeforeScreen(
+            itemId: state.uri.queryParameters['itemId'],
           );
         },
       ),
@@ -329,4 +322,4 @@ GoRouter createAppRouter() {
       ),
     ],
   );
-}
+});

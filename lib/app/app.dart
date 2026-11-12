@@ -8,23 +8,17 @@ import 'router.dart';
 import 'theme/app_theme.dart';
 
 /// Root widget: Riverpod scope, theme, localisation and router.
-class KegelApp extends ConsumerStatefulWidget {
+class KegelApp extends ConsumerWidget {
   const KegelApp({super.key});
 
   @override
-  ConsumerState<KegelApp> createState() => _KegelAppState();
-}
-
-class _KegelAppState extends ConsumerState<KegelApp> {
-  late final GoRouter _router = createAppRouter();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final GoRouter router = ref.watch(routerProvider);
     return MaterialApp.router(
       title: AppConstants.displayName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
-      routerConfig: _router,
+      routerConfig: router,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     );

@@ -24,5 +24,230 @@
   "devGalleryTitle": "Widget gallery",
   "devGalleryOpen": "Open widget gallery",
   "devDataTitle": "Data debug",
-  "devDataOpen": "Open data debug"
+  "devDataOpen": "Open data debug",
+
+  "o1Title": "Train your pelvic floor in a few minutes a day",
+  "o1Body": "Guided exercises for bladder control and pelvic health. No equipment.",
+  "o1BulletPlan": "A plan that grows with you, level by level",
+  "o1BulletDiscreet": "Discreet: train anywhere, nobody can tell",
+  "o1BulletPrivate": "Private: your data stays on this phone",
+  "o1AgeCheckbox": "I am 18 or older",
+  "o1Disclaimer": "This app is not a medical device and does not diagnose, treat, cure or prevent any medical condition. Talk to a healthcare professional for medical advice.",
+  "o1GetStarted": "Get started",
+  "o1Terms": "Terms",
+  "o1Privacy": "Privacy Policy",
+  "o1HeroSemantic": "Person standing, with calendar, shield, stopwatch and target icons",
+  "o1CalendarSemantic": "Calendar",
+  "o1ShieldSemantic": "Shield",
+  "o1StopwatchSemantic": "Stopwatch",
+  "o1TargetSemantic": "Target",
+
+  "o2Title": "What do you want to work on?",
+  "o2Subtitle": "Pick one. You can change it later in Settings.",
+  "o2GoalBladder": "Bladder control",
+  "o2GoalErection": "Erection support",
+  "o2GoalEjaculation": "Ejaculation control",
+  "o2GoalSurgery": "Recovery after prostate surgery",
+  "o2GoalGeneral": "General pelvic health",
+
+  "o3Title": "Do any of these apply to you?",
+  "o3Subtitle": "Select all that apply. This keeps your plan safe.",
+  "o3Pain": "Pelvic, groin or genital pain",
+  "o3PainSexual": "Pain with erection or ejaculation",
+  "o3Surgery": "Surgery in the last 3 months",
+  "o3Catheter": "A urinary catheter in place right now",
+  "o3None": "None of these",
+  "o3PainMessage": "Squeezing exercises can make pain worse. We will start you with relaxation only. Please see a doctor or pelvic floor physiotherapist.",
+  "o3CatheterMessage": "Do not do these exercises with a catheter in place. Come back when it is removed and your care team says you can start.",
+  "o3SurgeryMessage": "Check with your surgeon or physiotherapist before starting.",
+  "o3SurgeryConfirm": "I have checked, continue",
+  "o3SurgeryUnderstand": "I understand",
+  "o3ShieldSemantic": "Safety shield",
+  "o3ContinueBlocked": "Continue to Today",
+
+  "o4Title": "Have you done Kegel exercises before?",
+  "o4Subtitle": "This decides whether we show the muscle-finding tutorial first.",
+  "o4None": "No",
+  "o4Unsure": "Yes, but I am not sure I do them right",
+  "o4Confident": "Yes, I am confident",
+  "o4TargetSemantic": "Target",
+
+  "o5Title": "How much time can you give each day?",
+  "o5Subtitle": "Includes 2 minutes of relaxation breathing.",
+  "o5Option1Title": "About 3 minutes",
+  "o5Option1Subtitle": "1 session",
+  "o5Option2Title": "About 5 minutes",
+  "o5Option2Subtitle": "2 sessions",
+  "o5Option3Title": "About 10 minutes",
+  "o5Option3Subtitle": "3 sessions",
+  "o5ReminderTitle": "Daily reminder",
+  "o5ReminderHint": "Discreet text, no health words.",
+  "o5TimeLabel": "Time",
+  "o5DaysPerWeek": "{count} days per week",
+  "@o5DaysPerWeek": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "o5RemindMe": "Remind me",
+  "o5NotNow": "Not now",
+  "o5CalendarSemantic": "Calendar",
+  "o5DayMon": "M",
+  "o5DayTue": "T",
+  "o5DayWed": "W",
+  "o5DayThu": "T",
+  "o5DayFri": "F",
+  "o5DaySat": "S",
+  "o5DaySun": "S",
+
+  "o6Title": "Your plan is ready",
+  "o6TrackBadge": "{track} plan",
+  "@o6TrackBadge": {
+    "placeholders": {
+      "track": {"type": "String"}
+    }
+  },
+  "o6LevelStart": "Level 1 · Start",
+  "o6PlanMeta": "{days} days · {sessions} sessions a day · about {minutes} min",
+  "@o6PlanMeta": {
+    "placeholders": {
+      "days": {"type": "int"},
+      "sessions": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "o6RelaxationTitle": "Relaxation · Weeks 1 to 2",
+  "o6RelaxationMeta": "{days} days · daily breathing and stretches · about {minutes} min",
+  "@o6RelaxationMeta": {
+    "placeholders": {
+      "days": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "o6RestLabel": "Rest",
+  "o6DayLabel": "D{day}",
+  "@o6DayLabel": {
+    "placeholders": {
+      "day": {"type": "int"}
+    }
+  },
+  "o6WhatToExpect": "What to expect",
+  "o6TimelineWeek1Title": "Week 1",
+  "o6TimelineWeek1Body": "You learn the movement. Most men feel no change yet, and that is normal.",
+  "o6TimelineWeek2Title": "Weeks 2 to 4",
+  "o6TimelineWeek2Body": "Holds get easier.",
+  "o6TimelineWeek6Title": "Weeks 6 to 12",
+  "o6TimelineWeek6Body": "The usual window for noticing results with daily practice. Results vary.",
+  "o6TimelineFull": "Week 1: you learn the movement. Most men feel no change yet, and that is normal. Weeks 2 to 4: holds get easier. Weeks 6 to 12: the usual window for noticing results with daily practice. Results vary.",
+  "o6RelaxationTimelineWeeks12Title": "Weeks 1 to 2",
+  "o6RelaxationTimelineWeeks12Body": "Gentle breathing and stretching to let the muscles relax. No squeezing exercises.",
+  "o6RelaxationTimelineAfterTitle": "After 2 weeks",
+  "o6RelaxationTimelineAfterBody": "If the pain has settled and a clinician agrees, you can start Level 1.",
+  "o6RelaxationTimelineAlwaysTitle": "Always",
+  "o6RelaxationTimelineAlwaysBody": "Please see a doctor or pelvic floor physiotherapist if pain continues.",
+  "o6Start": "Start my first session",
+  "o6BridgeSemantic": "Bridge exercise illustration",
+  "o6ChildSemantic": "Child pose illustration",
+  "o6TrackGeneralBladder": "General and bladder",
+  "o6TrackErection": "Erection support",
+  "o6TrackEjaculation": "Ejaculation control",
+  "o6TrackSurgery": "After prostate surgery",
+  "o6TrackRelaxation": "Relaxation first",
+
+  "commonSkip": "Skip",
+  "commonYes": "Yes",
+  "commonTryAgain": "Try again",
+  "commonContinueAnyway": "Continue anyway",
+
+  "t1Title": "How to do a Kegel",
+  "t1Card1Title": "Where the muscles are",
+  "t1Card1Body": "These muscles run from the pubic bone to the tailbone and support the bladder and bowel.",
+  "t1Card2Title": "How to find them",
+  "t1Card2Body": "Tighten as if you are stopping yourself passing wind, and draw the penis slightly inward. The testicles should lift a little.",
+  "t1Card2UrineNote": "You can test once by slowing your urine flow. Do not practise that way.",
+  "t1Card3Title": "What to avoid",
+  "t1Card3Body": "Keep buttocks, thighs and stomach relaxed. Keep breathing.",
+  "t1AvoidCheckBreathing": "Keep breathing",
+  "t1AvoidCheckRelaxed": "Buttocks, thighs and stomach stay relaxed",
+  "t1AvoidCrossButtocks": "Do not squeeze your buttocks",
+  "t1AvoidCrossBreath": "Do not hold your breath",
+  "t1PracticeTitle": "Practice",
+  "t1PracticeSubtitle": "3 guided reps · squeeze 3 s, relax 3 s",
+  "t1PhaseSqueeze": "Squeeze",
+  "t1PhaseRelax": "Relax",
+  "t1RepOf": "Rep {current} of {total}",
+  "@t1RepOf": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "t1FeltLiftTitle": "Did you feel the lift?",
+  "t1FeltLiftYes": "Yes",
+  "t1FeltLiftNotSure": "Not sure",
+  "t1NotSureTip": "Try lying down if you are not sure. Soft surfaces can make the lift easier to feel.",
+  "t1AnatomyBladder": "Bladder",
+  "t1AnatomyPubicBone": "Pubic bone",
+  "t1AnatomyTailbone": "Tailbone",
+  "t1AnatomyPelvicFloor": "Pelvic floor",
+  "t1AnatomySemantic": "Side view: the pelvic floor runs from the pubic bone to the tailbone, under the bladder",
+
+  "s1LevelDay": "Level {level} · Day {day}",
+  "@s1LevelDay": {
+    "placeholders": {
+      "level": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+  "s1SessionOf": "Session {number} of {total}",
+  "@s1SessionOf": {
+    "placeholders": {
+      "number": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "s1Meta": "{seconds} seconds · {parts} parts",
+  "@s1Meta": {
+    "placeholders": {
+      "seconds": {"type": "int"},
+      "parts": {"type": "int"}
+    }
+  },
+  "s1MetaMinutes": "{minutes} min · {parts} parts",
+  "@s1MetaMinutes": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "parts": {"type": "int"}
+    }
+  },
+  "s1BlockSlowHolds": "Slow holds",
+  "s1BlockQuickSqueezes": "Quick squeezes",
+  "s1BlockRest": "Rest",
+  "s1BlockBreathing": "Relaxation breathing",
+  "s1BlockReverseKegel": "Reverse Kegel",
+  "s1BlockRepsDetail": "{reps} reps · squeeze {squeeze} s, relax {relax} s",
+  "@s1BlockRepsDetail": {
+    "placeholders": {
+      "reps": {"type": "int"},
+      "squeeze": {"type": "int"},
+      "relax": {"type": "int"}
+    }
+  },
+  "s1BlockRestDetail": "{seconds} s",
+  "@s1BlockRestDetail": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "s1PositionLyingOrSitting": "Lie on your back with knees bent, or sit. Keep breathing.",
+  "s1PositionSitting": "Sit upright with feet flat. Keep breathing.",
+  "s1PositionSittingAndStanding": "Sit for some reps, then stand. Keep breathing.",
+  "s1PositionStanding": "Stand with soft knees. Keep breathing.",
+  "s1PositionAny": "Use any comfortable position. Keep breathing.",
+  "s1ShowMeHow": "Show me how",
+  "s1Start": "Start",
+  "s1VibrationCues": "Vibration cues",
+  "s1VoiceCues": "Voice cues",
+  "s1VoicePrivacy": "Off by default for privacy",
+  "s1LyingSemantic": "Person lying on their back with knees bent"
 }

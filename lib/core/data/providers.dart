@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../content/content_models.dart';
 import '../content/content_repository.dart';
 import '../domain/session_record.dart';
 import '../domain/user_profile.dart';
@@ -95,4 +96,9 @@ final todayPlanProvider = FutureProvider<TodayPlan>((Ref ref) async {
         profile: profile,
         sessions: sessions,
       );
+});
+
+/// Cached level definitions from content JSON.
+final levelsProvider = FutureProvider<List<LevelContent>>((Ref ref) {
+  return ref.watch(contentRepositoryProvider).loadLevels();
 });
