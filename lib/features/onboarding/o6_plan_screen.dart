@@ -5,13 +5,14 @@ import 'package:material_ui/material_ui.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/content/content_models.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
 import '../../core/plan/plan_models.dart';
-import '../../core/plan/plan_rules.dart';
 import '../../core/plan/plan_service.dart';
+import '../../core/plan/session_definition.dart';
 import '../../core/widgets/widgets.dart';
 import 'onboarding_controller.dart';
 import 'onboarding_state.dart';
@@ -36,33 +37,40 @@ class O6PlanScreen extends ConsumerWidget {
     }
   }
 
-  int _strengtheningMinutes(int sessionsPerDay) {
-    final int strengthSec = estimateStrengtheningSeconds(
-      slowReps: 5,
-      holdSec: 3,
-      relaxSec: 3,
-      quickReps: 5,
-    );
-    final int totalSec =
-        (strengthSec * sessionsPerDay) + PlanRules.breathingDurationSeconds;
-    return (totalSec / 60).ceil().clamp(3, 15);
-  }
-
-  int _relaxationMinutes(PlanService planService, OnboardingDraft draft) {
+  /// Sum of part durations for a typical day from [PlanService.todayPlan].
+  int _typicalDayMinutes({
+    required PlanService planService,
+    required OnboardingDraft draft,
+    required TrackId track,
+    required int strengtheningDurationSeconds,
+  }) {
     final UserProfile profile = UserProfile.initial().copyWith(
-      track: TrackId.relaxationFirst,
+      track: track,
       sessionsPerDay: draft.sessionsPerDay,
       safetyFlags: draft.safetyFlags,
+      goal: draft.goal ?? Goal.generalPelvicHealth,
     );
     final TodayPlan plan = planService.todayPlan(
       profile: profile,
       sessions: const <SessionRecord>[],
+      strengtheningDurationSeconds: strengtheningDurationSeconds,
     );
     final int totalSec = plan.items.fold<int>(
       0,
       (int sum, TodayItem item) => sum + item.durationSeconds,
     );
-    return (totalSec / 60).ceil().clamp(1, 30);
+    return (totalSec / 60).ceil().clamp(1, 60);
+  }
+
+  int _level1StrengthSeconds(List<LevelContent>? levels) {
+    if (levels == null || levels.isEmpty) {
+      return 55;
+    }
+    final LevelContent level = levels.firstWhere(
+      (LevelContent l) => l.id == 1,
+      orElse: () => levels.first,
+    );
+    return SessionDefinitionBuilder.strengtheningDurationForLevel(level);
   }
 
   @override
@@ -75,9 +83,13 @@ class O6PlanScreen extends ConsumerWidget {
     final bool relaxation = track == TrackId.relaxationFirst;
     final int restWeekday = UserProfile.initial().restWeekday;
     final PlanService planService = ref.watch(planServiceProvider);
-    final int minutes = relaxation
-        ? _relaxationMinutes(planService, draft)
-        : _strengtheningMinutes(draft.sessionsPerDay);
+    final List<LevelContent>? levels = ref.watch(levelsProvider).asData?.value;
+    final int minutes = _typicalDayMinutes(
+      planService: planService,
+      draft: draft,
+      track: track,
+      strengtheningDurationSeconds: _level1StrengthSeconds(levels),
+    );
 
     return OnboardingScaffold(
       step: 6,

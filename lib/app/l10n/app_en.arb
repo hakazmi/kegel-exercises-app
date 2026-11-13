@@ -165,7 +165,7 @@
   "t1Card2Title": "How to find them",
   "t1Card2Body": "Tighten as if you are stopping yourself passing wind, and draw the penis slightly inward. The testicles should lift a little.",
   "t1Card2UrineNote": "You can test once by slowing your urine flow. Do not practise that way.",
-  "t1Card3Title": "What to avoid",
+  "t1Card3Title": "Do and don't",
   "t1Card3Body": "Keep buttocks, thighs and stomach relaxed. Keep breathing.",
   "t1AvoidCheckBreathing": "Keep breathing",
   "t1AvoidCheckRelaxed": "Buttocks, thighs and stomach stay relaxed",
@@ -199,6 +199,12 @@
       "day": {"type": "int"}
     }
   },
+  "s1RelaxationDay": "Relaxation · Day {day}",
+  "@s1RelaxationDay": {
+    "placeholders": {
+      "day": {"type": "int"}
+    }
+  },
   "s1SessionOf": "Session {number} of {total}",
   "@s1SessionOf": {
     "placeholders": {
@@ -206,20 +212,21 @@
       "total": {"type": "int"}
     }
   },
-  "s1Meta": "{seconds} seconds · {parts} parts",
+  "s1Meta": "{seconds} seconds · {parts, plural, =1{1 part} other{{parts} parts}}",
   "@s1Meta": {
     "placeholders": {
       "seconds": {"type": "int"},
       "parts": {"type": "int"}
     }
   },
-  "s1MetaMinutes": "{minutes} min · {parts} parts",
+  "s1MetaMinutes": "{minutes} min · {parts, plural, =1{1 part} other{{parts} parts}}",
   "@s1MetaMinutes": {
     "placeholders": {
       "minutes": {"type": "int"},
       "parts": {"type": "int"}
     }
   },
+  "s1ReverseKegelDescription": "Gently release and lengthen instead of squeezing.",
   "s1BlockSlowHolds": "Slow holds",
   "s1BlockQuickSqueezes": "Quick squeezes",
   "s1BlockRest": "Rest",

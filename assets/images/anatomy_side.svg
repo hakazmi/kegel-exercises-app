@@ -10,6 +10,4 @@
   <path d="M148 136 C166 138, 184 132, 196 118" stroke="#0E1412" stroke-width="3" stroke-linecap="round" stroke-dasharray="5 5" fill="none"/>
   <!-- Pelvic floor sling -->
   <path d="M88 128 C104 148, 144 148, 160 128" stroke="#0B7A4B" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <!-- Soft connective fill under bladder -->
-  <path d="M92 100 C108 118, 140 118, 156 100" stroke="#CBD2D0" stroke-width="2" fill="none"/>
 </svg>

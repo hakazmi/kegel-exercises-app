@@ -817,7 +817,7 @@ abstract class AppLocalizations {
   /// No description provided for @t1Card3Title.
   ///
   /// In en, this message translates to:
-  /// **'What to avoid'**
+  /// **'Do and don\'t'**
   String get t1Card3Title;
 
   /// No description provided for @t1Card3Body.
@@ -940,6 +940,12 @@ abstract class AppLocalizations {
   /// **'Level {level} · Day {day}'**
   String s1LevelDay(int level, int day);
 
+  /// No description provided for @s1RelaxationDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxation · Day {day}'**
+  String s1RelaxationDay(int day);
+
   /// No description provided for @s1SessionOf.
   ///
   /// In en, this message translates to:
@@ -949,14 +955,20 @@ abstract class AppLocalizations {
   /// No description provided for @s1Meta.
   ///
   /// In en, this message translates to:
-  /// **'{seconds} seconds · {parts} parts'**
+  /// **'{seconds} seconds · {parts, plural, =1{1 part} other{{parts} parts}}'**
   String s1Meta(int seconds, int parts);
 
   /// No description provided for @s1MetaMinutes.
   ///
   /// In en, this message translates to:
-  /// **'{minutes} min · {parts} parts'**
+  /// **'{minutes} min · {parts, plural, =1{1 part} other{{parts} parts}}'**
   String s1MetaMinutes(int minutes, int parts);
+
+  /// No description provided for @s1ReverseKegelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Gently release and lengthen instead of squeezing.'**
+  String get s1ReverseKegelDescription;
 
   /// No description provided for @s1BlockSlowHolds.
   ///

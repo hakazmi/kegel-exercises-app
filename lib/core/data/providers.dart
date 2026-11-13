@@ -102,3 +102,8 @@ final todayPlanProvider = FutureProvider<TodayPlan>((Ref ref) async {
 final levelsProvider = FutureProvider<List<LevelContent>>((Ref ref) {
   return ref.watch(contentRepositoryProvider).loadLevels();
 });
+
+/// Cached exercise definitions from content JSON.
+final exercisesProvider = FutureProvider<List<ExerciseContent>>((Ref ref) {
+  return ref.watch(contentRepositoryProvider).loadExercises();
+});

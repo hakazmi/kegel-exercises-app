@@ -398,7 +398,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'You can test once by slowing your urine flow. Do not practise that way.';
 
   @override
-  String get t1Card3Title => 'What to avoid';
+  String get t1Card3Title => 'Do and don\'t';
 
   @override
   String get t1Card3Body =>
@@ -468,19 +468,40 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String s1RelaxationDay(int day) {
+    return 'Relaxation · Day $day';
+  }
+
+  @override
   String s1SessionOf(int number, int total) {
     return 'Session $number of $total';
   }
 
   @override
   String s1Meta(int seconds, int parts) {
-    return '$seconds seconds · $parts parts';
+    String _temp0 = intl.Intl.pluralLogic(
+      parts,
+      locale: localeName,
+      other: '$parts parts',
+      one: '1 part',
+    );
+    return '$seconds seconds · $_temp0';
   }
 
   @override
   String s1MetaMinutes(int minutes, int parts) {
-    return '$minutes min · $parts parts';
+    String _temp0 = intl.Intl.pluralLogic(
+      parts,
+      locale: localeName,
+      other: '$parts parts',
+      one: '1 part',
+    );
+    return '$minutes min · $_temp0';
   }
+
+  @override
+  String get s1ReverseKegelDescription =>
+      'Gently release and lengthen instead of squeezing.';
 
   @override
   String get s1BlockSlowHolds => 'Slow holds';

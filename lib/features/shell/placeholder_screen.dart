@@ -1,5 +1,6 @@
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/theme/app_theme.dart';
@@ -35,9 +36,10 @@ class PlaceholderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final ThemeData theme = useSessionTheme ? AppTheme.session() : Theme.of(context);
+    final ThemeData theme =
+        useSessionTheme ? AppTheme.session() : Theme.of(context);
 
-    return Theme(
+    final Widget scaffold = Theme(
       data: theme,
       child: Builder(
         builder: (BuildContext context) {
@@ -82,6 +84,18 @@ class PlaceholderScreen extends StatelessWidget {
           );
         },
       ),
+    );
+
+    if (!useSessionTheme) {
+      return scaffold;
+    }
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+        systemStatusBarContrastEnforced: false,
+      ),
+      child: scaffold,
     );
   }
 }

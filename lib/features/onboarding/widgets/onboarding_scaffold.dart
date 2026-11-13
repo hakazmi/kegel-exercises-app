@@ -46,13 +46,10 @@ class OnboardingScaffold extends StatelessWidget {
         child: Column(
           children: [
             if (showHeader)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                child: ProgressHeader(
-                  step: step,
-                  total: 6,
-                  onBack: onBack,
-                ),
+              ProgressHeader(
+                step: step,
+                total: 6,
+                onBack: onBack,
               ),
             Expanded(
               child: splitBody

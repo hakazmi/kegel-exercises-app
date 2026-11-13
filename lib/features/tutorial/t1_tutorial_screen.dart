@@ -112,70 +112,80 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool darkChrome = _step == _T1Step.practice;
 
-    return Scaffold(
-      backgroundColor: _step == _T1Step.practice
-          ? AppColors.sessionBackground
-          : AppColors.background,
-      body: SafeArea(
-        child: switch (_step) {
-          _T1Step.cards => _CardsStep(
-              cardIndex: _cardIndex,
-              l10n: l10n,
-              onBack: () {
-                if (_cardIndex == 0) {
-                  if (context.canPop()) {
-                    context.pop();
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: (darkChrome
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark)
+          .copyWith(
+        statusBarColor: Colors.transparent,
+        systemStatusBarContrastEnforced: false,
+      ),
+      child: Scaffold(
+        backgroundColor: darkChrome
+            ? AppColors.sessionBackground
+            : AppColors.background,
+        body: SafeArea(
+          child: switch (_step) {
+            _T1Step.cards => _CardsStep(
+                cardIndex: _cardIndex,
+                l10n: l10n,
+                onBack: () {
+                  if (_cardIndex == 0) {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go(AppRoutes.today);
+                    }
                   } else {
-                    context.go(AppRoutes.today);
+                    setState(() => _cardIndex -= 1);
                   }
-                } else {
-                  setState(() => _cardIndex -= 1);
-                }
-              },
-              onSkip: () => _finish(feltLift: false),
-              onNext: () {
-                if (_cardIndex < _cardCount - 1) {
-                  setState(() => _cardIndex += 1);
-                } else {
-                  _startPractice(reset: true);
-                }
-              },
-            ),
-          _T1Step.practice => _PracticeStep(
-              key: ValueKey<int>(_practiceKey),
-              l10n: l10n,
-              rep: _rep,
-              totalReps: _practiceReps,
-              isSqueeze: _isSqueeze,
-              duration: _phaseDuration,
-              onPhaseDone: () {
-                final bool enteringSqueeze = _isSqueeze == false;
-                _onPracticePhaseDone();
-                if (mounted &&
-                    _step == _T1Step.practice &&
-                    enteringSqueeze) {
-                  _pulseIfEnabled();
-                }
-              },
-              onBack: () => setState(() {
-                _step = _T1Step.cards;
-                _cardIndex = _cardCount - 1;
-              }),
-            ),
-          _T1Step.feltLift => _FeltLiftStep(
-              l10n: l10n,
-              onYes: () => _finish(feltLift: true),
-              onNotSure: () => setState(() => _step = _T1Step.notSure),
-              onBack: () => _startPractice(reset: true),
-            ),
-          _T1Step.notSure => _NotSureStep(
-              l10n: l10n,
-              onTryAgain: () => _startPractice(reset: true),
-              onContinue: () => _finish(feltLift: false),
-              onBack: () => setState(() => _step = _T1Step.feltLift),
-            ),
-        },
+                },
+                onSkip: () => _finish(feltLift: false),
+                onNext: () {
+                  if (_cardIndex < _cardCount - 1) {
+                    setState(() => _cardIndex += 1);
+                  } else {
+                    _startPractice(reset: true);
+                  }
+                },
+              ),
+            _T1Step.practice => _PracticeStep(
+                key: ValueKey<int>(_practiceKey),
+                l10n: l10n,
+                rep: _rep,
+                totalReps: _practiceReps,
+                isSqueeze: _isSqueeze,
+                duration: _phaseDuration,
+                onPhaseDone: () {
+                  final bool enteringSqueeze = _isSqueeze == false;
+                  _onPracticePhaseDone();
+                  if (mounted &&
+                      _step == _T1Step.practice &&
+                      enteringSqueeze) {
+                    _pulseIfEnabled();
+                  }
+                },
+                onBack: () => setState(() {
+                  _step = _T1Step.cards;
+                  _cardIndex = _cardCount - 1;
+                }),
+              ),
+            _T1Step.feltLift => _FeltLiftStep(
+                l10n: l10n,
+                onYes: () => _finish(feltLift: true),
+                onNotSure: () => setState(() => _step = _T1Step.notSure),
+                onBack: () => _startPractice(reset: true),
+              ),
+            _T1Step.notSure => _NotSureStep(
+                l10n: l10n,
+                onTryAgain: () => _startPractice(reset: true),
+                onContinue: () => _finish(feltLift: false),
+                onBack: () => setState(() => _step = _T1Step.feltLift),
+              ),
+          },
+        ),
       ),
     );
   }
@@ -206,63 +216,57 @@ class _CardsStep extends StatelessWidget {
           trailing: TextLinkButton(label: l10n.commonSkip, onPressed: onSkip),
         ),
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              AppSpacing.sm,
-              AppSpacing.xl,
-              AppSpacing.md,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                if (cardIndex == 0) ...<Widget>[
-                  const AnatomyDiagram(),
-                  const SizedBox(height: AppSpacing.md),
-                ],
-                _Dots(count: 3, index: cardIndex),
-                const SizedBox(height: AppSpacing.lg),
-                Text(_cardTitle(l10n, cardIndex), style: AppTypography.display),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  _cardBody(l10n, cardIndex),
-                  style: AppTypography.body
-                      .copyWith(color: AppColors.textSecondary),
-                ),
-                if (cardIndex == 1) ...<Widget>[
-                  const SizedBox(height: AppSpacing.md),
-                  AppCard(
-                    backgroundColor: AppColors.surfaceMuted,
-                    child: Text(
-                      l10n.t1Card2UrineNote,
-                      style: AppTypography.body.copyWith(
-                        fontWeight: FontWeight.w600,
+          child: cardIndex == 2
+              ? _AvoidCard(l10n: l10n)
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xl,
+                    AppSpacing.sm,
+                    AppSpacing.xl,
+                    AppSpacing.md,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      if (cardIndex == 0) ...<Widget>[
+                        const AnatomyDiagram(),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+                      _Dots(count: 3, index: cardIndex),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        _cardTitle(l10n, cardIndex),
+                        style: AppTypography.display,
                       ),
-                    ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        _cardBody(l10n, cardIndex),
+                        style: AppTypography.body
+                            .copyWith(color: AppColors.textSecondary),
+                      ),
+                      if (cardIndex == 1) ...<Widget>[
+                        const SizedBox(height: AppSpacing.xl),
+                        Center(
+                          child: Illustration(
+                            assetPath: 'assets/images/lying.svg',
+                            semanticLabel: l10n.s1LyingSemantic,
+                            height: 140,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        AppCard(
+                          backgroundColor: AppColors.surfaceMuted,
+                          child: Text(
+                            l10n.t1Card2UrineNote,
+                            style: AppTypography.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
-                if (cardIndex == 2) ...<Widget>[
-                  const SizedBox(height: AppSpacing.lg),
-                  _AvoidRow(
-                    positive: true,
-                    text: l10n.t1AvoidCheckRelaxed,
-                  ),
-                  _AvoidRow(
-                    positive: true,
-                    text: l10n.t1AvoidCheckBreathing,
-                  ),
-                  _AvoidRow(
-                    positive: false,
-                    text: l10n.t1AvoidCrossButtocks,
-                  ),
-                  _AvoidRow(
-                    positive: false,
-                    text: l10n.t1AvoidCrossBreath,
-                  ),
-                ],
-              ],
-            ),
-          ),
+                ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -297,6 +301,61 @@ class _CardsStep extends StatelessWidget {
       default:
         return l10n.t1Card3Body;
     }
+  }
+}
+
+/// "Do and don't" — checklist centred vertically in the free space.
+class _AvoidCard extends StatelessWidget {
+  const _AvoidCard({required this.l10n});
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        AppSpacing.sm,
+        AppSpacing.xl,
+        AppSpacing.md,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const _Dots(count: 3, index: 2),
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(l10n.t1Card3Title, style: AppTypography.display),
+                    const SizedBox(height: AppSpacing.lg),
+                    _AvoidRow(
+                      positive: true,
+                      text: l10n.t1AvoidCheckRelaxed,
+                    ),
+                    _AvoidRow(
+                      positive: true,
+                      text: l10n.t1AvoidCheckBreathing,
+                    ),
+                    _AvoidRow(
+                      positive: false,
+                      text: l10n.t1AvoidCrossButtocks,
+                    ),
+                    _AvoidRow(
+                      positive: false,
+                      text: l10n.t1AvoidCrossBreath,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -435,9 +494,16 @@ class _FeltLiftStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Spacer(),
+                const Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: AnatomyDiagram(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
                 Text(l10n.t1FeltLiftTitle, style: AppTypography.display),
-                const Spacer(),
+                const SizedBox(height: AppSpacing.lg),
                 PrimaryButton(label: l10n.t1FeltLiftYes, onPressed: onYes),
                 const SizedBox(height: AppSpacing.sm),
                 SecondaryButton(

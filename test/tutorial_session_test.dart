@@ -3,14 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kegelexercisesapp/app/app.dart';
 import 'package:kegelexercisesapp/app/l10n/app_localizations.dart';
 import 'package:kegelexercisesapp/app/router.dart';
+import 'package:kegelexercisesapp/app/theme/tokens.dart';
 import 'package:kegelexercisesapp/core/content/content_models.dart';
 import 'package:kegelexercisesapp/core/data/database/app_database.dart';
 import 'package:kegelexercisesapp/core/data/providers.dart';
 import 'package:kegelexercisesapp/core/domain/enums.dart';
+import 'package:kegelexercisesapp/core/domain/safety_flags.dart';
 import 'package:kegelexercisesapp/core/domain/session_record.dart';
 import 'package:kegelexercisesapp/core/domain/user_profile.dart';
 import 'package:kegelexercisesapp/core/plan/plan_models.dart';
+import 'package:kegelexercisesapp/core/widgets/progress_header.dart';
 import 'package:kegelexercisesapp/features/session/s1_before_screen.dart';
+import 'package:kegelexercisesapp/features/tutorial/anatomy_diagram.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,7 +55,53 @@ const TodayPlan _plan = TodayPlan(
   ],
 );
 
-Future<ProviderContainer> _container({UserProfile? profile}) async {
+const TodayPlan _relaxationPlan = TodayPlan(
+  state: TodayPlanState.normal,
+  dayInLevel: 1,
+  level: 1,
+  track: TrackId.relaxationFirst,
+  items: <TodayItem>[
+    TodayItem(
+      id: 'reverse_kegel',
+      kind: SessionKind.relaxation,
+      label: 'Reverse Kegel',
+      durationSeconds: 120,
+      done: false,
+    ),
+  ],
+);
+
+const List<ExerciseContent> _exercises = <ExerciseContent>[
+  ExerciseContent(
+    id: 'slow_hold',
+    name: 'Slow hold',
+    description: 'Squeeze, hold, fully release',
+    type: 'strength',
+  ),
+  ExerciseContent(
+    id: 'quick_squeeze',
+    name: 'Quick squeeze',
+    description: 'Squeeze hard for 1 second, release at once',
+    type: 'strength',
+  ),
+  ExerciseContent(
+    id: 'diaphragmatic_breathing',
+    name: 'Diaphragmatic breathing',
+    description: 'Belly breath in as the pelvic floor lets go',
+    type: 'relaxation',
+  ),
+  ExerciseContent(
+    id: 'reverse_kegel',
+    name: 'Reverse Kegel',
+    description: 'Gently release and lengthen instead of squeezing',
+    type: 'relaxation',
+  ),
+];
+
+Future<ProviderContainer> _container({
+  UserProfile? profile,
+  TodayPlan plan = _plan,
+}) async {
   SharedPreferences.setMockInitialValues(<String, Object>{});
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final AppDatabase db = AppDatabase.memory();
@@ -62,8 +112,11 @@ Future<ProviderContainer> _container({UserProfile? profile}) async {
       sessionsProvider.overrideWith(
         (Ref ref) async => const <SessionRecord>[],
       ),
-      todayPlanProvider.overrideWith((Ref ref) async => _plan),
+      todayPlanProvider.overrideWith((Ref ref) async => plan),
       levelsProvider.overrideWith((Ref ref) async => <LevelContent>[_level1]),
+      exercisesProvider.overrideWith(
+        (Ref ref) async => _exercises,
+      ),
     ],
   );
   addTearDown(db.close);
@@ -90,8 +143,88 @@ Future<void> _advancePractice(WidgetTester tester) async {
   await tester.pump();
 }
 
+bool _rectsOverlap(Rect a, Rect b) {
+  return a.left < b.right &&
+      a.right > b.left &&
+      a.top < b.bottom &&
+      a.bottom > b.top;
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('ProgressHeader step label sits on the right content edge',
+      (WidgetTester tester) async {
+    const Size surface = Size(360, 640);
+    await tester.binding.setSurfaceSize(surface);
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: ProgressHeader(step: 2, total: 6, onBack: null),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final Finder label = find.text('2 of 6');
+    expect(label, findsOneWidget);
+    final Rect rect = tester.getRect(label);
+    expect(rect.right, closeTo(surface.width - AppSpacing.xl, 0.5));
+  });
+
+  testWidgets('Anatomy diagram labels do not overlap at native size',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: AnatomyDiagram.viewBoxWidth,
+              child: AnatomyDiagram(),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final List<Rect> labels = <Rect>[
+      tester.getRect(find.text('Bladder')),
+      tester.getRect(find.text('Pubic bone')),
+      tester.getRect(find.text('Tailbone')),
+      tester.getRect(find.text('Pelvic floor')),
+    ];
+    for (int i = 0; i < labels.length; i++) {
+      for (int j = i + 1; j < labels.length; j++) {
+        expect(
+          _rectsOverlap(labels[i], labels[j]),
+          isFalse,
+          reason: 'labels $i and $j overlap',
+        );
+      }
+    }
+
+    final Size diagramSize = tester.getSize(find.byType(AnatomyDiagram));
+    expect(
+      diagramSize.width / diagramSize.height,
+      closeTo(
+        AnatomyDiagram.viewBoxWidth / AnatomyDiagram.viewBoxHeight,
+        0.01,
+      ),
+    );
+  });
+
+  test('S1 meta uses ICU plural for parts', () {
+    final AppLocalizations l10n = lookupAppLocalizations(const Locale('en'));
+    expect(l10n.s1Meta(55, 1), '55 seconds · 1 part');
+    expect(l10n.s1Meta(55, 3), '55 seconds · 3 parts');
+    expect(l10n.s1MetaMinutes(2, 1), '2 min · 1 part');
+    expect(l10n.s1MetaMinutes(2, 3), '2 min · 3 parts');
+  });
 
   testWidgets('T1 flow: cards, practice, Not sure then Try again',
       (WidgetTester tester) async {
@@ -127,7 +260,7 @@ void main() {
 
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
-    expect(find.text('What to avoid'), findsOneWidget);
+    expect(find.text('Do and don\'t'), findsOneWidget);
     expect(find.text('Keep breathing'), findsOneWidget);
     expect(find.text('Do not squeeze your buttocks'), findsOneWidget);
 
@@ -138,6 +271,7 @@ void main() {
 
     await _advancePractice(tester);
     expect(find.text('Did you feel the lift?'), findsOneWidget);
+    expect(find.byType(AnatomyDiagram), findsWidgets);
 
     await tester.tap(find.text('Not sure'));
     await tester.pumpAndSettle();
@@ -182,7 +316,7 @@ void main() {
     expect(container.read(userProfileProvider).tutorialDone, isFalse);
   });
 
-  testWidgets('S1 lists Level 1 blocks for a strengthening item',
+  testWidgets('S1 lists Level 1 blocks with exercise descriptions',
       (WidgetTester tester) async {
     final ProviderContainer container = await _container(
       profile: UserProfile.initial().copyWith(
@@ -212,11 +346,15 @@ void main() {
 
     expect(find.textContaining('LEVEL 1'), findsOneWidget);
     expect(find.text('Slow holds'), findsOneWidget);
-    expect(find.textContaining('5 reps · squeeze 3 s, relax 3 s'), findsOneWidget);
+    expect(find.text('Squeeze, hold, fully release'), findsOneWidget);
     expect(find.text('Rest'), findsOneWidget);
     expect(find.text('10 s'), findsOneWidget);
     expect(find.text('Quick squeezes'), findsOneWidget);
-    expect(find.textContaining('5 reps · squeeze 1 s, relax 2 s'), findsOneWidget);
+    expect(
+      find.text('Squeeze hard for 1 second, release at once'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('55 seconds · 3 parts'), findsOneWidget);
     expect(
       find.textContaining('Lie on your back with knees bent'),
       findsOneWidget,
@@ -229,5 +367,44 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Show me how'), findsOneWidget);
     expect(find.text('Start'), findsOneWidget);
+  });
+
+  testWidgets('S1 relaxation track shows RELAXATION · DAY without Level',
+      (WidgetTester tester) async {
+    final ProviderContainer container = await _container(
+      profile: UserProfile.initial().copyWith(
+        onboardingDone: true,
+        tutorialDone: true,
+        goal: Goal.bladderControl,
+        experience: Experience.confident,
+        sessionsPerDay: 1,
+        level: 1,
+        track: TrackId.relaxationFirst,
+        safetyFlags: const SafetyFlags(pain: true),
+      ),
+      plan: _relaxationPlan,
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: S1BeforeScreen(itemId: 'reverse_kegel'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('RELAXATION · DAY 1'), findsOneWidget);
+    expect(find.textContaining('LEVEL'), findsNothing);
+    expect(find.text('Reverse Kegel'), findsWidgets);
+    expect(
+      find.text('Gently release and lengthen instead of squeezing.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('1 part'), findsOneWidget);
   });
 }

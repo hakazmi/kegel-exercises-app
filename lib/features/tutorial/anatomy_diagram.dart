@@ -5,11 +5,14 @@ import '../../app/theme/tokens.dart';
 import '../../core/widgets/illustration.dart';
 
 /// Side-view pelvic floor diagram with overlaid labels (SVG has no text).
+///
+/// Labels are positioned in the native 260×180 viewBox so they clear the
+/// figure lines at the real rendered aspect ratio.
 class AnatomyDiagram extends StatelessWidget {
   const AnatomyDiagram({super.key});
 
-  static const double _vbW = 260;
-  static const double _vbH = 180;
+  static const double viewBoxWidth = 260;
+  static const double viewBoxHeight = 180;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class AnatomyDiagram extends StatelessWidget {
       label: l10n.t1AnatomySemantic,
       image: true,
       child: AspectRatio(
-        aspectRatio: _vbW / _vbH,
+        aspectRatio: viewBoxWidth / viewBoxHeight,
         child: ClipRRect(
           borderRadius: AppRadii.xlAll,
           child: ColoredBox(
@@ -42,10 +45,11 @@ class AnatomyDiagram extends StatelessWidget {
                   );
                 }
 
+                /// Centres [child] on viewBox point ([x], [y]).
                 Widget centeredAt(double x, double y, Widget child) {
                   return Positioned(
-                    left: (x / _vbW) * w,
-                    top: (y / _vbH) * h,
+                    left: (x / viewBoxWidth) * w,
+                    top: (y / viewBoxHeight) * h,
                     child: FractionalTranslation(
                       translation: const Offset(-0.5, -0.5),
                       child: child,
@@ -53,12 +57,37 @@ class AnatomyDiagram extends StatelessWidget {
                   );
                 }
 
+                /// Places [child] with its left edge at [x] and baseline at [y].
                 Widget baselineAt(double x, double y, Widget child) {
                   return Positioned(
-                    left: (x / _vbW) * w,
-                    top: (y / _vbH) * h,
+                    left: (x / viewBoxWidth) * w,
+                    top: (y / viewBoxHeight) * h,
                     child: FractionalTranslation(
                       translation: const Offset(0, -1),
+                      child: child,
+                    ),
+                  );
+                }
+
+                /// Places [child] with its right edge at [x] and baseline at [y].
+                Widget rightBaselineAt(double x, double y, Widget child) {
+                  return Positioned(
+                    left: (x / viewBoxWidth) * w,
+                    top: (y / viewBoxHeight) * h,
+                    child: FractionalTranslation(
+                      translation: const Offset(-1, -1),
+                      child: child,
+                    ),
+                  );
+                }
+
+                /// Centres horizontally on [x], baseline at [y].
+                Widget centeredBaselineAt(double x, double y, Widget child) {
+                  return Positioned(
+                    left: (x / viewBoxWidth) * w,
+                    top: (y / viewBoxHeight) * h,
+                    child: FractionalTranslation(
+                      translation: const Offset(-0.5, -1),
                       child: child,
                     ),
                   );
@@ -71,8 +100,6 @@ class AnatomyDiagram extends StatelessWidget {
                       child: Illustration(
                         assetPath: 'assets/images/anatomy_side.svg',
                         semanticLabel: l10n.t1AnatomySemantic,
-                        width: w,
-                        height: h,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -93,8 +120,8 @@ class AnatomyDiagram extends StatelessWidget {
                             ),
                           ),
                           baselineAt(
-                            40,
-                            140,
+                            14,
+                            152,
                             Text(
                               l10n.t1AnatomyPubicBone,
                               style: labelStyle(
@@ -104,8 +131,9 @@ class AnatomyDiagram extends StatelessWidget {
                               ),
                             ),
                           ),
-                          baselineAt(
-                            176,
+                          // Right-aligned to mirror Pubic bone's left inset (14).
+                          rightBaselineAt(
+                            246,
                             150,
                             Text(
                               l10n.t1AnatomyTailbone,
@@ -116,9 +144,9 @@ class AnatomyDiagram extends StatelessWidget {
                               ),
                             ),
                           ),
-                          centeredAt(
+                          centeredBaselineAt(
                             124,
-                            166,
+                            170,
                             Text(
                               l10n.t1AnatomyPelvicFloor,
                               style: labelStyle(

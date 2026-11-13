@@ -23,3 +23,9 @@ One line per decision the product spec does not cover. Format: `YYYY-MM-DD — D
 2026-11-12 — O3 safety messages sit in a pinned live-region panel between the options list and Next (max 40% height); surgery confirm label is "I understand".
 2026-11-12 — O3 catheter overrides other safety messages (panel shows catheter only; Continue to Today enabled); surgery "I understand" is a fixed row above Next; list keeps ≥3 option rows on 360×640 by shrinking the panel.
 2026-11-12 — Anatomy diagram labels are Flutter Text overlays on anatomy_side.svg (flutter_svg skips text); T1 replay via ?replay=1 does not set tutorialDone; S1 takes ?itemId= for the plan item.
+2026-11-13 — ProgressHeader uses content horizontal padding (xl); step label is intrinsic-width and right-aligned on that edge.
+2026-11-13 — S1 eyebrow for relaxation-first is "Relaxation · Day N" (no "Level"); block rows show exercises.json one-line descriptions (Reverse Kegel copy also in ARB).
+2026-11-13 — Dark session chrome (T1 practice, S1 header, S2–S4 placeholders) uses AnnotatedRegion light status-bar icons.
+2026-11-13 — Anatomy Tailbone label is right-aligned at x=246 (mirrors Pubic bone inset) so "Tailbone" stays inside the 260-wide viewBox.
+2026-11-13 — T1 card 3 title is "Do and don't"; grey body under the title removed (it duplicated the checklist).
+2026-11-13 — O6 "about N min" is the ceil of summed TodayPlan item durations for a typical day (Level 1 strength length from levels.json via SessionDefinitionBuilder).
