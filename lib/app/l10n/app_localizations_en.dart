@@ -562,4 +562,134 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s1LyingSemantic => 'Person lying on their back with knees bent';
+
+  @override
+  String get s2GetReady => 'Get ready';
+
+  @override
+  String get s2TapToSkip => 'Tap to skip';
+
+  @override
+  String s3BlockRepHeader(String block, int rep, int total) {
+    return '$block · $rep of $total';
+  }
+
+  @override
+  String s3RepOf(int rep, int total) {
+    return 'Rep $rep of $total';
+  }
+
+  @override
+  String get s3CueBreathing => 'Keep breathing normally';
+
+  @override
+  String get s3CueRelaxed => 'Buttocks, thighs and stomach stay relaxed';
+
+  @override
+  String get s3CueLetGo => 'Let go completely';
+
+  @override
+  String get s3CueGentle => 'Gentle effort is enough';
+
+  @override
+  String s3NowBlock(String block) {
+    return 'Now: $block';
+  }
+
+  @override
+  String s3NextBlock(String block) {
+    return 'Next: $block';
+  }
+
+  @override
+  String get s3NoNextBlock => 'Finish';
+
+  @override
+  String get s3BlockStretch => 'Stretch';
+
+  @override
+  String get s3Pause => 'Pause';
+
+  @override
+  String get s3Resume => 'Resume';
+
+  @override
+  String get s3Voice => 'Voice';
+
+  @override
+  String get s3Vibration => 'Vibrate';
+
+  @override
+  String get s3Exit => 'Exit';
+
+  @override
+  String get s3ExitTitle => 'End this session?';
+
+  @override
+  String get s3ExitMessage => 'A partial session is not counted.';
+
+  @override
+  String get s3ExitConfirm => 'End session';
+
+  @override
+  String get s4Title => 'Session complete';
+
+  @override
+  String get s4TimeLabel => 'Time';
+
+  @override
+  String s4TimeSeconds(int seconds) {
+    return '$seconds seconds';
+  }
+
+  @override
+  String s4TimeMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get s4StreakLabel => 'Streak';
+
+  @override
+  String s4StreakDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get s4NextLabel => 'Next today';
+
+  @override
+  String get s4NextNone => 'Nothing else scheduled';
+
+  @override
+  String get s4FeelPrompt => 'How did that feel?';
+
+  @override
+  String get s4FeelFine => 'Fine';
+
+  @override
+  String get s4FeelMild => 'Mild discomfort';
+
+  @override
+  String get s4FeelPain => 'Pain';
+
+  @override
+  String get s4StepDownSuggestion =>
+      'Two sessions with mild discomfort. Consider stepping down a level in Levels.';
+
+  @override
+  String get h3Title => 'Pain help';
+
+  @override
+  String get h3Body =>
+      'Stop strengthening for now. Switch to relaxation-only training and talk to a clinician if pain continues.';
+
+  @override
+  String get h3ConfirmRelaxation => 'Switch to relaxation';
 }

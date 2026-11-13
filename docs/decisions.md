@@ -29,3 +29,6 @@ One line per decision the product spec does not cover. Format: `YYYY-MM-DD — D
 2026-11-13 — Anatomy Tailbone label is right-aligned at x=246 (mirrors Pubic bone inset) so "Tailbone" stays inside the 260-wide viewBox.
 2026-11-13 — T1 card 3 title is "Do and don't"; grey body under the title removed (it duplicated the checklist).
 2026-11-13 — O6 "about N min" is the ceil of summed TodayPlan item durations for a typical day (Level 1 strength length from levels.json via SessionDefinitionBuilder).
+2026-11-13 — Session haptics use the `vibration` package (custom patterns with HapticFeedback fallback). Allowed dependency for Prompt 5.
+2026-11-13 — Haptics go through HapticsService: Android keeps `vibration` patterns; iOS uses HapticFeedback (heavy/medium/vibrate). TTS on iOS uses ambient + mixWithOthers so the audio session does not block haptics.
+2026-11-13 — S3 phase countdown: bare seconds under 60; `m:ss` (unpadded minutes) at 60+. Elapsed clock stays zero-padded `mm:ss`. Last-block next label is "Finish".

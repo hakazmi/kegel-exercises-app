@@ -7,7 +7,7 @@ Checklist for Prompts 0–13. Tick each step when it ships.
 - [x] **Prompt 2** — Data layer, content, plan rules
 - [x] **Prompt 3** — Onboarding O1-O6
 - [x] **Prompt 4** — Tutorial T1 and pre-session S1
-- [ ] **Prompt 5** — Session engine and player S2-S4
+- [x] **Prompt 5** — Session engine and player S2-S4
 - [ ] **Prompt 6** — Home tab H1-H3
 - [ ] **Prompt 7** — Progress and check-in G1-G2
 - [ ] **Prompt 8** — Learn and Settings L1, L2, X1

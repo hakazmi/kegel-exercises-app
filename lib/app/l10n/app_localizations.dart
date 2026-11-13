@@ -1077,6 +1077,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Person lying on their back with knees bent'**
   String get s1LyingSemantic;
+
+  /// No description provided for @s2GetReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Get ready'**
+  String get s2GetReady;
+
+  /// No description provided for @s2TapToSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to skip'**
+  String get s2TapToSkip;
+
+  /// No description provided for @s3BlockRepHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'{block} · {rep} of {total}'**
+  String s3BlockRepHeader(String block, int rep, int total);
+
+  /// No description provided for @s3RepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Rep {rep} of {total}'**
+  String s3RepOf(int rep, int total);
+
+  /// No description provided for @s3CueBreathing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep breathing normally'**
+  String get s3CueBreathing;
+
+  /// No description provided for @s3CueRelaxed.
+  ///
+  /// In en, this message translates to:
+  /// **'Buttocks, thighs and stomach stay relaxed'**
+  String get s3CueRelaxed;
+
+  /// No description provided for @s3CueLetGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Let go completely'**
+  String get s3CueLetGo;
+
+  /// No description provided for @s3CueGentle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentle effort is enough'**
+  String get s3CueGentle;
+
+  /// No description provided for @s3NowBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Now: {block}'**
+  String s3NowBlock(String block);
+
+  /// No description provided for @s3NextBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {block}'**
+  String s3NextBlock(String block);
+
+  /// No description provided for @s3NoNextBlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get s3NoNextBlock;
+
+  /// No description provided for @s3BlockStretch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stretch'**
+  String get s3BlockStretch;
+
+  /// No description provided for @s3Pause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get s3Pause;
+
+  /// No description provided for @s3Resume.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get s3Resume;
+
+  /// No description provided for @s3Voice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice'**
+  String get s3Voice;
+
+  /// No description provided for @s3Vibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibrate'**
+  String get s3Vibration;
+
+  /// No description provided for @s3Exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get s3Exit;
+
+  /// No description provided for @s3ExitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End this session?'**
+  String get s3ExitTitle;
+
+  /// No description provided for @s3ExitMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A partial session is not counted.'**
+  String get s3ExitMessage;
+
+  /// No description provided for @s3ExitConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'End session'**
+  String get s3ExitConfirm;
+
+  /// No description provided for @s4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Session complete'**
+  String get s4Title;
+
+  /// No description provided for @s4TimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get s4TimeLabel;
+
+  /// No description provided for @s4TimeSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} seconds'**
+  String s4TimeSeconds(int seconds);
+
+  /// No description provided for @s4TimeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String s4TimeMinutes(int minutes);
+
+  /// No description provided for @s4StreakLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak'**
+  String get s4StreakLabel;
+
+  /// No description provided for @s4StreakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day} other{{days} days}}'**
+  String s4StreakDays(int days);
+
+  /// No description provided for @s4NextLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Next today'**
+  String get s4NextLabel;
+
+  /// No description provided for @s4NextNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing else scheduled'**
+  String get s4NextNone;
+
+  /// No description provided for @s4FeelPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'How did that feel?'**
+  String get s4FeelPrompt;
+
+  /// No description provided for @s4FeelFine.
+  ///
+  /// In en, this message translates to:
+  /// **'Fine'**
+  String get s4FeelFine;
+
+  /// No description provided for @s4FeelMild.
+  ///
+  /// In en, this message translates to:
+  /// **'Mild discomfort'**
+  String get s4FeelMild;
+
+  /// No description provided for @s4FeelPain.
+  ///
+  /// In en, this message translates to:
+  /// **'Pain'**
+  String get s4FeelPain;
+
+  /// No description provided for @s4StepDownSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Two sessions with mild discomfort. Consider stepping down a level in Levels.'**
+  String get s4StepDownSuggestion;
+
+  /// No description provided for @h3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Pain help'**
+  String get h3Title;
+
+  /// No description provided for @h3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop strengthening for now. Switch to relaxation-only training and talk to a clinician if pain continues.'**
+  String get h3Body;
+
+  /// No description provided for @h3ConfirmRelaxation.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to relaxation'**
+  String get h3ConfirmRelaxation;
 }
 
 class _AppLocalizationsDelegate

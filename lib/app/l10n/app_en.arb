@@ -256,5 +256,83 @@
   "s1VibrationCues": "Vibration cues",
   "s1VoiceCues": "Voice cues",
   "s1VoicePrivacy": "Off by default for privacy",
-  "s1LyingSemantic": "Person lying on their back with knees bent"
+  "s1LyingSemantic": "Person lying on their back with knees bent",
+
+  "s2GetReady": "Get ready",
+  "s2TapToSkip": "Tap to skip",
+
+  "s3BlockRepHeader": "{block} · {rep} of {total}",
+  "@s3BlockRepHeader": {
+    "placeholders": {
+      "block": {"type": "String"},
+      "rep": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "s3RepOf": "Rep {rep} of {total}",
+  "@s3RepOf": {
+    "placeholders": {
+      "rep": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "s3CueBreathing": "Keep breathing normally",
+  "s3CueRelaxed": "Buttocks, thighs and stomach stay relaxed",
+  "s3CueLetGo": "Let go completely",
+  "s3CueGentle": "Gentle effort is enough",
+  "s3NowBlock": "Now: {block}",
+  "@s3NowBlock": {
+    "placeholders": {
+      "block": {"type": "String"}
+    }
+  },
+  "s3NextBlock": "Next: {block}",
+  "@s3NextBlock": {
+    "placeholders": {
+      "block": {"type": "String"}
+    }
+  },
+  "s3NoNextBlock": "Finish",
+  "s3BlockStretch": "Stretch",
+  "s3Pause": "Pause",
+  "s3Resume": "Resume",
+  "s3Voice": "Voice",
+  "s3Vibration": "Vibrate",
+  "s3Exit": "Exit",
+  "s3ExitTitle": "End this session?",
+  "s3ExitMessage": "A partial session is not counted.",
+  "s3ExitConfirm": "End session",
+
+  "s4Title": "Session complete",
+  "s4TimeLabel": "Time",
+  "s4TimeSeconds": "{seconds} seconds",
+  "@s4TimeSeconds": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "s4TimeMinutes": "{minutes} min",
+  "@s4TimeMinutes": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "s4StreakLabel": "Streak",
+  "s4StreakDays": "{days, plural, =1{1 day} other{{days} days}}",
+  "@s4StreakDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "s4NextLabel": "Next today",
+  "s4NextNone": "Nothing else scheduled",
+  "s4FeelPrompt": "How did that feel?",
+  "s4FeelFine": "Fine",
+  "s4FeelMild": "Mild discomfort",
+  "s4FeelPain": "Pain",
+  "s4StepDownSuggestion": "Two sessions with mild discomfort. Consider stepping down a level in Levels.",
+
+  "h3Title": "Pain help",
+  "h3Body": "Stop strengthening for now. Switch to relaxation-only training and talk to a clinician if pain continues.",
+  "h3ConfirmRelaxation": "Switch to relaxation"
 }

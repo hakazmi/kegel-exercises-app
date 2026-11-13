@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import '../../app/theme/tokens.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/user_profile.dart';
 import '../../core/services/analytics_service.dart';
+import '../../core/services/haptics_service.dart';
 import '../../core/widgets/widgets.dart';
 import 'anatomy_diagram.dart';
 
@@ -92,9 +95,10 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
   }
 
   void _pulseIfEnabled() {
-    if (ref.read(userProfileProvider).vibrationOn) {
-      HapticFeedback.mediumImpact();
+    if (!ref.read(userProfileProvider).vibrationOn) {
+      return;
     }
+    unawaited(ref.read(hapticsServiceProvider).mediumImpact());
   }
 
   void _startPractice({bool reset = false}) {

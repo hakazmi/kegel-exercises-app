@@ -65,6 +65,28 @@ class SessionDefinition {
       blocks.fold<int>(0, (int sum, SessionBlockDef b) => sum + b.durationSeconds);
 
   int get partCount => blocks.length;
+
+  SessionDefinition copyWith({
+    String? id,
+    int? level,
+    String? position,
+    List<SessionBlockDef>? blocks,
+    SessionKind? kind,
+    String? label,
+    int? sessionNumber,
+    int? sessionsToday,
+  }) {
+    return SessionDefinition(
+      id: id ?? this.id,
+      level: level ?? this.level,
+      position: position ?? this.position,
+      blocks: blocks ?? this.blocks,
+      kind: kind ?? this.kind,
+      label: label ?? this.label,
+      sessionNumber: sessionNumber ?? this.sessionNumber,
+      sessionsToday: sessionsToday ?? this.sessionsToday,
+    );
+  }
 }
 
 /// Builds [SessionDefinition]s from content JSON + today's plan item.

@@ -13,7 +13,11 @@ import '../features/onboarding/o3_safety_screen.dart';
 import '../features/onboarding/o4_experience_screen.dart';
 import '../features/onboarding/o5_time_screen.dart';
 import '../features/onboarding/o6_plan_screen.dart';
+import '../features/help/h3_pain_help_screen.dart';
 import '../features/session/s1_before_screen.dart';
+import '../features/session/s2_countdown_screen.dart';
+import '../features/session/s3_player_screen.dart';
+import '../features/session/s4_done_screen.dart';
 import '../features/shell/main_shell.dart';
 import '../features/shell/placeholder_screen.dart';
 import '../features/tutorial/t1_tutorial_screen.dart';
@@ -137,37 +141,24 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.countdown,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'S2',
-            name: 'Countdown',
-            useSessionTheme: true,
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.player, 'S3 Player')],
+          return S2CountdownScreen(
+            itemId: state.uri.queryParameters['itemId'],
           );
         },
       ),
       GoRoute(
         path: AppRoutes.player,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'S3',
-            name: 'Player',
-            useSessionTheme: true,
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.done, 'S4 Done')],
+          return S3PlayerScreen(
+            itemId: state.uri.queryParameters['itemId'],
           );
         },
       ),
       GoRoute(
         path: AppRoutes.done,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'S4',
-            name: 'Done',
-            useSessionTheme: true,
-            nextRoutes: <RouteLink>[
-              RouteLink(AppRoutes.paywall, 'P1 Paywall'),
-              RouteLink(AppRoutes.today, 'H1 Today'),
-              RouteLink(AppRoutes.painHelp, 'H3 PainHelp'),
-            ],
+          return S4DoneScreen(
+            itemId: state.uri.queryParameters['itemId'],
           );
         },
       ),
@@ -194,11 +185,9 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.painHelp,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'H3',
-            name: 'PainHelp',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.today, 'H1 Today')],
-          );
+          final bool fromSession =
+              state.uri.queryParameters['fromSession'] == '1';
+          return H3PainHelpScreen(fromSession: fromSession);
         },
       ),
       GoRoute(
