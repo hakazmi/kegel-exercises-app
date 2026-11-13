@@ -1,5 +1,7 @@
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../app/theme/system_ui.dart';
 import '../../../app/theme/tokens.dart';
 import '../../../core/widgets/progress_header.dart';
 
@@ -40,60 +42,65 @@ class OnboardingScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool splitBody = pinnedPanel != null || listMinExtent > 0;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            if (showHeader)
-              ProgressHeader(
-                step: step,
-                total: 6,
-                onBack: onBack,
-              ),
-            Expanded(
-              child: splitBody
-                  ? LayoutBuilder(
-                      builder: (BuildContext context, BoxConstraints constraints) {
-                        final double panelCap =
-                            MediaQuery.sizeOf(context).height * 0.4;
-                        final double panelMax = (constraints.maxHeight -
-                                listMinExtent)
-                            .clamp(0.0, panelCap);
-                        return Column(
-                          children: [
-                            Expanded(
-                              child: _ScrollingBody(
-                                fadeBottom: fadeListBottom,
-                                child: body,
-                              ),
-                            ),
-                            if (pinnedPanel != null)
-                              ConstrainedBox(
-                                constraints: BoxConstraints(maxHeight: panelMax),
-                                child: pinnedPanel!,
-                              ),
-                          ],
-                        );
-                      },
-                    )
-                  : _ScrollingBody(
-                      fadeBottom: fadeListBottom,
-                      child: body,
-                    ),
-            ),
-            ?pinnedAboveFooter,
-            if (footer != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
-                  AppSpacing.md,
-                  AppSpacing.xl,
-                  AppSpacing.md,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppSystemUi.lightScreen,
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Column(
+            children: [
+              if (showHeader)
+                ProgressHeader(
+                  step: step,
+                  total: 6,
+                  onBack: onBack,
                 ),
-                child: footer,
+              Expanded(
+                child: splitBody
+                    ? LayoutBuilder(
+                        builder:
+                            (BuildContext context, BoxConstraints constraints) {
+                          final double panelCap =
+                              MediaQuery.sizeOf(context).height * 0.4;
+                          final double panelMax = (constraints.maxHeight -
+                                  listMinExtent)
+                              .clamp(0.0, panelCap);
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: _ScrollingBody(
+                                  fadeBottom: fadeListBottom,
+                                  child: body,
+                                ),
+                              ),
+                              if (pinnedPanel != null)
+                                ConstrainedBox(
+                                  constraints:
+                                      BoxConstraints(maxHeight: panelMax),
+                                  child: pinnedPanel!,
+                                ),
+                            ],
+                          );
+                        },
+                      )
+                    : _ScrollingBody(
+                        fadeBottom: fadeListBottom,
+                        child: body,
+                      ),
               ),
-          ],
+              ?pinnedAboveFooter,
+              if (footer != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xl,
+                    AppSpacing.md,
+                    AppSpacing.xl,
+                    AppSpacing.md,
+                  ),
+                  child: footer,
+                ),
+            ],
+          ),
         ),
       ),
     );

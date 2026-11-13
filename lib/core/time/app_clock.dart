@@ -25,6 +25,16 @@ class FakeClock implements AppClock {
   void add(Duration duration) => _now = _now.add(duration);
 }
 
+/// System clock shifted by a fixed [offset] (debug day controls).
+class OffsetClock implements AppClock {
+  const OffsetClock(this.offset);
+
+  final Duration offset;
+
+  @override
+  DateTime now() => DateTime.now().add(offset);
+}
+
 /// Calendar date helpers (local, date-only).
 DateTime dateOnly(DateTime value) =>
     DateTime(value.year, value.month, value.day);

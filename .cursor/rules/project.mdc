@@ -13,7 +13,7 @@ An 8-week-plus level plan covers bladder control, erection support, ejaculation 
 Safety and relaxation content is always free; Premium unlocks Levels 2–5 and goal-specific track content.
 All training data stays on the device; there is no account in v1.
 Wording and visuals stay clinical and non-sexual, including the store listing.
-One Flutter codebase for Android and iOS. First store release is Android; keep all code iOS-ready (no Android-only API without a platform check). iOS submission comes after Prompt 13.
+One Flutter codebase for Android and iOS. Both platforms are first-class; every step is tested on both.
 Do not hard-code prices or trial length; they come from the store products via RevenueCat.
 
 ## Plan behaviour
@@ -40,11 +40,12 @@ Do not add other packages without asking.
 - go_router
 - drift + shared_preferences (+ drift_dev, build_runner, path, path_provider, sqlite3_flutter_libs)
 - purchases_flutter (RevenueCat)
-- flutter_local_notifications + timezone
+- flutter_local_notifications + timezone + flutter_timezone
 - flutter_tts (on-device voice cues)
 - wakelock_plus
 - flutter_svg
 - url_launcher
+- package_info_plus (app version on Settings)
 - flutter_localizations / intl
 - firebase_core + firebase_analytics + firebase_crashlytics — **not in pubspec until Prompt 11** (Analytics, Crashlytics, privacy)
 
@@ -84,10 +85,21 @@ Do not add other packages without asking.
 
 ## Workflow
 
-- After every task run `flutter analyze` and `flutter test` and fix all issues.
+- Follow **Testing speed** for analyze/test during and at the end of a task.
 - Keep changes small.
 - If the spec is ambiguous or conflicts with these rules, stop and ask instead of guessing.
 - List anything skipped at the end of the reply.
+
+## Testing speed
+
+- Do not use `--concurrency=1`. Use the default parallel run. If one specific test file truly cannot run in parallel, say which one and why instead of slowing down the suite.
+- Never run the full test suite. The user runs it before each commit.
+- Run only `flutter analyze --no-pub` and the test files you added or changed, with: `flutter test --no-pub --timeout=30s -r compact <files>`.
+- Never pipe test output through `tail` or `head`. Piping hides all output until the process ends and makes a healthy run look hung. Show the output directly.
+- Do not kill a test process and retry. If a test file takes longer than 30 seconds, stop and tell which test and why.
+- Widget tests: avoid `pumpAndSettle` on screens with repeating animations (the session ring); use `pump(Duration)` instead. Use the fake clock, never real timers. Share setup helpers between test files. No golden tests.
+- Never run `flutter run` or `flutter build`. The user runs the app themselves.
+- Keep summaries short: what changed, test result in one line, anything skipped.
 
 ## Code style
 

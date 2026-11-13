@@ -22,9 +22,13 @@ class SessionVoice {
     }
     try {
       final FlutterTts tts = await _ensure();
+      if (_failed) {
+        return;
+      }
       await tts.stop();
       await tts.speak(phrase);
     } on Object {
+      // Missing speech engine or other TTS failure — fail silently.
       _failed = true;
     }
   }
@@ -35,6 +39,9 @@ class SessionVoice {
     }
     final FlutterTts tts = FlutterTts();
     try {
+      tts.setErrorHandler((dynamic message) {
+        _failed = true;
+      });
       await tts.setSpeechRate(0.45);
       await tts.setVolume(1);
       // Avoid playAndRecord / record categories — they can suppress iOS haptics.
@@ -48,8 +55,19 @@ class SessionVoice {
           ],
         );
       }
+      // Android: if no TTS engine / languages, disable voice without crashing.
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+        try {
+          final dynamic languages = await tts.getLanguages;
+          if (languages is List && languages.isEmpty) {
+            _failed = true;
+          }
+        } on Object {
+          _failed = true;
+        }
+      }
     } on Object {
-      // Ignore setup failures; speak may still work.
+      // Ignore setup failures; speak may still work, or [_failed] already set.
     }
     _tts = tts;
     return tts;

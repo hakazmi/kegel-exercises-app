@@ -215,6 +215,30 @@ List<_Pair> _requiredPairs() {
       minRatio: normal,
     ),
     const _Pair(
+      name: 'caption primary on background (START HERE / min read)',
+      foreground: AppColors.primary,
+      background: AppColors.background,
+      minRatio: normal,
+    ),
+    const _Pair(
+      name: 'caption primary on surface (START HERE / min read)',
+      foreground: AppColors.primary,
+      background: AppColors.surface,
+      minRatio: normal,
+    ),
+    const _Pair(
+      name: 'article Sources link primary on background',
+      foreground: AppColors.primary,
+      background: AppColors.background,
+      minRatio: normal,
+    ),
+    const _Pair(
+      name: 'G2 eyebrow primary on background',
+      foreground: AppColors.primary,
+      background: AppColors.background,
+      minRatio: normal,
+    ),
+    const _Pair(
       name: 'tab selected (ink) on surface',
       foreground: AppColors.ink,
       background: AppColors.surface,

@@ -333,6 +333,417 @@
   "s4StepDownSuggestion": "Two sessions with mild discomfort. Consider stepping down a level in Levels.",
 
   "h3Title": "Pain help",
-  "h3Body": "Stop strengthening for now. Switch to relaxation-only training and talk to a clinician if pain continues.",
-  "h3ConfirmRelaxation": "Switch to relaxation"
+  "h3Headline": "Stop squeezing exercises for now",
+  "h3Body": "Stop the squeezing exercises for now. Pain can mean the muscles are too tight, and more squeezing can make that worse.",
+  "h3BodyDetail": "Pain can mean the pelvic floor muscles are too tight. Squeezing more can make that worse. Relaxing them is the better starting point.",
+  "h3TrackBadge": "Relaxation track, daily",
+  "h3TrackBreathing": "Belly breathing · 2 min",
+  "h3TrackReverse": "Reverse Kegel: gently let go · 2 min",
+  "h3TrackStretch": "Child's pose stretch · 1 to 3 min",
+  "h3ClinicianNote": "See a doctor or pelvic floor physiotherapist if the pain continues, or if you have pain with erection or ejaculation.",
+  "h3SwitchRelaxation": "Switch me to relaxation exercises",
+  "h3KeepPlan": "Keep my plan",
+  "h3ConfirmRelaxation": "Switch me to relaxation exercises",
+  "h3SwitchedConfirm": "You are on relaxation exercises now. Strengthening is paused.",
+  "h3IllustrationSemantic": "Person resting in a gentle stretch pose",
+
+  "h1Streak": "{count, plural, =0{No streak} =1{1-day streak} other{{count}-day streak}}",
+  "@h1Streak": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "h1LevelDayOf": "Level {level} · Day {day} of {total}",
+  "@h1LevelDayOf": {
+    "placeholders": {
+      "level": {"type": "int"},
+      "day": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "h1RelaxationDayOf": "Relaxation · Day {day} of {total}",
+  "@h1RelaxationDayOf": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "h1LevelName": "Level {level} · {name}",
+  "@h1LevelName": {
+    "placeholders": {
+      "level": {"type": "int"},
+      "name": {"type": "String"}
+    }
+  },
+  "h1DayProgress": "{done, plural, =1{1 of {total} days} other{{done} of {total} days}}",
+  "@h1DayProgress": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "h1WeekRest": "Rest",
+  "h1Percent": "{percent}%",
+  "@h1Percent": {
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
+  "h1SessionLabel": "Session {number}",
+  "@h1SessionLabel": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "h1SessionOptional": "Optional",
+  "h1BreathingLabel": "Relaxation breathing",
+  "h1ReverseLabel": "Reverse Kegel",
+  "h1DurationSeconds": "{seconds} s",
+  "@h1DurationSeconds": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "h1DurationMinutes": "{minutes, plural, =1{1 min} other{{minutes} min}}",
+  "@h1DurationMinutes": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "h1ItemDoneMeta": "Done · {duration}",
+  "@h1ItemDoneMeta": {
+    "placeholders": {
+      "duration": {"type": "String"}
+    }
+  },
+  "h1ItemPendingMeta": "{duration}",
+  "@h1ItemPendingMeta": {
+    "placeholders": {
+      "duration": {"type": "String"}
+    }
+  },
+  "h1StartSession": "Start session",
+  "h1FeltPain": "I felt pain",
+  "h1AllDone": "Done for today. Rest is part of the training.",
+  "h1RestDay": "Rest day. Your muscles recover today.",
+  "h1DailyCap": "That is enough for today. Doing more can tire the muscles and slow progress.",
+  "h1UpdateCatheter": "Update my answer",
+  "h1CatheterClearedTitle": "Catheter removed?",
+  "h1CatheterClearedMessage": "Only continue if your care team says you can start these exercises.",
+  "h1CatheterClearedConfirm": "Yes, update answer",
+  "h1WeekMon": "Mon",
+  "h1WeekTue": "Tue",
+  "h1WeekWed": "Wed",
+  "h1WeekThu": "Thu",
+  "h1WeekFri": "Fri",
+  "h1WeekSat": "Sat",
+  "h1WeekSun": "Sun",
+  "h1LevelCardSemantic": "Open levels",
+
+  "h2Title": "Your levels",
+  "h2Subtitle": "{track} plan. Each level makes holds a little longer.",
+  "@h2Subtitle": {
+    "placeholders": {
+      "track": {"type": "String"}
+    }
+  },
+  "h2SubtitleRelaxation": "{track} plan. Breathing and stretches come before strengthening.",
+  "@h2SubtitleRelaxation": {
+    "placeholders": {
+      "track": {"type": "String"}
+    }
+  },
+  "h2Current": "Current",
+  "h2Premium": "Premium",
+  "h2DaysOf": "{done, plural, =1{1 of {total} days} other{{done} of {total} days}}",
+  "@h2DaysOf": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "h2DayRange": "Days {start}–{end}",
+  "@h2DayRange": {
+    "placeholders": {
+      "start": {"type": "int"},
+      "end": {"type": "int"}
+    }
+  },
+  "h2DayOnward": "Day {start} onward",
+  "@h2DayOnward": {
+    "placeholders": {
+      "start": {"type": "int"}
+    }
+  },
+  "h2LevelMeta": "{range} · {holds}, {position}",
+  "@h2LevelMeta": {
+    "placeholders": {
+      "range": {"type": "String"},
+      "holds": {"type": "String"},
+      "position": {"type": "String"}
+    }
+  },
+  "h2RelaxationName": "Relaxation",
+  "h2RelaxationMeta": "Days 1–{days} · daily breathing and stretches",
+  "@h2RelaxationMeta": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "h2RelaxationLevel1Note": "If the pain has settled and a clinician agrees, you can start Level 1.",
+  "h2HoldsFixed": "{seconds} s holds",
+  "@h2HoldsFixed": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "h2HoldsRange": "{min}–{max} s holds",
+  "@h2HoldsRange": {
+    "placeholders": {
+      "min": {"type": "int"},
+      "max": {"type": "int"}
+    }
+  },
+  "h2PositionLyingOrSitting": "lying or sitting",
+  "h2PositionSitting": "sitting",
+  "h2PositionSittingAndStanding": "sitting and standing",
+  "h2PositionStanding": "standing",
+  "h2PositionAny": "everyday moves",
+  "h2PositionExtras": "bridge and squat",
+  "h2UnlockNote": "The next level unlocks when you complete 5 of the last 7 days. Missed a few days? Your plan simply waits for you.",
+  "h2UnlockNoteRelaxation": "Strengthening levels stay below until the relaxation weeks are done. If the pain has settled and a clinician agrees, you can start Level 1.",
+  "h2RepeatOrStepDown": "Repeat or step down a level",
+  "h2RepeatTitle": "Repeat this level?",
+  "h2RepeatMessage": "Day progress for this level resets. Your session history stays on the device.",
+  "h2RepeatConfirm": "Repeat level",
+  "h2StepDownTitle": "Step down one level?",
+  "h2StepDownMessage": "You will train at the previous level. This never happens automatically.",
+  "h2StepDownConfirm": "Step down",
+  "h2ChooseActionTitle": "Adjust your level",
+  "h2ChooseRepeat": "Repeat current level",
+  "h2ChooseStepDown": "Step down one level",
+  "h2LevelNameStart": "Start",
+  "h2LevelNameBuild": "Build",
+  "h2LevelNameSteady": "Steady",
+  "h2LevelNameDeep": "Deep",
+  "h2LevelNameMaintain": "Maintain",
+
+  "g1SettingsTooltip": "Settings",
+  "g1StatStreakLabel": "Streak",
+  "g1StatStreakValue": "{count, plural, =0{0 days} =1{1 day} other{{count} days}}",
+  "@g1StatStreakValue": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "g1StatWeekLabel": "This week",
+  "g1StatWeekValue": "{count, plural, =0{0 sessions} =1{1 session} other{{count} sessions}}",
+  "@g1StatWeekValue": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "g1StatHoldLabel": "Longest hold",
+  "g1StatHoldValue": "{seconds} s",
+  "@g1StatHoldValue": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "g1StatLevelLabel": "Level",
+  "g1StatLevelDay": "{level} · day {day}",
+  "@g1StatLevelDay": {
+    "placeholders": {
+      "level": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+  "g1StatRelaxationLabel": "Relaxation plan",
+  "g1StatRelaxationDay": "Day {day} of {total}",
+  "@g1StatRelaxationDay": {
+    "placeholders": {
+      "day": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "h1RelaxationWeeksTitle": "Weeks 1 to 2",
+  "g1CalPrevious": "Previous month",
+  "g1CalNext": "Next month",
+  "g1CalTrained": "Trained",
+  "g1CalMonthYear": "{month} {year}",
+  "@g1CalMonthYear": {
+    "placeholders": {
+      "month": {"type": "String"},
+      "year": {"type": "int"}
+    }
+  },
+  "g1CalMon": "M",
+  "g1CalTue": "T",
+  "g1CalWed": "W",
+  "g1CalThu": "T",
+  "g1CalFri": "F",
+  "g1CalSat": "S",
+  "g1CalSun": "S",
+  "g1MonthJanuary": "January",
+  "g1MonthFebruary": "February",
+  "g1MonthMarch": "March",
+  "g1MonthApril": "April",
+  "g1MonthMay": "May",
+  "g1MonthJune": "June",
+  "g1MonthJuly": "July",
+  "g1MonthAugust": "August",
+  "g1MonthSeptember": "September",
+  "g1MonthOctober": "October",
+  "g1MonthNovember": "November",
+  "g1MonthDecember": "December",
+  "g1CheckInBaselineTitle": "Baseline check-in",
+  "g1CheckInBaselineBody": "One question, 10 seconds. See your own change over time.",
+  "g1CheckInFollowUpTitle": "4-week check-in",
+  "g1CheckInFollowUpBody": "One question. Compare with your earlier answer.",
+  "g1CheckInHistoryTitle": "Your check-ins",
+  "g1CheckInStart": "Start",
+  "g1CheckInLockedHint": "A short check-in unlocks after your third completed session.",
+  "g1CheckInUnlockHistory": "Unlock check-in history",
+
+  "g2EyebrowBaseline": "WEEK 0 · BASELINE",
+  "g2EyebrowFollowUp": "4-WEEK CHECK-IN",
+  "g2SubtitleBaseline": "We will ask again in 4 weeks and show you both answers side by side.",
+  "g2SubtitleFollowUp": "Your answers stay on this phone. No predictions.",
+  "g2PrivacyNote": "Saved only on this phone",
+  "g2Save": "Save",
+  "g2Skip": "Skip for now",
+  "g2Done": "Done",
+  "g2ResultTitle": "Your check-in",
+  "g2ResultSubtitle": "Your own numbers, side by side. Results vary.",
+  "g2ComparisonLine": "Week {week}: {score} of {max} · {label}",
+  "@g2ComparisonLine": {
+    "placeholders": {
+      "week": {"type": "int"},
+      "score": {"type": "int"},
+      "max": {"type": "int"},
+      "label": {"type": "String"}
+    }
+  },
+  "g2DoctorNote": "Exercises do not help everyone. It is worth talking to a doctor.",
+  "g2HistoryPremiumHint": "Full check-in history is part of Premium.",
+
+  "g2QuestionBladder": "In the last week, how often did you leak urine?",
+  "g2OptionBladder1": "Never",
+  "g2OptionBladder2": "Once or twice",
+  "g2OptionBladder3": "A few times",
+  "g2OptionBladder4": "Most days",
+  "g2OptionBladder5": "Every day",
+
+  "g2QuestionErection": "How would you rate erection firmness in the last week?",
+  "g2OptionErection1": "Very soft",
+  "g2OptionErection2": "Soft",
+  "g2OptionErection3": "Moderate",
+  "g2OptionErection4": "Firm",
+  "g2OptionErection5": "Very firm",
+
+  "g2QuestionEjaculation": "How much control did you feel in the last week?",
+  "g2OptionEjaculation1": "No control",
+  "g2OptionEjaculation2": "A little control",
+  "g2OptionEjaculation3": "Some control",
+  "g2OptionEjaculation4": "Good control",
+  "g2OptionEjaculation5": "Full control",
+
+  "g2QuestionSurgery": "In the last week, how well have you controlled your urine?",
+  "g2OptionSurgery1": "No control",
+  "g2OptionSurgery2": "Limited control",
+  "g2OptionSurgery3": "Some control",
+  "g2OptionSurgery4": "Good control",
+  "g2OptionSurgery5": "Full control",
+
+  "g2QuestionGeneral": "In the last week, how comfortable has your pelvic area felt?",
+  "g2OptionGeneral1": "Very uncomfortable",
+  "g2OptionGeneral2": "Uncomfortable",
+  "g2OptionGeneral3": "Mixed",
+  "g2OptionGeneral4": "Mostly comfortable",
+  "g2OptionGeneral5": "Very comfortable",
+
+  "l1ArticlesHeading": "Articles",
+  "l1StartHere": "Start here · {minutes} min",
+  "@l1StartHere": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "l1ReplayTutorial": "Replay the tutorial anytime",
+  "l1Minutes": "{minutes} min",
+  "@l1Minutes": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "l2MinutesRead": "{minutes} min read",
+  "@l2MinutesRead": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "l2Sources": "Sources",
+  "l2NotFound": "Article not found.",
+
+  "x1Title": "Settings",
+  "x1SectionPlan": "Plan",
+  "x1SectionReminders": "Reminders",
+  "x1SectionSession": "Session",
+  "x1SectionPrivacy": "Privacy",
+  "x1SectionSubscription": "Subscription",
+  "x1SectionAbout": "About",
+  "x1Goal": "Goal",
+  "x1GoalTitle": "Your goal",
+  "x1DailyTime": "Daily time",
+  "x1DailyTimeTitle": "Sessions per day",
+  "x1DailySessions": "{count, plural, =1{1 session a day} other{{count} sessions a day}}",
+  "@x1DailySessions": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "x1SafetyAnswers": "Safety answers",
+  "x1SafetyTitle": "Safety answers",
+  "x1ValueNone": "None",
+  "x1SafetySelectedCount": "{count, plural, =1{1 selected} other{{count} selected}}",
+  "@x1SafetySelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "x1DailyReminder": "Daily reminder",
+  "x1TimeAndDays": "Time and days",
+  "x1ReminderScheduleTitle": "Reminder time and days",
+  "x1EveryDay": "Every day",
+  "x1Daily": "Daily",
+  "x1DaysCount": "{count, plural, =1{1 day} other{{count} days}}",
+  "@x1DaysCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "x1Vibration": "Vibration cues",
+  "x1Voice": "Voice cues",
+  "x1Discreet": "Discreet notifications",
+  "x1DiscreetSubtitle": "No health words on the lock screen.",
+  "x1DeleteAll": "Delete all my data",
+  "x1DeleteTitle": "Delete all data?",
+  "x1DeleteMessage": "This removes your plan, sessions and check-ins from this phone. It cannot be undone.",
+  "x1DeleteConfirm": "Delete everything",
+  "x1ManagePlay": "Manage in Google Play",
+  "x1ManageAppStore": "Manage in the App Store",
+  "x1Free": "Free",
+  "x1Premium": "Premium",
+  "x1Restore": "Restore purchase",
+  "x1RestoreStub": "Restore will be available when subscriptions ship.",
+  "x1LegalRow": "Disclaimer, privacy and terms",
+  "x1PrivacyPolicy": "Privacy Policy",
+  "x1Terms": "Terms",
+  "x1Contact": "Contact",
+  "x1VersionFooter": "Version {version} · Not a medical device",
+  "@x1VersionFooter": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  }
 }

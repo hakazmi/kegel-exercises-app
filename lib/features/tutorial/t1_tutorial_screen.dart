@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
+import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/user_profile.dart';
@@ -119,13 +120,7 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
     final bool darkChrome = _step == _T1Step.practice;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: (darkChrome
-              ? SystemUiOverlayStyle.light
-              : SystemUiOverlayStyle.dark)
-          .copyWith(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
-      ),
+      value: darkChrome ? AppSystemUi.darkScreen : AppSystemUi.lightScreen,
       child: Scaffold(
         backgroundColor: darkChrome
             ? AppColors.sessionBackground

@@ -111,15 +111,6 @@ class OnboardingController extends Notifier<OnboardingDraft> {
     final DateTime now = dateOnly(ref.read(appClockProvider).now());
     final TrackId track = draft.resolveTrack();
 
-    if (reminderOn) {
-      await ref.read(reminderServiceProvider).enableReminder(
-            minutesFromMidnight: draft.reminderTime,
-            days: draft.reminderDays,
-          );
-    } else {
-      await ref.read(reminderServiceProvider).disableReminder();
-    }
-
     final UserProfile profile = UserProfile.initial().copyWith(
       goal: draft.goal ?? Goal.generalPelvicHealth,
       safetyFlags: draft.safetyFlags,
@@ -136,6 +127,16 @@ class OnboardingController extends Notifier<OnboardingDraft> {
     );
 
     await ref.read(userProfileProvider.notifier).save(profile);
+
+    // Schedule after profile is saved so loadInput sees reminderEnabled.
+    if (reminderOn) {
+      await ref.read(reminderServiceProvider).enableReminder(
+            minutesFromMidnight: draft.reminderTime,
+            days: draft.reminderDays,
+          );
+    } else {
+      await ref.read(reminderServiceProvider).disableReminder();
+    }
 
     if (!catheterExit) {
       await ref.read(analyticsServiceProvider).logEvent(

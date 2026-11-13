@@ -5,9 +5,11 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
+import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import 'engine/engine_models.dart';
 import 'session_controller.dart';
+import 'session_exit.dart';
 
 /// S2 Countdown — "Get ready", 5 seconds, tap to skip.
 class S2CountdownScreen extends ConsumerStatefulWidget {
@@ -59,6 +61,22 @@ class _S2CountdownScreenState extends ConsumerState<S2CountdownScreen> {
     _goPlayer();
   }
 
+  Future<void> _onSystemBack() async {
+    if (_navigating) {
+      return;
+    }
+    final bool ok = await confirmSessionExit(context);
+    if (!ok || !mounted) {
+      return;
+    }
+    _navigating = true;
+    await ref.read(sessionControllerProvider.notifier).exitSession();
+    if (!mounted) {
+      return;
+    }
+    context.go(AppRoutes.today);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -80,45 +98,51 @@ class _S2CountdownScreenState extends ConsumerState<S2CountdownScreen> {
         ? play!.engineState.secondsRemaining
         : 5;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.sessionBackground,
-        body: SafeArea(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: _onSkip,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    l10n.s2GetReady,
-                    style: AppTypography.display.copyWith(
-                      color: AppColors.sessionText,
-                      fontSize: 32,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop) {
+          return;
+        }
+        _onSystemBack();
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: AppSystemUi.darkScreen,
+        child: Scaffold(
+          backgroundColor: AppColors.sessionBackground,
+          body: SafeArea(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _onSkip,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.s2GetReady,
+                      style: AppTypography.display.copyWith(
+                        color: AppColors.sessionText,
+                        fontSize: 32,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  Text(
-                    '$seconds',
-                    style: AppTypography.display.copyWith(
-                      color: AppColors.accent,
-                      fontSize: 72,
-                      fontWeight: FontWeight.w800,
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      '$seconds',
+                      style: AppTypography.display.copyWith(
+                        color: AppColors.accent,
+                        fontSize: 72,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    l10n.s2TapToSkip,
-                    style: AppTypography.body.copyWith(
-                      color: AppColors.sessionTextSecondary,
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      l10n.s2TapToSkip,
+                      style: AppTypography.body.copyWith(
+                        color: AppColors.sessionTextSecondary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -301,6 +301,27 @@ void main() {
         2,
       );
     });
+
+    test('relaxation-first dayInLevel counts breathing and relaxation days', () {
+      final UserProfile profile = _profile(track: TrackId.relaxationFirst);
+      final List<SessionRecord> sessions = <SessionRecord>[
+        _session(
+          at: DateTime(2026, 11, 2),
+          kind: SessionKind.breathing,
+          track: TrackId.relaxationFirst,
+        ),
+        _session(
+          at: DateTime(2026, 11, 3),
+          kind: SessionKind.relaxation,
+          track: TrackId.relaxationFirst,
+        ),
+      ];
+      expect(
+        PlanRules.dayInLevel(profile: profile, sessions: sessions),
+        3,
+      );
+      expect(PlanRules.relaxationFirstDays, 14);
+    });
   });
 
   group('relaxation first and catheter', () {

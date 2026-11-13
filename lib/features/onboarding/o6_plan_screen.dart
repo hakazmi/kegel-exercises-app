@@ -11,6 +11,7 @@ import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
 import '../../core/plan/plan_models.dart';
+import '../../core/plan/plan_rules.dart';
 import '../../core/plan/plan_service.dart';
 import '../../core/plan/session_definition.dart';
 import '../../core/widgets/widgets.dart';
@@ -135,7 +136,10 @@ class O6PlanScreen extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.xs),
                           Text(
                             relaxation
-                                ? l10n.o6RelaxationMeta(7, minutes)
+                                ? l10n.o6RelaxationMeta(
+                                    PlanRules.relaxationFirstDays,
+                                    minutes,
+                                  )
                                 : l10n.o6PlanMeta(
                                     7,
                                     draft.sessionsPerDay,
@@ -177,7 +181,7 @@ class O6PlanScreen extends ConsumerWidget {
             _TimelineItem(
               title: l10n.o6RelaxationTimelineAfterTitle,
               body: l10n.o6RelaxationTimelineAfterBody,
-              color: AppColors.accent,
+              color: AppColors.primary,
             ),
             _TimelineItem(
               title: l10n.o6RelaxationTimelineAlwaysTitle,
@@ -193,7 +197,7 @@ class O6PlanScreen extends ConsumerWidget {
             _TimelineItem(
               title: l10n.o6TimelineWeek2Title,
               body: l10n.o6TimelineWeek2Body,
-              color: AppColors.accent,
+              color: AppColors.primary,
             ),
             _TimelineItem(
               title: l10n.o6TimelineWeek6Title,

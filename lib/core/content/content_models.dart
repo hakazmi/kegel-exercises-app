@@ -61,6 +61,77 @@ class LevelContent {
   }
 }
 
+/// One source link shown under an article.
+class ArticleSource {
+  const ArticleSource({required this.title, required this.url});
+
+  final String title;
+  final String url;
+
+  factory ArticleSource.fromJson(Map<String, dynamic> json) {
+    return ArticleSource(
+      title: json['title'] as String,
+      url: json['url'] as String,
+    );
+  }
+}
+
+/// Article entry from `assets/content/articles.json` plus loaded Markdown body.
+class ArticleContent {
+  const ArticleContent({
+    required this.id,
+    required this.title,
+    required this.minutes,
+    required this.image,
+    required this.featured,
+    required this.opensTutorial,
+    required this.bodyAsset,
+    required this.sources,
+    this.bodyMarkdown = '',
+  });
+
+  final String id;
+  final String title;
+  final int minutes;
+  final String image;
+  final bool featured;
+  final bool opensTutorial;
+  final String bodyAsset;
+  final List<ArticleSource> sources;
+  final String bodyMarkdown;
+
+  ArticleContent copyWith({String? bodyMarkdown}) {
+    return ArticleContent(
+      id: id,
+      title: title,
+      minutes: minutes,
+      image: image,
+      featured: featured,
+      opensTutorial: opensTutorial,
+      bodyAsset: bodyAsset,
+      sources: sources,
+      bodyMarkdown: bodyMarkdown ?? this.bodyMarkdown,
+    );
+  }
+
+  factory ArticleContent.fromJson(Map<String, dynamic> json) {
+    return ArticleContent(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      minutes: json['minutes'] as int,
+      image: json['image'] as String,
+      featured: json['featured'] as bool? ?? false,
+      opensTutorial: json['opensTutorial'] as bool? ?? false,
+      bodyAsset: json['bodyAsset'] as String,
+      sources: (json['sources'] as List<dynamic>? ?? const <dynamic>[])
+          .map(
+            (dynamic e) => ArticleSource.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+    );
+  }
+}
+
 /// Track definition from `assets/content/tracks.json`.
 class TrackContent {
   const TrackContent({

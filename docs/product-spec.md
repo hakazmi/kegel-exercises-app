@@ -419,7 +419,7 @@ The build runs in five milestones, each ending in something testable. Tick items
 
 - [ ] O1 to O6 with safety routing
 - [ ] Tutorial with practice reps
-- [ ] Reminder scheduling and discreet notifications
+- [x] Reminder scheduling and discreet notifications
 
 **M4 Progress, Learn, Settings, paywall**
 

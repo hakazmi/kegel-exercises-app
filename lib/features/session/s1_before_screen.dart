@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
+import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/content/content_models.dart';
 import '../../core/data/providers.dart';
@@ -158,10 +159,7 @@ class _S1Body extends StatelessWidget {
         : l10n.s1Meta(session.durationSeconds, session.partCount);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
-      ),
+      value: AppSystemUi.darkHeaderLightBody,
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: Column(

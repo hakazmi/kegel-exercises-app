@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/theme/app_theme.dart';
+import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/secondary_button.dart';
@@ -91,10 +92,7 @@ class PlaceholderScreen extends StatelessWidget {
     }
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
-      ),
+      value: AppSystemUi.darkScreen,
       child: scaffold,
     );
   }

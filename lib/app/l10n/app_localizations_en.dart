@@ -687,9 +687,802 @@ class AppLocalizationsEn extends AppLocalizations {
   String get h3Title => 'Pain help';
 
   @override
-  String get h3Body =>
-      'Stop strengthening for now. Switch to relaxation-only training and talk to a clinician if pain continues.';
+  String get h3Headline => 'Stop squeezing exercises for now';
 
   @override
-  String get h3ConfirmRelaxation => 'Switch to relaxation';
+  String get h3Body =>
+      'Stop the squeezing exercises for now. Pain can mean the muscles are too tight, and more squeezing can make that worse.';
+
+  @override
+  String get h3BodyDetail =>
+      'Pain can mean the pelvic floor muscles are too tight. Squeezing more can make that worse. Relaxing them is the better starting point.';
+
+  @override
+  String get h3TrackBadge => 'Relaxation track, daily';
+
+  @override
+  String get h3TrackBreathing => 'Belly breathing · 2 min';
+
+  @override
+  String get h3TrackReverse => 'Reverse Kegel: gently let go · 2 min';
+
+  @override
+  String get h3TrackStretch => 'Child\'s pose stretch · 1 to 3 min';
+
+  @override
+  String get h3ClinicianNote =>
+      'See a doctor or pelvic floor physiotherapist if the pain continues, or if you have pain with erection or ejaculation.';
+
+  @override
+  String get h3SwitchRelaxation => 'Switch me to relaxation exercises';
+
+  @override
+  String get h3KeepPlan => 'Keep my plan';
+
+  @override
+  String get h3ConfirmRelaxation => 'Switch me to relaxation exercises';
+
+  @override
+  String get h3SwitchedConfirm =>
+      'You are on relaxation exercises now. Strengthening is paused.';
+
+  @override
+  String get h3IllustrationSemantic =>
+      'Person resting in a gentle stretch pose';
+
+  @override
+  String h1Streak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count-day streak',
+      one: '1-day streak',
+      zero: 'No streak',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String h1LevelDayOf(int level, int day, int total) {
+    return 'Level $level · Day $day of $total';
+  }
+
+  @override
+  String h1RelaxationDayOf(int day, int total) {
+    return 'Relaxation · Day $day of $total';
+  }
+
+  @override
+  String h1LevelName(int level, String name) {
+    return 'Level $level · $name';
+  }
+
+  @override
+  String h1DayProgress(int done, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      done,
+      locale: localeName,
+      other: '$done of $total days',
+      one: '1 of $total days',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get h1WeekRest => 'Rest';
+
+  @override
+  String h1Percent(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String h1SessionLabel(int number) {
+    return 'Session $number';
+  }
+
+  @override
+  String get h1SessionOptional => 'Optional';
+
+  @override
+  String get h1BreathingLabel => 'Relaxation breathing';
+
+  @override
+  String get h1ReverseLabel => 'Reverse Kegel';
+
+  @override
+  String h1DurationSeconds(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String h1DurationMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min',
+      one: '1 min',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String h1ItemDoneMeta(String duration) {
+    return 'Done · $duration';
+  }
+
+  @override
+  String h1ItemPendingMeta(String duration) {
+    return '$duration';
+  }
+
+  @override
+  String get h1StartSession => 'Start session';
+
+  @override
+  String get h1FeltPain => 'I felt pain';
+
+  @override
+  String get h1AllDone => 'Done for today. Rest is part of the training.';
+
+  @override
+  String get h1RestDay => 'Rest day. Your muscles recover today.';
+
+  @override
+  String get h1DailyCap =>
+      'That is enough for today. Doing more can tire the muscles and slow progress.';
+
+  @override
+  String get h1UpdateCatheter => 'Update my answer';
+
+  @override
+  String get h1CatheterClearedTitle => 'Catheter removed?';
+
+  @override
+  String get h1CatheterClearedMessage =>
+      'Only continue if your care team says you can start these exercises.';
+
+  @override
+  String get h1CatheterClearedConfirm => 'Yes, update answer';
+
+  @override
+  String get h1WeekMon => 'Mon';
+
+  @override
+  String get h1WeekTue => 'Tue';
+
+  @override
+  String get h1WeekWed => 'Wed';
+
+  @override
+  String get h1WeekThu => 'Thu';
+
+  @override
+  String get h1WeekFri => 'Fri';
+
+  @override
+  String get h1WeekSat => 'Sat';
+
+  @override
+  String get h1WeekSun => 'Sun';
+
+  @override
+  String get h1LevelCardSemantic => 'Open levels';
+
+  @override
+  String get h2Title => 'Your levels';
+
+  @override
+  String h2Subtitle(String track) {
+    return '$track plan. Each level makes holds a little longer.';
+  }
+
+  @override
+  String h2SubtitleRelaxation(String track) {
+    return '$track plan. Breathing and stretches come before strengthening.';
+  }
+
+  @override
+  String get h2Current => 'Current';
+
+  @override
+  String get h2Premium => 'Premium';
+
+  @override
+  String h2DaysOf(int done, int total) {
+    String _temp0 = intl.Intl.pluralLogic(
+      done,
+      locale: localeName,
+      other: '$done of $total days',
+      one: '1 of $total days',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String h2DayRange(int start, int end) {
+    return 'Days $start–$end';
+  }
+
+  @override
+  String h2DayOnward(int start) {
+    return 'Day $start onward';
+  }
+
+  @override
+  String h2LevelMeta(String range, String holds, String position) {
+    return '$range · $holds, $position';
+  }
+
+  @override
+  String get h2RelaxationName => 'Relaxation';
+
+  @override
+  String h2RelaxationMeta(int days) {
+    return 'Days 1–$days · daily breathing and stretches';
+  }
+
+  @override
+  String get h2RelaxationLevel1Note =>
+      'If the pain has settled and a clinician agrees, you can start Level 1.';
+
+  @override
+  String h2HoldsFixed(int seconds) {
+    return '$seconds s holds';
+  }
+
+  @override
+  String h2HoldsRange(int min, int max) {
+    return '$min–$max s holds';
+  }
+
+  @override
+  String get h2PositionLyingOrSitting => 'lying or sitting';
+
+  @override
+  String get h2PositionSitting => 'sitting';
+
+  @override
+  String get h2PositionSittingAndStanding => 'sitting and standing';
+
+  @override
+  String get h2PositionStanding => 'standing';
+
+  @override
+  String get h2PositionAny => 'everyday moves';
+
+  @override
+  String get h2PositionExtras => 'bridge and squat';
+
+  @override
+  String get h2UnlockNote =>
+      'The next level unlocks when you complete 5 of the last 7 days. Missed a few days? Your plan simply waits for you.';
+
+  @override
+  String get h2UnlockNoteRelaxation =>
+      'Strengthening levels stay below until the relaxation weeks are done. If the pain has settled and a clinician agrees, you can start Level 1.';
+
+  @override
+  String get h2RepeatOrStepDown => 'Repeat or step down a level';
+
+  @override
+  String get h2RepeatTitle => 'Repeat this level?';
+
+  @override
+  String get h2RepeatMessage =>
+      'Day progress for this level resets. Your session history stays on the device.';
+
+  @override
+  String get h2RepeatConfirm => 'Repeat level';
+
+  @override
+  String get h2StepDownTitle => 'Step down one level?';
+
+  @override
+  String get h2StepDownMessage =>
+      'You will train at the previous level. This never happens automatically.';
+
+  @override
+  String get h2StepDownConfirm => 'Step down';
+
+  @override
+  String get h2ChooseActionTitle => 'Adjust your level';
+
+  @override
+  String get h2ChooseRepeat => 'Repeat current level';
+
+  @override
+  String get h2ChooseStepDown => 'Step down one level';
+
+  @override
+  String get h2LevelNameStart => 'Start';
+
+  @override
+  String get h2LevelNameBuild => 'Build';
+
+  @override
+  String get h2LevelNameSteady => 'Steady';
+
+  @override
+  String get h2LevelNameDeep => 'Deep';
+
+  @override
+  String get h2LevelNameMaintain => 'Maintain';
+
+  @override
+  String get g1SettingsTooltip => 'Settings';
+
+  @override
+  String get g1StatStreakLabel => 'Streak';
+
+  @override
+  String g1StatStreakValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+      zero: '0 days',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get g1StatWeekLabel => 'This week';
+
+  @override
+  String g1StatWeekValue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions',
+      one: '1 session',
+      zero: '0 sessions',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get g1StatHoldLabel => 'Longest hold';
+
+  @override
+  String g1StatHoldValue(int seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get g1StatLevelLabel => 'Level';
+
+  @override
+  String g1StatLevelDay(int level, int day) {
+    return '$level · day $day';
+  }
+
+  @override
+  String get g1StatRelaxationLabel => 'Relaxation plan';
+
+  @override
+  String g1StatRelaxationDay(int day, int total) {
+    return 'Day $day of $total';
+  }
+
+  @override
+  String get h1RelaxationWeeksTitle => 'Weeks 1 to 2';
+
+  @override
+  String get g1CalPrevious => 'Previous month';
+
+  @override
+  String get g1CalNext => 'Next month';
+
+  @override
+  String get g1CalTrained => 'Trained';
+
+  @override
+  String g1CalMonthYear(String month, int year) {
+    return '$month $year';
+  }
+
+  @override
+  String get g1CalMon => 'M';
+
+  @override
+  String get g1CalTue => 'T';
+
+  @override
+  String get g1CalWed => 'W';
+
+  @override
+  String get g1CalThu => 'T';
+
+  @override
+  String get g1CalFri => 'F';
+
+  @override
+  String get g1CalSat => 'S';
+
+  @override
+  String get g1CalSun => 'S';
+
+  @override
+  String get g1MonthJanuary => 'January';
+
+  @override
+  String get g1MonthFebruary => 'February';
+
+  @override
+  String get g1MonthMarch => 'March';
+
+  @override
+  String get g1MonthApril => 'April';
+
+  @override
+  String get g1MonthMay => 'May';
+
+  @override
+  String get g1MonthJune => 'June';
+
+  @override
+  String get g1MonthJuly => 'July';
+
+  @override
+  String get g1MonthAugust => 'August';
+
+  @override
+  String get g1MonthSeptember => 'September';
+
+  @override
+  String get g1MonthOctober => 'October';
+
+  @override
+  String get g1MonthNovember => 'November';
+
+  @override
+  String get g1MonthDecember => 'December';
+
+  @override
+  String get g1CheckInBaselineTitle => 'Baseline check-in';
+
+  @override
+  String get g1CheckInBaselineBody =>
+      'One question, 10 seconds. See your own change over time.';
+
+  @override
+  String get g1CheckInFollowUpTitle => '4-week check-in';
+
+  @override
+  String get g1CheckInFollowUpBody =>
+      'One question. Compare with your earlier answer.';
+
+  @override
+  String get g1CheckInHistoryTitle => 'Your check-ins';
+
+  @override
+  String get g1CheckInStart => 'Start';
+
+  @override
+  String get g1CheckInLockedHint =>
+      'A short check-in unlocks after your third completed session.';
+
+  @override
+  String get g1CheckInUnlockHistory => 'Unlock check-in history';
+
+  @override
+  String get g2EyebrowBaseline => 'WEEK 0 · BASELINE';
+
+  @override
+  String get g2EyebrowFollowUp => '4-WEEK CHECK-IN';
+
+  @override
+  String get g2SubtitleBaseline =>
+      'We will ask again in 4 weeks and show you both answers side by side.';
+
+  @override
+  String get g2SubtitleFollowUp =>
+      'Your answers stay on this phone. No predictions.';
+
+  @override
+  String get g2PrivacyNote => 'Saved only on this phone';
+
+  @override
+  String get g2Save => 'Save';
+
+  @override
+  String get g2Skip => 'Skip for now';
+
+  @override
+  String get g2Done => 'Done';
+
+  @override
+  String get g2ResultTitle => 'Your check-in';
+
+  @override
+  String get g2ResultSubtitle =>
+      'Your own numbers, side by side. Results vary.';
+
+  @override
+  String g2ComparisonLine(int week, int score, int max, String label) {
+    return 'Week $week: $score of $max · $label';
+  }
+
+  @override
+  String get g2DoctorNote =>
+      'Exercises do not help everyone. It is worth talking to a doctor.';
+
+  @override
+  String get g2HistoryPremiumHint =>
+      'Full check-in history is part of Premium.';
+
+  @override
+  String get g2QuestionBladder =>
+      'In the last week, how often did you leak urine?';
+
+  @override
+  String get g2OptionBladder1 => 'Never';
+
+  @override
+  String get g2OptionBladder2 => 'Once or twice';
+
+  @override
+  String get g2OptionBladder3 => 'A few times';
+
+  @override
+  String get g2OptionBladder4 => 'Most days';
+
+  @override
+  String get g2OptionBladder5 => 'Every day';
+
+  @override
+  String get g2QuestionErection =>
+      'How would you rate erection firmness in the last week?';
+
+  @override
+  String get g2OptionErection1 => 'Very soft';
+
+  @override
+  String get g2OptionErection2 => 'Soft';
+
+  @override
+  String get g2OptionErection3 => 'Moderate';
+
+  @override
+  String get g2OptionErection4 => 'Firm';
+
+  @override
+  String get g2OptionErection5 => 'Very firm';
+
+  @override
+  String get g2QuestionEjaculation =>
+      'How much control did you feel in the last week?';
+
+  @override
+  String get g2OptionEjaculation1 => 'No control';
+
+  @override
+  String get g2OptionEjaculation2 => 'A little control';
+
+  @override
+  String get g2OptionEjaculation3 => 'Some control';
+
+  @override
+  String get g2OptionEjaculation4 => 'Good control';
+
+  @override
+  String get g2OptionEjaculation5 => 'Full control';
+
+  @override
+  String get g2QuestionSurgery =>
+      'In the last week, how well have you controlled your urine?';
+
+  @override
+  String get g2OptionSurgery1 => 'No control';
+
+  @override
+  String get g2OptionSurgery2 => 'Limited control';
+
+  @override
+  String get g2OptionSurgery3 => 'Some control';
+
+  @override
+  String get g2OptionSurgery4 => 'Good control';
+
+  @override
+  String get g2OptionSurgery5 => 'Full control';
+
+  @override
+  String get g2QuestionGeneral =>
+      'In the last week, how comfortable has your pelvic area felt?';
+
+  @override
+  String get g2OptionGeneral1 => 'Very uncomfortable';
+
+  @override
+  String get g2OptionGeneral2 => 'Uncomfortable';
+
+  @override
+  String get g2OptionGeneral3 => 'Mixed';
+
+  @override
+  String get g2OptionGeneral4 => 'Mostly comfortable';
+
+  @override
+  String get g2OptionGeneral5 => 'Very comfortable';
+
+  @override
+  String get l1ArticlesHeading => 'Articles';
+
+  @override
+  String l1StartHere(int minutes) {
+    return 'Start here · $minutes min';
+  }
+
+  @override
+  String get l1ReplayTutorial => 'Replay the tutorial anytime';
+
+  @override
+  String l1Minutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String l2MinutesRead(int minutes) {
+    return '$minutes min read';
+  }
+
+  @override
+  String get l2Sources => 'Sources';
+
+  @override
+  String get l2NotFound => 'Article not found.';
+
+  @override
+  String get x1Title => 'Settings';
+
+  @override
+  String get x1SectionPlan => 'Plan';
+
+  @override
+  String get x1SectionReminders => 'Reminders';
+
+  @override
+  String get x1SectionSession => 'Session';
+
+  @override
+  String get x1SectionPrivacy => 'Privacy';
+
+  @override
+  String get x1SectionSubscription => 'Subscription';
+
+  @override
+  String get x1SectionAbout => 'About';
+
+  @override
+  String get x1Goal => 'Goal';
+
+  @override
+  String get x1GoalTitle => 'Your goal';
+
+  @override
+  String get x1DailyTime => 'Daily time';
+
+  @override
+  String get x1DailyTimeTitle => 'Sessions per day';
+
+  @override
+  String x1DailySessions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions a day',
+      one: '1 session a day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get x1SafetyAnswers => 'Safety answers';
+
+  @override
+  String get x1SafetyTitle => 'Safety answers';
+
+  @override
+  String get x1ValueNone => 'None';
+
+  @override
+  String x1SafetySelectedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected',
+      one: '1 selected',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get x1DailyReminder => 'Daily reminder';
+
+  @override
+  String get x1TimeAndDays => 'Time and days';
+
+  @override
+  String get x1ReminderScheduleTitle => 'Reminder time and days';
+
+  @override
+  String get x1EveryDay => 'Every day';
+
+  @override
+  String get x1Daily => 'Daily';
+
+  @override
+  String x1DaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get x1Vibration => 'Vibration cues';
+
+  @override
+  String get x1Voice => 'Voice cues';
+
+  @override
+  String get x1Discreet => 'Discreet notifications';
+
+  @override
+  String get x1DiscreetSubtitle => 'No health words on the lock screen.';
+
+  @override
+  String get x1DeleteAll => 'Delete all my data';
+
+  @override
+  String get x1DeleteTitle => 'Delete all data?';
+
+  @override
+  String get x1DeleteMessage =>
+      'This removes your plan, sessions and check-ins from this phone. It cannot be undone.';
+
+  @override
+  String get x1DeleteConfirm => 'Delete everything';
+
+  @override
+  String get x1ManagePlay => 'Manage in Google Play';
+
+  @override
+  String get x1ManageAppStore => 'Manage in the App Store';
+
+  @override
+  String get x1Free => 'Free';
+
+  @override
+  String get x1Premium => 'Premium';
+
+  @override
+  String get x1Restore => 'Restore purchase';
+
+  @override
+  String get x1RestoreStub =>
+      'Restore will be available when subscriptions ship.';
+
+  @override
+  String get x1LegalRow => 'Disclaimer, privacy and terms';
+
+  @override
+  String get x1PrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get x1Terms => 'Terms';
+
+  @override
+  String get x1Contact => 'Contact';
+
+  @override
+  String x1VersionFooter(String version) {
+    return 'Version $version · Not a medical device';
+  }
 }

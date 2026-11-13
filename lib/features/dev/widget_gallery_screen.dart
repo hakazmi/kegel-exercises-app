@@ -120,7 +120,7 @@ class _WidgetGalleryScreenState extends State<WidgetGalleryScreen> {
               WeekDayItem(label: 'Thu', dayNumber: '12'),
               WeekDayItem(label: 'Fri', dayNumber: '13'),
               WeekDayItem(label: 'Sat', dayNumber: '14'),
-              WeekDayItem(label: 'Sun', dayNumber: '15', isRest: true),
+              WeekDayItem(label: 'Sun', dayNumber: 'Rest', isRest: true),
             ],
           ),
           const SizedBox(height: AppSpacing.xl),

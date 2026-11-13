@@ -13,6 +13,7 @@ class WeekDayItem {
   });
 
   final String label;
+  /// Calendar day number, or the rest label (same typography as day numbers).
   final String dayNumber;
   final bool completed;
   final bool isToday;
@@ -50,7 +51,8 @@ class _DayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color bg = day.isToday ? AppColors.ink : Colors.transparent;
-    final Color fg = day.isToday ? AppColors.textOnPrimary : AppColors.textPrimary;
+    final Color fg =
+        day.isToday ? AppColors.textOnPrimary : AppColors.textPrimary;
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
       child: DecoratedBox(
@@ -66,21 +68,30 @@ class _DayCell extends StatelessWidget {
               Text(
                 day.label,
                 style: AppTypography.caption.copyWith(
-                  color: day.isToday ? AppColors.textOnPrimary : AppColors.textSecondary,
+                  color: day.isToday
+                      ? AppColors.textOnPrimary
+                      : AppColors.textSecondary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
-              Text(
-                day.isRest ? 'Rest' : day.dayNumber,
-                style: AppTypography.body.copyWith(
-                  color: fg,
-                  fontWeight: FontWeight.w700,
-                  fontSize: day.isRest ? 12 : 16,
+              SizedBox(
+                height: 22,
+                child: Center(
+                  child: Text(
+                    day.dayNumber,
+                    style: AppTypography.body.copyWith(
+                      color: fg,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      height: 1.2,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
               SizedBox(

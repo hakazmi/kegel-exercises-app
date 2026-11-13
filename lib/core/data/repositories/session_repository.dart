@@ -48,6 +48,28 @@ class SessionRepository {
 
   Future<void> clear() => _db.delete(_db.sessions).go();
 
+  /// Deletes every session whose calendar day matches [day] (local date-only).
+  Future<int> deleteOnDay(DateTime day) async {
+    final DateTime target = DateTime(day.year, day.month, day.day);
+    final List<SessionRecord> all = await getAll();
+    int removed = 0;
+    for (final SessionRecord session in all) {
+      final DateTime when = session.completedAt ?? session.startedAt;
+      final DateTime sessionDay = DateTime(when.year, when.month, when.day);
+      if (session.id == null ||
+          sessionDay.year != target.year ||
+          sessionDay.month != target.month ||
+          sessionDay.day != target.day) {
+        continue;
+      }
+      await (_db.delete(_db.sessions)
+            ..where((Sessions t) => t.id.equals(session.id!)))
+          .go();
+      removed += 1;
+    }
+    return removed;
+  }
+
   SessionRecord _fromRow(Session row) {
     return SessionRecord(
       id: row.id,

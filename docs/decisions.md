@@ -4,7 +4,7 @@ One line per decision the product spec does not cover. Format: `YYYY-MM-DD — D
 
 2026-11-12 — Safety rules: keep all 9 (spec heading says eight; numbered list plus never-diagnoses paragraph).
 2026-11-12 — Build steps: use the owner's Prompt 0–13 pack in docs/progress.md, not the M1–M5 mapping.
-2026-11-12 — One Flutter codebase for Android and iOS; first store release is Android; keep code iOS-ready (no Android-only API without a platform check); iOS submission after Prompt 13.
+2026-11-13 — Android and iOS are both first-class from now on; every step is tested on both platforms.
 2026-11-12 — "Mild discomfort" twice in a row only suggests stepping down a level; never step down automatically.
 2026-11-12 — Check-in baseline offered once after the third completed session overall, then every 4 weeks.
 2026-11-12 — Do not hard-code prices or trial length; they come from store products via RevenueCat.
@@ -32,3 +32,18 @@ One line per decision the product spec does not cover. Format: `YYYY-MM-DD — D
 2026-11-13 — Session haptics use the `vibration` package (custom patterns with HapticFeedback fallback). Allowed dependency for Prompt 5.
 2026-11-13 — Haptics go through HapticsService: Android keeps `vibration` patterns; iOS uses HapticFeedback (heavy/medium/vibrate). TTS on iOS uses ambient + mixWithOthers so the audio session does not block haptics.
 2026-11-13 — S3 phase countdown: bare seconds under 60; `m:ss` (unpadded minutes) at 60+. Elapsed clock stays zero-padded `mm:ss`. Last-block next label is "Finish".
+2026-11-13 — Android main manifest declares VIBRATE only; debug/profile also merge INTERNET; flutter_local_notifications merges POST_NOTIFICATIONS (for Prompt 9). Portrait-only via Flutter + AndroidManifest + Info.plist. S2/S3 use PopScope so system back matches Exit confirm. Edge-to-edge uses AppSystemUi light/dark (and S1 dark-header/light-body) for status + nav icons.
+2026-11-13 — H1 level card title is "Level N · Name" (relaxation-first: "Relaxation · Weeks 1 to 2"); progress row is "D of T days" with the bar (no duplicate Day line). T for strengthening is the level dayStart/dayEnd span (Level 5 uses the 7-day unlock window); relaxation-first T is 14 days (spec: 2 weeks).
+2026-11-13 — H2 on relaxation-first: current card is the relaxation plan (Days 1–14) with progress; Level 1 is not Current and shows the clinician-start note; subtitle uses the relaxation line; strengthening levels stay listed below with Premium locks unchanged.
+2026-11-13 — isPremiumProvider stubs false until RevenueCat (Prompt 10); /dev/data can override. Locked Levels 2–5 open paywall with ?source=locked_content.
+2026-11-13 — MainShell PopScope: Android back on Progress/Learn goes to Today; on Today calls SystemNavigator.pop. Tab stacks stay independent via StatefulShellRoute.
+2026-11-13 — H1 catheter "Update my answer" opens Settings → Safety answers (re-runs SafetyRouting); it does not clear the catheter flag directly. Debug day tools use debugDayOffsetProvider → OffsetClock so PlanService/streak see the shifted "today".
+2026-11-13 — compileSdk 37 and desugaring are required by flutter_local_notifications.
+2026-11-13 — G2 check-in stores normalised scores 1 = worst … 5 = best. On-screen option order: bladder keeps Never at the top but maps Never = 5 / Every day = 1; other goals top = worst. Approved wording — surgery: "In the last week, how well have you controlled your urine?" (No control → Full control); general: "In the last week, how comfortable has your pelvic area felt?" (Very uncomfortable → Very comfortable). Bladder / erection / ejaculation questions unchanged. Comparison lines show "Week N: S of 5 · label".
+2026-11-13 — G2 doctor hint fires when the latest normalised score is still 1 after ≥8 weeks from baseline. Bladder "Never" (normalised 5) never triggers the hint.
+2026-11-13 — Check-in history UI is premium: free users see the baseline row only; all scores still store locally in Drift and never reach AnalyticsService.
+2026-11-13 — package_info_plus approved for Settings version line.
+2026-11-13 — flutter_timezone approved to read the device IANA time zone for reminder scheduling. ReminderService uses flutter_local_notifications with AndroidScheduleMode.inexactAllowWhileIdle (no exact-alarm permission). Android channel name "Daily reminder"; boot receivers in the app manifest. Permission requested only on O5 "Remind me" or Settings reminder on.
+2026-11-13 — Learn articles: 8 Markdown drafts under assets/content/articles with "DRAFT: content pending review"; index in articles.json (title, minutes, image, sources). Featured card is "Finding the right muscles" and opens tutorial replay; other seven list with thumbnails. SimpleMarkdown renderer (no flutter_markdown). Spec section 9 lists 8 titles; all are present (1 featured + 7 list). Learn thumbnails use a fixed 56×56 BoxFit.contain slot.
+2026-11-13 — H1 relaxation-first card title is "Weeks 1 to 2" (eyebrow already says the track). G1 fourth tile on that track: label "Relaxation plan", value "Day D of 14".
+2026-11-13 — Settings safety answers re-use O3 routing via SafetyRouting (pain → relaxation-first; catheter blocks Today; Learn stays available). Delete-all clears Drift + prefs, cancels ReminderService, resets onboarding draft, goes to Welcome.

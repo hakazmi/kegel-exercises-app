@@ -16,6 +16,9 @@ abstract final class PlanRules {
   static const int levelUnlockMinCompletedDays = 5;
   static const int relaxationFirstWeeks = 2;
 
+  /// Calendar length of the relaxation-first track (spec: 2 weeks).
+  static int get relaxationFirstDays => relaxationFirstWeeks * 7;
+
   /// Default ISO weekday for rest day: 7 = Sunday.
   static const int defaultRestWeekday = DateTime.sunday;
 
@@ -104,17 +107,24 @@ abstract final class PlanRules {
 
   /// Level day index counted from completed training days in this level (not calendar).
   /// Rest days never advance [dayInLevel]. Missed calendar days do not rewind it.
+  /// Relaxation-first counts days with a completed relaxation or breathing session.
   static int dayInLevel({
     required UserProfile profile,
     required List<SessionRecord> sessions,
   }) {
+    final bool relaxationOnly = profile.track == TrackId.relaxationFirst;
     final int completedTrainingDays = sessions
-        .where(
-          (SessionRecord s) =>
-              s.completed &&
-              s.level == profile.level &&
-              s.kind == SessionKind.strengthening,
-        )
+        .where((SessionRecord s) {
+          if (!s.completed) {
+            return false;
+          }
+          if (relaxationOnly) {
+            return s.kind == SessionKind.relaxation ||
+                s.kind == SessionKind.breathing;
+          }
+          return s.level == profile.level &&
+              s.kind == SessionKind.strengthening;
+        })
         .map((SessionRecord s) => dateOnly(s.completedAt ?? s.startedAt))
         .toSet()
         .length;

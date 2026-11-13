@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,12 +8,13 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
+import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/user_profile.dart';
-import '../../core/widgets/confirm_dialog.dart';
 import 'engine/engine_models.dart';
 import 'session_controller.dart';
+import 'session_exit.dart';
 import 'session_time_format.dart';
 import 'widgets/session_muscle_ring.dart';
 
@@ -87,18 +90,14 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
   }
 
   Future<void> _confirmExit() async {
-    final AppLocalizations l10n = AppLocalizations.of(context);
-    final bool ok = await ConfirmDialog.show(
-      context,
-      title: l10n.s3ExitTitle,
-      message: l10n.s3ExitMessage,
-      confirmLabel: l10n.s3ExitConfirm,
-      cancelLabel: l10n.commonCancel,
-      isDestructive: true,
-    );
+    if (_navigating) {
+      return;
+    }
+    final bool ok = await confirmSessionExit(context);
     if (!ok || !mounted) {
       return;
     }
+    _navigating = true;
     await ref.read(sessionControllerProvider.notifier).exitSession();
     if (!mounted) {
       return;
@@ -168,9 +167,20 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
     });
 
     if (play == null) {
-      return const Scaffold(
-        backgroundColor: AppColors.sessionBackground,
-        body: Center(child: CircularProgressIndicator()),
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, Object? result) {
+          if (!didPop) {
+            _confirmExit();
+          }
+        },
+        child: const AnnotatedRegion<SystemUiOverlayStyle>(
+          value: AppSystemUi.darkScreen,
+          child: Scaffold(
+            backgroundColor: AppColors.sessionBackground,
+            body: Center(child: CircularProgressIndicator()),
+          ),
+        ),
       );
     }
 
@@ -184,14 +194,18 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
     final String nextTitle =
         nextKey == null ? l10n.s3NoNextBlock : _blockTitle(l10n, nextKey);
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
-      ),
-      child: Scaffold(
-        backgroundColor: AppColors.sessionBackground,
-        body: SafeArea(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop) {
+          _confirmExit();
+        }
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: AppSystemUi.darkScreen,
+        child: Scaffold(
+          backgroundColor: AppColors.sessionBackground,
+          body: SafeArea(
           child: Column(
             children: [
               Padding(
@@ -222,53 +236,71 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
                 ),
               ),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Semantics(
-                      liveRegion: true,
-                      label: es.phaseWord,
-                      child: SessionMuscleRing(engineState: es),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      es.phaseWord,
-                      style: AppTypography.display.copyWith(
-                        color: AppColors.sessionText,
-                        fontSize: 36,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      formatPhaseSecondsRemaining(es.secondsRemaining),
-                      style: AppTypography.title.copyWith(
-                        color: AppColors.sessionTextSecondary,
-                        fontSize: 28,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xl,
-                      ),
-                      child: Text(
-                        _cue(l10n, es.elapsedSeconds),
-                        textAlign: TextAlign.center,
-                        style: AppTypography.body.copyWith(
-                          color: AppColors.sessionTextSecondary,
+                child: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    final double ringSize = math.min(
+                      280,
+                      math.max(160, constraints.maxHeight * 0.5),
+                    );
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Semantics(
+                              liveRegion: true,
+                              label: es.phaseWord,
+                              child: SessionMuscleRing(
+                                engineState: es,
+                                size: ringSize,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            Text(
+                              es.phaseWord,
+                              style: AppTypography.display.copyWith(
+                                color: AppColors.sessionText,
+                                fontSize: 36,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              formatPhaseSecondsRemaining(es.secondsRemaining),
+                              style: AppTypography.title.copyWith(
+                                color: AppColors.sessionTextSecondary,
+                                fontSize: 28,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.xl,
+                              ),
+                              child: Text(
+                                _cue(l10n, es.elapsedSeconds),
+                                textAlign: TextAlign.center,
+                                style: AppTypography.body.copyWith(
+                                  color: AppColors.sessionTextSecondary,
+                                ),
+                              ),
+                            ),
+                            if (es.rep != null && es.totalReps != null) ...[
+                              const SizedBox(height: AppSpacing.sm),
+                              Text(
+                                l10n.s3RepOf(es.rep!, es.totalReps!),
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.sessionTextSecondary,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    ),
-                    if (es.rep != null && es.totalReps != null) ...[
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        l10n.s3RepOf(es.rep!, es.totalReps!),
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.sessionTextSecondary,
-                        ),
-                      ),
-                    ],
-                  ],
+                    );
+                  },
                 ),
               ),
               Padding(
@@ -354,6 +386,7 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
             ],
           ),
         ),
+      ),
       ),
     );
   }

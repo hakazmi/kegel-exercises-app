@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/services.dart';
 
+import 'system_ui.dart';
 import 'tokens.dart';
 
 /// Builds the light app [ThemeData] and the dark [SessionTheme] for S2–S4.
@@ -43,7 +43,7 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        systemOverlayStyle: AppSystemUi.lightScreen,
         centerTitle: true,
       ),
       dividerColor: AppColors.border,
@@ -111,7 +111,7 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         backgroundColor: AppColors.sessionBackground,
         foregroundColor: AppColors.sessionText,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        systemOverlayStyle: AppSystemUi.darkScreen,
       ),
     );
   }

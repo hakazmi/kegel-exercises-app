@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegelexercisesapp/app/app.dart';
 import 'package:kegelexercisesapp/app/router.dart';
+import 'package:kegelexercisesapp/core/data/database/app_database.dart';
 import 'package:kegelexercisesapp/core/data/providers.dart';
 import 'package:kegelexercisesapp/core/domain/enums.dart';
 import 'package:kegelexercisesapp/core/domain/user_profile.dart';
@@ -15,9 +16,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<ProviderContainer> _container() async {
   SharedPreferences.setMockInitialValues(<String, Object>{});
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final AppDatabase db = AppDatabase.memory();
+  addTearDown(db.close);
   return ProviderContainer(
     overrides: [
       sharedPreferencesProvider.overrideWithValue(prefs),
+      appDatabaseProvider.overrideWithValue(db),
     ],
   );
 }
@@ -197,17 +201,30 @@ void main() {
       find.text('A urinary catheter in place right now'),
     );
     await tester.tap(find.text('Continue to Today'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    for (int i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+      if (find.text('Update my answer').evaluate().isNotEmpty) {
+        break;
+      }
+    }
 
     final UserProfile profile = container.read(userProfileProvider);
     expect(profile.onboardingDone, isTrue);
     expect(profile.safetyFlags.catheter, isTrue);
-    expect(find.textContaining('H1'), findsWidgets);
+    expect(find.text('Update my answer'), findsOneWidget);
+    expect(find.text(catheterMessage), findsWidgets);
 
     final GoRouter router = container.read(routerProvider);
     router.go(AppRoutes.welcome);
-    await tester.pumpAndSettle();
-    expect(find.textContaining('H1'), findsWidgets);
+    await tester.pump();
+    for (int i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+      if (find.text('Update my answer').evaluate().isNotEmpty) {
+        break;
+      }
+    }
+    expect(find.text('Update my answer'), findsOneWidget);
   });
 
   testWidgets(
@@ -276,11 +293,18 @@ void main() {
     expect(find.text('Continue to Today'), findsOneWidget);
 
     await tester.tap(find.text('Continue to Today'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    for (int i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+      if (find.text('Update my answer').evaluate().isNotEmpty) {
+        break;
+      }
+    }
     final UserProfile profile = container.read(userProfileProvider);
     expect(profile.safetyFlags.catheter, isTrue);
     expect(profile.safetyFlags.pain, isTrue);
     expect(profile.safetyFlags.recentSurgery, isTrue);
+    expect(find.text('Update my answer'), findsOneWidget);
   });
 
   testWidgets(
@@ -396,6 +420,7 @@ void main() {
 
     expect(find.text('RELAXATION FIRST PLAN'), findsOneWidget);
     expect(find.text('Relaxation · Weeks 1 to 2'), findsOneWidget);
+    expect(find.textContaining('14 days · daily breathing and stretches'), findsOneWidget);
     expect(find.text('Level 1 · Start'), findsNothing);
     expect(find.textContaining('Holds get easier'), findsNothing);
     expect(find.textContaining('Results vary'), findsNothing);

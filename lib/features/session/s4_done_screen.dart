@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
+import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/domain/enums.dart';
 import '../../core/widgets/primary_button.dart';
@@ -86,9 +87,7 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
 
     if (summary == null) {
       return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light.copyWith(
-          statusBarColor: Colors.transparent,
-        ),
+        value: AppSystemUi.darkScreen,
         child: Scaffold(
           backgroundColor: AppColors.sessionBackground,
           body: Center(
@@ -106,10 +105,7 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
         : l10n.s4TimeSeconds(summary.durationSeconds);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-        systemStatusBarContrastEnforced: false,
-      ),
+      value: AppSystemUi.darkScreen,
       child: Scaffold(
         backgroundColor: AppColors.sessionBackground,
         body: SafeArea(

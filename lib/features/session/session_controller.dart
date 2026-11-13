@@ -13,6 +13,7 @@ import '../../core/plan/plan_rules.dart';
 import '../../core/plan/session_definition.dart';
 import '../../core/services/analytics_service.dart';
 import '../../core/services/haptics_service.dart';
+import '../../core/services/reminder_service.dart';
 import '../../core/time/app_clock.dart';
 import 'engine/engine_models.dart';
 import 'engine/session_engine.dart';
@@ -109,11 +110,10 @@ class SessionController extends Notifier<SessionPlayState?> {
     _stateSub = engine.states.listen(_onState);
     _eventSub = engine.events.listen(_onEvent);
 
-    try {
-      await WakelockPlus.enable();
-    } on Object {
-      // Keep playing without wakelock if the platform refuses.
-    }
+    // Fire-and-forget: platform channel can hang in tests without a plugin.
+    unawaited(
+      WakelockPlus.enable().catchError((Object _) {}),
+    );
 
     state = SessionPlayState(
       itemId: item.id,
@@ -197,6 +197,10 @@ class SessionController extends Notifier<SessionPlayState?> {
     final List<SessionRecord> sessions =
         await ref.read(sessionRepositoryProvider).getAll();
     final bool suggestStepDown = PlanRules.shouldSuggestStepDown(sessions);
+
+    unawaited(
+      ref.read(reminderServiceProvider).reschedule().catchError((Object _) {}),
+    );
 
     if (feel == SessionFeel.pain) {
       return SessionSaveResult(
@@ -315,11 +319,9 @@ class SessionController extends Notifier<SessionPlayState?> {
       nextLabel = null;
     }
 
-    try {
-      await WakelockPlus.disable();
-    } on Object {
-      // Ignore.
-    }
+    unawaited(
+      WakelockPlus.disable().catchError((Object _) {}),
+    );
 
     state = SessionPlayState(
       itemId: current.itemId,
@@ -406,11 +408,9 @@ class SessionController extends Notifier<SessionPlayState?> {
     _engine?.dispose();
     _engine = null;
     await _voice.dispose();
-    try {
-      await WakelockPlus.disable();
-    } on Object {
-      // Ignore.
-    }
+    unawaited(
+      WakelockPlus.disable().catchError((Object _) {}),
+    );
   }
 }
 

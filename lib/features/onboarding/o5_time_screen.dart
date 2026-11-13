@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/services/reminder_service.dart';
 import '../../core/widgets/widgets.dart';
 import 'onboarding_controller.dart';
 import 'onboarding_state.dart';
@@ -183,6 +184,8 @@ class O5TimeScreen extends ConsumerWidget {
             label: l10n.o5RemindMe,
             onPressed: () async {
               controller.setReminderEnabled(true);
+              // Permission only when the user opts in (Android 13+ / iOS).
+              await ref.read(reminderServiceProvider).requestPermission();
               await controller.completeStep('O5');
               if (context.mounted) {
                 context.go(AppRoutes.plan);

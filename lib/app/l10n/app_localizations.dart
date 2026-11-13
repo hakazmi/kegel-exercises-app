@@ -1282,17 +1282,1301 @@ abstract class AppLocalizations {
   /// **'Pain help'**
   String get h3Title;
 
+  /// No description provided for @h3Headline.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop squeezing exercises for now'**
+  String get h3Headline;
+
   /// No description provided for @h3Body.
   ///
   /// In en, this message translates to:
-  /// **'Stop strengthening for now. Switch to relaxation-only training and talk to a clinician if pain continues.'**
+  /// **'Stop the squeezing exercises for now. Pain can mean the muscles are too tight, and more squeezing can make that worse.'**
   String get h3Body;
+
+  /// No description provided for @h3BodyDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Pain can mean the pelvic floor muscles are too tight. Squeezing more can make that worse. Relaxing them is the better starting point.'**
+  String get h3BodyDetail;
+
+  /// No description provided for @h3TrackBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxation track, daily'**
+  String get h3TrackBadge;
+
+  /// No description provided for @h3TrackBreathing.
+  ///
+  /// In en, this message translates to:
+  /// **'Belly breathing · 2 min'**
+  String get h3TrackBreathing;
+
+  /// No description provided for @h3TrackReverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse Kegel: gently let go · 2 min'**
+  String get h3TrackReverse;
+
+  /// No description provided for @h3TrackStretch.
+  ///
+  /// In en, this message translates to:
+  /// **'Child\'s pose stretch · 1 to 3 min'**
+  String get h3TrackStretch;
+
+  /// No description provided for @h3ClinicianNote.
+  ///
+  /// In en, this message translates to:
+  /// **'See a doctor or pelvic floor physiotherapist if the pain continues, or if you have pain with erection or ejaculation.'**
+  String get h3ClinicianNote;
+
+  /// No description provided for @h3SwitchRelaxation.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch me to relaxation exercises'**
+  String get h3SwitchRelaxation;
+
+  /// No description provided for @h3KeepPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep my plan'**
+  String get h3KeepPlan;
 
   /// No description provided for @h3ConfirmRelaxation.
   ///
   /// In en, this message translates to:
-  /// **'Switch to relaxation'**
+  /// **'Switch me to relaxation exercises'**
   String get h3ConfirmRelaxation;
+
+  /// No description provided for @h3SwitchedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'You are on relaxation exercises now. Strengthening is paused.'**
+  String get h3SwitchedConfirm;
+
+  /// No description provided for @h3IllustrationSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Person resting in a gentle stretch pose'**
+  String get h3IllustrationSemantic;
+
+  /// No description provided for @h1Streak.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No streak} =1{1-day streak} other{{count}-day streak}}'**
+  String h1Streak(int count);
+
+  /// No description provided for @h1LevelDayOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {level} · Day {day} of {total}'**
+  String h1LevelDayOf(int level, int day, int total);
+
+  /// No description provided for @h1RelaxationDayOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxation · Day {day} of {total}'**
+  String h1RelaxationDayOf(int day, int total);
+
+  /// No description provided for @h1LevelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {level} · {name}'**
+  String h1LevelName(int level, String name);
+
+  /// No description provided for @h1DayProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{done, plural, =1{1 of {total} days} other{{done} of {total} days}}'**
+  String h1DayProgress(int done, int total);
+
+  /// No description provided for @h1WeekRest.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest'**
+  String get h1WeekRest;
+
+  /// No description provided for @h1Percent.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String h1Percent(int percent);
+
+  /// No description provided for @h1SessionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Session {number}'**
+  String h1SessionLabel(int number);
+
+  /// No description provided for @h1SessionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get h1SessionOptional;
+
+  /// No description provided for @h1BreathingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxation breathing'**
+  String get h1BreathingLabel;
+
+  /// No description provided for @h1ReverseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse Kegel'**
+  String get h1ReverseLabel;
+
+  /// No description provided for @h1DurationSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s'**
+  String h1DurationSeconds(int seconds);
+
+  /// No description provided for @h1DurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{1 min} other{{minutes} min}}'**
+  String h1DurationMinutes(int minutes);
+
+  /// No description provided for @h1ItemDoneMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Done · {duration}'**
+  String h1ItemDoneMeta(String duration);
+
+  /// No description provided for @h1ItemPendingMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{duration}'**
+  String h1ItemPendingMeta(String duration);
+
+  /// No description provided for @h1StartSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Start session'**
+  String get h1StartSession;
+
+  /// No description provided for @h1FeltPain.
+  ///
+  /// In en, this message translates to:
+  /// **'I felt pain'**
+  String get h1FeltPain;
+
+  /// No description provided for @h1AllDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done for today. Rest is part of the training.'**
+  String get h1AllDone;
+
+  /// No description provided for @h1RestDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest day. Your muscles recover today.'**
+  String get h1RestDay;
+
+  /// No description provided for @h1DailyCap.
+  ///
+  /// In en, this message translates to:
+  /// **'That is enough for today. Doing more can tire the muscles and slow progress.'**
+  String get h1DailyCap;
+
+  /// No description provided for @h1UpdateCatheter.
+  ///
+  /// In en, this message translates to:
+  /// **'Update my answer'**
+  String get h1UpdateCatheter;
+
+  /// No description provided for @h1CatheterClearedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catheter removed?'**
+  String get h1CatheterClearedTitle;
+
+  /// No description provided for @h1CatheterClearedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Only continue if your care team says you can start these exercises.'**
+  String get h1CatheterClearedMessage;
+
+  /// No description provided for @h1CatheterClearedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, update answer'**
+  String get h1CatheterClearedConfirm;
+
+  /// No description provided for @h1WeekMon.
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get h1WeekMon;
+
+  /// No description provided for @h1WeekTue.
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get h1WeekTue;
+
+  /// No description provided for @h1WeekWed.
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get h1WeekWed;
+
+  /// No description provided for @h1WeekThu.
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get h1WeekThu;
+
+  /// No description provided for @h1WeekFri.
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get h1WeekFri;
+
+  /// No description provided for @h1WeekSat.
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get h1WeekSat;
+
+  /// No description provided for @h1WeekSun.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get h1WeekSun;
+
+  /// No description provided for @h1LevelCardSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open levels'**
+  String get h1LevelCardSemantic;
+
+  /// No description provided for @h2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your levels'**
+  String get h2Title;
+
+  /// No description provided for @h2Subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{track} plan. Each level makes holds a little longer.'**
+  String h2Subtitle(String track);
+
+  /// No description provided for @h2SubtitleRelaxation.
+  ///
+  /// In en, this message translates to:
+  /// **'{track} plan. Breathing and stretches come before strengthening.'**
+  String h2SubtitleRelaxation(String track);
+
+  /// No description provided for @h2Current.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get h2Current;
+
+  /// No description provided for @h2Premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get h2Premium;
+
+  /// No description provided for @h2DaysOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{done, plural, =1{1 of {total} days} other{{done} of {total} days}}'**
+  String h2DaysOf(int done, int total);
+
+  /// No description provided for @h2DayRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Days {start}–{end}'**
+  String h2DayRange(int start, int end);
+
+  /// No description provided for @h2DayOnward.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {start} onward'**
+  String h2DayOnward(int start);
+
+  /// No description provided for @h2LevelMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{range} · {holds}, {position}'**
+  String h2LevelMeta(String range, String holds, String position);
+
+  /// No description provided for @h2RelaxationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxation'**
+  String get h2RelaxationName;
+
+  /// No description provided for @h2RelaxationMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Days 1–{days} · daily breathing and stretches'**
+  String h2RelaxationMeta(int days);
+
+  /// No description provided for @h2RelaxationLevel1Note.
+  ///
+  /// In en, this message translates to:
+  /// **'If the pain has settled and a clinician agrees, you can start Level 1.'**
+  String get h2RelaxationLevel1Note;
+
+  /// No description provided for @h2HoldsFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s holds'**
+  String h2HoldsFixed(int seconds);
+
+  /// No description provided for @h2HoldsRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{min}–{max} s holds'**
+  String h2HoldsRange(int min, int max);
+
+  /// No description provided for @h2PositionLyingOrSitting.
+  ///
+  /// In en, this message translates to:
+  /// **'lying or sitting'**
+  String get h2PositionLyingOrSitting;
+
+  /// No description provided for @h2PositionSitting.
+  ///
+  /// In en, this message translates to:
+  /// **'sitting'**
+  String get h2PositionSitting;
+
+  /// No description provided for @h2PositionSittingAndStanding.
+  ///
+  /// In en, this message translates to:
+  /// **'sitting and standing'**
+  String get h2PositionSittingAndStanding;
+
+  /// No description provided for @h2PositionStanding.
+  ///
+  /// In en, this message translates to:
+  /// **'standing'**
+  String get h2PositionStanding;
+
+  /// No description provided for @h2PositionAny.
+  ///
+  /// In en, this message translates to:
+  /// **'everyday moves'**
+  String get h2PositionAny;
+
+  /// No description provided for @h2PositionExtras.
+  ///
+  /// In en, this message translates to:
+  /// **'bridge and squat'**
+  String get h2PositionExtras;
+
+  /// No description provided for @h2UnlockNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The next level unlocks when you complete 5 of the last 7 days. Missed a few days? Your plan simply waits for you.'**
+  String get h2UnlockNote;
+
+  /// No description provided for @h2UnlockNoteRelaxation.
+  ///
+  /// In en, this message translates to:
+  /// **'Strengthening levels stay below until the relaxation weeks are done. If the pain has settled and a clinician agrees, you can start Level 1.'**
+  String get h2UnlockNoteRelaxation;
+
+  /// No description provided for @h2RepeatOrStepDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat or step down a level'**
+  String get h2RepeatOrStepDown;
+
+  /// No description provided for @h2RepeatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat this level?'**
+  String get h2RepeatTitle;
+
+  /// No description provided for @h2RepeatMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Day progress for this level resets. Your session history stays on the device.'**
+  String get h2RepeatMessage;
+
+  /// No description provided for @h2RepeatConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat level'**
+  String get h2RepeatConfirm;
+
+  /// No description provided for @h2StepDownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Step down one level?'**
+  String get h2StepDownTitle;
+
+  /// No description provided for @h2StepDownMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You will train at the previous level. This never happens automatically.'**
+  String get h2StepDownMessage;
+
+  /// No description provided for @h2StepDownConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Step down'**
+  String get h2StepDownConfirm;
+
+  /// No description provided for @h2ChooseActionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust your level'**
+  String get h2ChooseActionTitle;
+
+  /// No description provided for @h2ChooseRepeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat current level'**
+  String get h2ChooseRepeat;
+
+  /// No description provided for @h2ChooseStepDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Step down one level'**
+  String get h2ChooseStepDown;
+
+  /// No description provided for @h2LevelNameStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get h2LevelNameStart;
+
+  /// No description provided for @h2LevelNameBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Build'**
+  String get h2LevelNameBuild;
+
+  /// No description provided for @h2LevelNameSteady.
+  ///
+  /// In en, this message translates to:
+  /// **'Steady'**
+  String get h2LevelNameSteady;
+
+  /// No description provided for @h2LevelNameDeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep'**
+  String get h2LevelNameDeep;
+
+  /// No description provided for @h2LevelNameMaintain.
+  ///
+  /// In en, this message translates to:
+  /// **'Maintain'**
+  String get h2LevelNameMaintain;
+
+  /// No description provided for @g1SettingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get g1SettingsTooltip;
+
+  /// No description provided for @g1StatStreakLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak'**
+  String get g1StatStreakLabel;
+
+  /// No description provided for @g1StatStreakValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 days} =1{1 day} other{{count} days}}'**
+  String g1StatStreakValue(int count);
+
+  /// No description provided for @g1StatWeekLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get g1StatWeekLabel;
+
+  /// No description provided for @g1StatWeekValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 sessions} =1{1 session} other{{count} sessions}}'**
+  String g1StatWeekValue(int count);
+
+  /// No description provided for @g1StatHoldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest hold'**
+  String get g1StatHoldLabel;
+
+  /// No description provided for @g1StatHoldValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s'**
+  String g1StatHoldValue(int seconds);
+
+  /// No description provided for @g1StatLevelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Level'**
+  String get g1StatLevelLabel;
+
+  /// No description provided for @g1StatLevelDay.
+  ///
+  /// In en, this message translates to:
+  /// **'{level} · day {day}'**
+  String g1StatLevelDay(int level, int day);
+
+  /// No description provided for @g1StatRelaxationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxation plan'**
+  String get g1StatRelaxationLabel;
+
+  /// No description provided for @g1StatRelaxationDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day} of {total}'**
+  String g1StatRelaxationDay(int day, int total);
+
+  /// No description provided for @h1RelaxationWeeksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks 1 to 2'**
+  String get h1RelaxationWeeksTitle;
+
+  /// No description provided for @g1CalPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get g1CalPrevious;
+
+  /// No description provided for @g1CalNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get g1CalNext;
+
+  /// No description provided for @g1CalTrained.
+  ///
+  /// In en, this message translates to:
+  /// **'Trained'**
+  String get g1CalTrained;
+
+  /// No description provided for @g1CalMonthYear.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} {year}'**
+  String g1CalMonthYear(String month, int year);
+
+  /// No description provided for @g1CalMon.
+  ///
+  /// In en, this message translates to:
+  /// **'M'**
+  String get g1CalMon;
+
+  /// No description provided for @g1CalTue.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get g1CalTue;
+
+  /// No description provided for @g1CalWed.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get g1CalWed;
+
+  /// No description provided for @g1CalThu.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get g1CalThu;
+
+  /// No description provided for @g1CalFri.
+  ///
+  /// In en, this message translates to:
+  /// **'F'**
+  String get g1CalFri;
+
+  /// No description provided for @g1CalSat.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get g1CalSat;
+
+  /// No description provided for @g1CalSun.
+  ///
+  /// In en, this message translates to:
+  /// **'S'**
+  String get g1CalSun;
+
+  /// No description provided for @g1MonthJanuary.
+  ///
+  /// In en, this message translates to:
+  /// **'January'**
+  String get g1MonthJanuary;
+
+  /// No description provided for @g1MonthFebruary.
+  ///
+  /// In en, this message translates to:
+  /// **'February'**
+  String get g1MonthFebruary;
+
+  /// No description provided for @g1MonthMarch.
+  ///
+  /// In en, this message translates to:
+  /// **'March'**
+  String get g1MonthMarch;
+
+  /// No description provided for @g1MonthApril.
+  ///
+  /// In en, this message translates to:
+  /// **'April'**
+  String get g1MonthApril;
+
+  /// No description provided for @g1MonthMay.
+  ///
+  /// In en, this message translates to:
+  /// **'May'**
+  String get g1MonthMay;
+
+  /// No description provided for @g1MonthJune.
+  ///
+  /// In en, this message translates to:
+  /// **'June'**
+  String get g1MonthJune;
+
+  /// No description provided for @g1MonthJuly.
+  ///
+  /// In en, this message translates to:
+  /// **'July'**
+  String get g1MonthJuly;
+
+  /// No description provided for @g1MonthAugust.
+  ///
+  /// In en, this message translates to:
+  /// **'August'**
+  String get g1MonthAugust;
+
+  /// No description provided for @g1MonthSeptember.
+  ///
+  /// In en, this message translates to:
+  /// **'September'**
+  String get g1MonthSeptember;
+
+  /// No description provided for @g1MonthOctober.
+  ///
+  /// In en, this message translates to:
+  /// **'October'**
+  String get g1MonthOctober;
+
+  /// No description provided for @g1MonthNovember.
+  ///
+  /// In en, this message translates to:
+  /// **'November'**
+  String get g1MonthNovember;
+
+  /// No description provided for @g1MonthDecember.
+  ///
+  /// In en, this message translates to:
+  /// **'December'**
+  String get g1MonthDecember;
+
+  /// No description provided for @g1CheckInBaselineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Baseline check-in'**
+  String get g1CheckInBaselineTitle;
+
+  /// No description provided for @g1CheckInBaselineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One question, 10 seconds. See your own change over time.'**
+  String get g1CheckInBaselineBody;
+
+  /// No description provided for @g1CheckInFollowUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'4-week check-in'**
+  String get g1CheckInFollowUpTitle;
+
+  /// No description provided for @g1CheckInFollowUpBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One question. Compare with your earlier answer.'**
+  String get g1CheckInFollowUpBody;
+
+  /// No description provided for @g1CheckInHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your check-ins'**
+  String get g1CheckInHistoryTitle;
+
+  /// No description provided for @g1CheckInStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get g1CheckInStart;
+
+  /// No description provided for @g1CheckInLockedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A short check-in unlocks after your third completed session.'**
+  String get g1CheckInLockedHint;
+
+  /// No description provided for @g1CheckInUnlockHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock check-in history'**
+  String get g1CheckInUnlockHistory;
+
+  /// No description provided for @g2EyebrowBaseline.
+  ///
+  /// In en, this message translates to:
+  /// **'WEEK 0 · BASELINE'**
+  String get g2EyebrowBaseline;
+
+  /// No description provided for @g2EyebrowFollowUp.
+  ///
+  /// In en, this message translates to:
+  /// **'4-WEEK CHECK-IN'**
+  String get g2EyebrowFollowUp;
+
+  /// No description provided for @g2SubtitleBaseline.
+  ///
+  /// In en, this message translates to:
+  /// **'We will ask again in 4 weeks and show you both answers side by side.'**
+  String get g2SubtitleBaseline;
+
+  /// No description provided for @g2SubtitleFollowUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Your answers stay on this phone. No predictions.'**
+  String get g2SubtitleFollowUp;
+
+  /// No description provided for @g2PrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved only on this phone'**
+  String get g2PrivacyNote;
+
+  /// No description provided for @g2Save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get g2Save;
+
+  /// No description provided for @g2Skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get g2Skip;
+
+  /// No description provided for @g2Done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get g2Done;
+
+  /// No description provided for @g2ResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your check-in'**
+  String get g2ResultTitle;
+
+  /// No description provided for @g2ResultSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your own numbers, side by side. Results vary.'**
+  String get g2ResultSubtitle;
+
+  /// No description provided for @g2ComparisonLine.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week}: {score} of {max} · {label}'**
+  String g2ComparisonLine(int week, int score, int max, String label);
+
+  /// No description provided for @g2DoctorNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercises do not help everyone. It is worth talking to a doctor.'**
+  String get g2DoctorNote;
+
+  /// No description provided for @g2HistoryPremiumHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Full check-in history is part of Premium.'**
+  String get g2HistoryPremiumHint;
+
+  /// No description provided for @g2QuestionBladder.
+  ///
+  /// In en, this message translates to:
+  /// **'In the last week, how often did you leak urine?'**
+  String get g2QuestionBladder;
+
+  /// No description provided for @g2OptionBladder1.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get g2OptionBladder1;
+
+  /// No description provided for @g2OptionBladder2.
+  ///
+  /// In en, this message translates to:
+  /// **'Once or twice'**
+  String get g2OptionBladder2;
+
+  /// No description provided for @g2OptionBladder3.
+  ///
+  /// In en, this message translates to:
+  /// **'A few times'**
+  String get g2OptionBladder3;
+
+  /// No description provided for @g2OptionBladder4.
+  ///
+  /// In en, this message translates to:
+  /// **'Most days'**
+  String get g2OptionBladder4;
+
+  /// No description provided for @g2OptionBladder5.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get g2OptionBladder5;
+
+  /// No description provided for @g2QuestionErection.
+  ///
+  /// In en, this message translates to:
+  /// **'How would you rate erection firmness in the last week?'**
+  String get g2QuestionErection;
+
+  /// No description provided for @g2OptionErection1.
+  ///
+  /// In en, this message translates to:
+  /// **'Very soft'**
+  String get g2OptionErection1;
+
+  /// No description provided for @g2OptionErection2.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft'**
+  String get g2OptionErection2;
+
+  /// No description provided for @g2OptionErection3.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get g2OptionErection3;
+
+  /// No description provided for @g2OptionErection4.
+  ///
+  /// In en, this message translates to:
+  /// **'Firm'**
+  String get g2OptionErection4;
+
+  /// No description provided for @g2OptionErection5.
+  ///
+  /// In en, this message translates to:
+  /// **'Very firm'**
+  String get g2OptionErection5;
+
+  /// No description provided for @g2QuestionEjaculation.
+  ///
+  /// In en, this message translates to:
+  /// **'How much control did you feel in the last week?'**
+  String get g2QuestionEjaculation;
+
+  /// No description provided for @g2OptionEjaculation1.
+  ///
+  /// In en, this message translates to:
+  /// **'No control'**
+  String get g2OptionEjaculation1;
+
+  /// No description provided for @g2OptionEjaculation2.
+  ///
+  /// In en, this message translates to:
+  /// **'A little control'**
+  String get g2OptionEjaculation2;
+
+  /// No description provided for @g2OptionEjaculation3.
+  ///
+  /// In en, this message translates to:
+  /// **'Some control'**
+  String get g2OptionEjaculation3;
+
+  /// No description provided for @g2OptionEjaculation4.
+  ///
+  /// In en, this message translates to:
+  /// **'Good control'**
+  String get g2OptionEjaculation4;
+
+  /// No description provided for @g2OptionEjaculation5.
+  ///
+  /// In en, this message translates to:
+  /// **'Full control'**
+  String get g2OptionEjaculation5;
+
+  /// No description provided for @g2QuestionSurgery.
+  ///
+  /// In en, this message translates to:
+  /// **'In the last week, how well have you controlled your urine?'**
+  String get g2QuestionSurgery;
+
+  /// No description provided for @g2OptionSurgery1.
+  ///
+  /// In en, this message translates to:
+  /// **'No control'**
+  String get g2OptionSurgery1;
+
+  /// No description provided for @g2OptionSurgery2.
+  ///
+  /// In en, this message translates to:
+  /// **'Limited control'**
+  String get g2OptionSurgery2;
+
+  /// No description provided for @g2OptionSurgery3.
+  ///
+  /// In en, this message translates to:
+  /// **'Some control'**
+  String get g2OptionSurgery3;
+
+  /// No description provided for @g2OptionSurgery4.
+  ///
+  /// In en, this message translates to:
+  /// **'Good control'**
+  String get g2OptionSurgery4;
+
+  /// No description provided for @g2OptionSurgery5.
+  ///
+  /// In en, this message translates to:
+  /// **'Full control'**
+  String get g2OptionSurgery5;
+
+  /// No description provided for @g2QuestionGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'In the last week, how comfortable has your pelvic area felt?'**
+  String get g2QuestionGeneral;
+
+  /// No description provided for @g2OptionGeneral1.
+  ///
+  /// In en, this message translates to:
+  /// **'Very uncomfortable'**
+  String get g2OptionGeneral1;
+
+  /// No description provided for @g2OptionGeneral2.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncomfortable'**
+  String get g2OptionGeneral2;
+
+  /// No description provided for @g2OptionGeneral3.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed'**
+  String get g2OptionGeneral3;
+
+  /// No description provided for @g2OptionGeneral4.
+  ///
+  /// In en, this message translates to:
+  /// **'Mostly comfortable'**
+  String get g2OptionGeneral4;
+
+  /// No description provided for @g2OptionGeneral5.
+  ///
+  /// In en, this message translates to:
+  /// **'Very comfortable'**
+  String get g2OptionGeneral5;
+
+  /// No description provided for @l1ArticlesHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Articles'**
+  String get l1ArticlesHeading;
+
+  /// No description provided for @l1StartHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Start here · {minutes} min'**
+  String l1StartHere(int minutes);
+
+  /// No description provided for @l1ReplayTutorial.
+  ///
+  /// In en, this message translates to:
+  /// **'Replay the tutorial anytime'**
+  String get l1ReplayTutorial;
+
+  /// No description provided for @l1Minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String l1Minutes(int minutes);
+
+  /// No description provided for @l2MinutesRead.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min read'**
+  String l2MinutesRead(int minutes);
+
+  /// No description provided for @l2Sources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get l2Sources;
+
+  /// No description provided for @l2NotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Article not found.'**
+  String get l2NotFound;
+
+  /// No description provided for @x1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get x1Title;
+
+  /// No description provided for @x1SectionPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get x1SectionPlan;
+
+  /// No description provided for @x1SectionReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get x1SectionReminders;
+
+  /// No description provided for @x1SectionSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Session'**
+  String get x1SectionSession;
+
+  /// No description provided for @x1SectionPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get x1SectionPrivacy;
+
+  /// No description provided for @x1SectionSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get x1SectionSubscription;
+
+  /// No description provided for @x1SectionAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get x1SectionAbout;
+
+  /// No description provided for @x1Goal.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get x1Goal;
+
+  /// No description provided for @x1GoalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your goal'**
+  String get x1GoalTitle;
+
+  /// No description provided for @x1DailyTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily time'**
+  String get x1DailyTime;
+
+  /// No description provided for @x1DailyTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions per day'**
+  String get x1DailyTimeTitle;
+
+  /// No description provided for @x1DailySessions.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 session a day} other{{count} sessions a day}}'**
+  String x1DailySessions(int count);
+
+  /// No description provided for @x1SafetyAnswers.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety answers'**
+  String get x1SafetyAnswers;
+
+  /// No description provided for @x1SafetyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety answers'**
+  String get x1SafetyTitle;
+
+  /// No description provided for @x1ValueNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get x1ValueNone;
+
+  /// No description provided for @x1SafetySelectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected} other{{count} selected}}'**
+  String x1SafetySelectedCount(int count);
+
+  /// No description provided for @x1DailyReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder'**
+  String get x1DailyReminder;
+
+  /// No description provided for @x1TimeAndDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Time and days'**
+  String get x1TimeAndDays;
+
+  /// No description provided for @x1ReminderScheduleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder time and days'**
+  String get x1ReminderScheduleTitle;
+
+  /// No description provided for @x1EveryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get x1EveryDay;
+
+  /// No description provided for @x1Daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get x1Daily;
+
+  /// No description provided for @x1DaysCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day} other{{count} days}}'**
+  String x1DaysCount(int count);
+
+  /// No description provided for @x1Vibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibration cues'**
+  String get x1Vibration;
+
+  /// No description provided for @x1Voice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice cues'**
+  String get x1Voice;
+
+  /// No description provided for @x1Discreet.
+  ///
+  /// In en, this message translates to:
+  /// **'Discreet notifications'**
+  String get x1Discreet;
+
+  /// No description provided for @x1DiscreetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No health words on the lock screen.'**
+  String get x1DiscreetSubtitle;
+
+  /// No description provided for @x1DeleteAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all my data'**
+  String get x1DeleteAll;
+
+  /// No description provided for @x1DeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all data?'**
+  String get x1DeleteTitle;
+
+  /// No description provided for @x1DeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This removes your plan, sessions and check-ins from this phone. It cannot be undone.'**
+  String get x1DeleteMessage;
+
+  /// No description provided for @x1DeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete everything'**
+  String get x1DeleteConfirm;
+
+  /// No description provided for @x1ManagePlay.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage in Google Play'**
+  String get x1ManagePlay;
+
+  /// No description provided for @x1ManageAppStore.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage in the App Store'**
+  String get x1ManageAppStore;
+
+  /// No description provided for @x1Free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get x1Free;
+
+  /// No description provided for @x1Premium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get x1Premium;
+
+  /// No description provided for @x1Restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchase'**
+  String get x1Restore;
+
+  /// No description provided for @x1RestoreStub.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore will be available when subscriptions ship.'**
+  String get x1RestoreStub;
+
+  /// No description provided for @x1LegalRow.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer, privacy and terms'**
+  String get x1LegalRow;
+
+  /// No description provided for @x1PrivacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get x1PrivacyPolicy;
+
+  /// No description provided for @x1Terms.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get x1Terms;
+
+  /// No description provided for @x1Contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get x1Contact;
+
+  /// No description provided for @x1VersionFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} · Not a medical device'**
+  String x1VersionFooter(String version);
 }
 
 class _AppLocalizationsDelegate

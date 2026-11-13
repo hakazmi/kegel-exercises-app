@@ -14,7 +14,15 @@ import '../features/onboarding/o4_experience_screen.dart';
 import '../features/onboarding/o5_time_screen.dart';
 import '../features/onboarding/o6_plan_screen.dart';
 import '../features/help/h3_pain_help_screen.dart';
+import '../features/home/h1_today_screen.dart';
+import '../features/home/h2_levels_screen.dart';
+import '../features/learn/l1_learn_screen.dart';
+import '../features/learn/l2_article_screen.dart';
+import '../features/progress/g1_progress_screen.dart';
+import '../features/progress/g2_checkin_screen.dart';
 import '../features/session/s1_before_screen.dart';
+import '../features/settings/settings_safety_screen.dart';
+import '../features/settings/x1_settings_screen.dart';
 import '../features/session/s2_countdown_screen.dart';
 import '../features/session/s3_player_screen.dart';
 import '../features/session/s4_done_screen.dart';
@@ -45,6 +53,7 @@ abstract final class AppRoutes {
   static const String learn = '/learn';
   static const String article = '/learn/article';
   static const String settings = '/settings';
+  static const String settingsSafety = '/settings/safety';
   static const String gallery = '/dev/gallery';
   static const String dataDebug = '/dev/data';
 
@@ -165,21 +174,21 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.paywall,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
+          final String source =
+              state.uri.queryParameters['source'] ?? 'unknown';
+          return PlaceholderScreen(
             id: 'P1',
-            name: 'Paywall',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.today, 'H1 Today')],
+            name: 'Paywall ($source)',
+            nextRoutes: const <RouteLink>[
+              RouteLink(AppRoutes.today, 'H1 Today'),
+            ],
           );
         },
       ),
       GoRoute(
         path: AppRoutes.levels,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'H2',
-            name: 'Levels',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.today, 'H1 Today')],
-          );
+          return const H2LevelsScreen();
         },
       ),
       GoRoute(
@@ -193,33 +202,26 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.checkin,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'G2',
-            name: 'Checkin',
-            nextRoutes: <RouteLink>[
-              RouteLink(AppRoutes.progress, 'G1 Progress'),
-            ],
-          );
+          return const G2CheckInScreen();
         },
       ),
       GoRoute(
         path: AppRoutes.article,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'L2',
-            name: 'Article',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.learn, 'L1 Learn')],
-          );
+          final String id = state.uri.queryParameters['id'] ?? '';
+          return L2ArticleScreen(articleId: id);
         },
       ),
       GoRoute(
         path: AppRoutes.settings,
         builder: (BuildContext context, GoRouterState state) {
-          return const PlaceholderScreen(
-            id: 'X1',
-            name: 'Settings',
-            nextRoutes: <RouteLink>[RouteLink(AppRoutes.today, 'H1 Today')],
-          );
+          return const X1SettingsScreen();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.settingsSafety,
+        builder: (BuildContext context, GoRouterState state) {
+          return const SettingsSafetyScreen();
         },
       ),
       if (kDebugMode) ...<RouteBase>[
@@ -256,17 +258,7 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.today,
                 builder: (BuildContext context, GoRouterState state) {
-                  return const PlaceholderScreen(
-                    id: 'H1',
-                    name: 'Today',
-                    showBottomGap: true,
-                    nextRoutes: <RouteLink>[
-                      RouteLink(AppRoutes.before, 'S1 Before'),
-                      RouteLink(AppRoutes.levels, 'H2 Levels'),
-                      RouteLink(AppRoutes.painHelp, 'H3 PainHelp'),
-                      RouteLink(AppRoutes.settings, 'X1 Settings'),
-                    ],
-                  );
+                  return const H1TodayScreen();
                 },
               ),
             ],
@@ -276,15 +268,7 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.progress,
                 builder: (BuildContext context, GoRouterState state) {
-                  return const PlaceholderScreen(
-                    id: 'G1',
-                    name: 'Progress',
-                    showBottomGap: true,
-                    nextRoutes: <RouteLink>[
-                      RouteLink(AppRoutes.checkin, 'G2 Checkin'),
-                      RouteLink(AppRoutes.settings, 'X1 Settings'),
-                    ],
-                  );
+                  return const G1ProgressScreen();
                 },
               ),
             ],
@@ -294,15 +278,7 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
               GoRoute(
                 path: AppRoutes.learn,
                 builder: (BuildContext context, GoRouterState state) {
-                  return const PlaceholderScreen(
-                    id: 'L1',
-                    name: 'Learn',
-                    showBottomGap: true,
-                    nextRoutes: <RouteLink>[
-                      RouteLink(AppRoutes.article, 'L2 Article'),
-                      RouteLink(AppRoutes.tutorial, 'T1 Tutorial'),
-                    ],
-                  );
+                  return const L1LearnScreen();
                 },
               ),
             ],
