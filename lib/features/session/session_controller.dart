@@ -8,6 +8,7 @@ import '../../core/data/providers.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
+import '../../core/plan/level_progression.dart';
 import '../../core/plan/plan_models.dart';
 import '../../core/plan/plan_rules.dart';
 import '../../core/plan/session_definition.dart';
@@ -198,6 +199,22 @@ class SessionController extends Notifier<SessionPlayState?> {
         await ref.read(sessionRepositoryProvider).getAll();
     final bool suggestStepDown = PlanRules.shouldSuggestStepDown(sessions);
 
+    // Re-show unlock card after the next session if it was snoozed.
+    if (profile.levelUnlockSnoozed) {
+      await ref
+          .read(userProfileProvider.notifier)
+          .save(LevelProgression.clearSnooze(profile));
+    }
+
+    final UserProfile fresh = ref.read(userProfileProvider);
+    final bool unlockReady = LevelProgression.shouldShowUnlockCard(
+      profile: fresh,
+      sessions: sessions,
+      today: now,
+    );
+    final int? nextLevel =
+        unlockReady ? LevelProgression.offeredLevel(fresh) : null;
+
     unawaited(
       ref.read(reminderServiceProvider).reschedule().catchError((Object _) {}),
     );
@@ -206,6 +223,8 @@ class SessionController extends Notifier<SessionPlayState?> {
       return SessionSaveResult(
         goTo: SessionNext.goPainHelp,
         suggestStepDown: suggestStepDown,
+        levelUnlockReady: unlockReady,
+        nextLevel: nextLevel,
       );
     }
 
@@ -213,12 +232,16 @@ class SessionController extends Notifier<SessionPlayState?> {
       return SessionSaveResult(
         goTo: SessionNext.goPaywall,
         suggestStepDown: suggestStepDown,
+        levelUnlockReady: unlockReady,
+        nextLevel: nextLevel,
       );
     }
 
     return SessionSaveResult(
       goTo: SessionNext.goToday,
       suggestStepDown: suggestStepDown,
+      levelUnlockReady: unlockReady,
+      nextLevel: nextLevel,
     );
   }
 
@@ -422,10 +445,14 @@ class SessionSaveResult {
   const SessionSaveResult({
     required this.goTo,
     this.suggestStepDown = false,
+    this.levelUnlockReady = false,
+    this.nextLevel,
   });
 
   final SessionNext goTo;
   final bool suggestStepDown;
+  final bool levelUnlockReady;
+  final int? nextLevel;
 }
 
 /// Active session controller for S2–S4.

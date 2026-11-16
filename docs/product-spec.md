@@ -410,9 +410,9 @@ The build runs in five milestones, each ending in something testable. Tick items
 **M2 Plan and Today**
 
 - [ ] Local storage for plan, completed sessions and settings
-- [ ] Level progression rule (5 of 7 days) and step-down
+- [x] Level progression rule (5 of 7 days) and step-down
 - [ ] Today tab with all states, daily cap, rest day
-- [ ] Levels screen
+- [x] Levels screen
 - [ ] Pain help flow and track switching
 
 **M3 Onboarding and tutorial**

@@ -28,6 +28,9 @@ abstract class ReminderService {
 
   /// Re-plans from current profile / sessions / check-ins.
   Future<void> reschedule();
+
+  /// Cancels a pending "New level unlocked" notice after the user starts that level.
+  Future<void> clearLevelUnlockNotice();
 }
 
 /// Local-notifications implementation for Android and iOS.
@@ -93,6 +96,7 @@ class LocalReminderService implements ReminderService {
       level: base.profile.level,
       sessions: base.sessions,
       today: base.now,
+      track: base.profile.track,
     );
     final int? lastNotified = _prefs.getInt(_levelNoticeKey);
     final bool notifyLevelUnlock =
@@ -112,6 +116,12 @@ class LocalReminderService implements ReminderService {
     if (notifyLevelUnlock) {
       await _prefs.setInt(_levelNoticeKey, base.profile.level);
     }
+  }
+
+  @override
+  Future<void> clearLevelUnlockNotice() async {
+    await _prefs.remove(_levelNoticeKey);
+    await reschedule();
   }
 }
 

@@ -133,15 +133,57 @@ abstract final class PlanRules {
     return completedTrainingDays + 1;
   }
 
-  /// True when ≥5 of the last 7 calendar days have a completed session at [level].
-  static bool canUnlockNextLevel({
+  /// Training-day span for a level (matches `assets/content/levels.json`).
+  static int levelDaySpan(int level) {
+    switch (level) {
+      case 1:
+      case 2:
+        return 7;
+      case 3:
+        return 14;
+      case 4:
+        return 28;
+      case 5:
+        return levelUnlockWindowDays;
+      default:
+        return levelUnlockWindowDays;
+    }
+  }
+
+  /// Unique calendar days with a completed strengthening session at [level].
+  static int completedTrainingDaysAtLevel({
+    required int level,
+    required List<SessionRecord> sessions,
+  }) {
+    return sessions
+        .where(
+          (SessionRecord s) =>
+              s.completed &&
+              s.level == level &&
+              s.kind == SessionKind.strengthening,
+        )
+        .map((SessionRecord s) => dateOnly(s.completedAt ?? s.startedAt))
+        .toSet()
+        .length;
+  }
+
+  /// True when the level's day span is finished (enough training days done).
+  static bool isLevelSpanComplete({
+    required int level,
+    required List<SessionRecord> sessions,
+    int? daySpan,
+  }) {
+    final int span = daySpan ?? levelDaySpan(level);
+    return completedTrainingDaysAtLevel(level: level, sessions: sessions) >=
+        span;
+  }
+
+  /// Completed calendar days at [level] inside the last [levelUnlockWindowDays].
+  static int completedDaysInUnlockWindow({
     required int level,
     required List<SessionRecord> sessions,
     required DateTime today,
   }) {
-    if (level >= 5) {
-      return false;
-    }
     final DateTime end = dateOnly(today);
     int completed = 0;
     for (int i = 0; i < levelUnlockWindowDays; i++) {
@@ -156,7 +198,45 @@ abstract final class PlanRules {
         completed += 1;
       }
     }
-    return completed >= levelUnlockMinCompletedDays;
+    return completed;
+  }
+
+  /// Unlock when the level span is complete and ≥5 of the last 7 days are done.
+  /// Never true on the relaxation-first track or at Level 5.
+  static bool canUnlockNextLevel({
+    required int level,
+    required List<SessionRecord> sessions,
+    required DateTime today,
+    TrackId track = TrackId.generalBladder,
+    int? daySpan,
+  }) {
+    if (track == TrackId.relaxationFirst) {
+      return false;
+    }
+    if (level >= 5) {
+      return false;
+    }
+    if (!isLevelSpanComplete(
+      level: level,
+      sessions: sessions,
+      daySpan: daySpan,
+    )) {
+      return false;
+    }
+    return completedDaysInUnlockWindow(
+          level: level,
+          sessions: sessions,
+          today: today,
+        ) >=
+        levelUnlockMinCompletedDays;
+  }
+
+  /// Next level id after [level], or null at the top.
+  static int? nextLevel(int level) {
+    if (level >= 5) {
+      return null;
+    }
+    return level + 1;
   }
 
   /// Suggest step-down after two consecutive mild-discomfort answers. Never auto-apply.

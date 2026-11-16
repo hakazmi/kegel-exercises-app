@@ -512,6 +512,34 @@
   "h2PositionExtras": "bridge and squat",
   "h2UnlockNote": "The next level unlocks when you complete 5 of the last 7 days. Missed a few days? Your plan simply waits for you.",
   "h2UnlockNoteRelaxation": "Strengthening levels stay below until the relaxation weeks are done. If the pain has settled and a clinician agrees, you can start Level 1.",
+  "h2StatusUnlocked": "Unlocked",
+  "h2StatusUnlocksWhen": "Unlocks when you complete 5 of the last 7 days",
+  "h2StartLevel": "Start Level {level}",
+  "@h2StartLevel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+
+  "h1LevelUnlockedTitle": "Level {level} unlocked",
+  "@h1LevelUnlockedTitle": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "h1LevelUnlockedStart": "Start Level {level}",
+  "@h1LevelUnlockedStart": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "h1LevelUnlockedStay": "Stay on this level a bit longer",
+  "h1LevelStartedConfirm": "You are on Level {level}.",
+  "@h1LevelStartedConfirm": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
   "h2RepeatOrStepDown": "Repeat or step down a level",
   "h2RepeatTitle": "Repeat this level?",
   "h2RepeatMessage": "Day progress for this level resets. Your session history stays on the device.",

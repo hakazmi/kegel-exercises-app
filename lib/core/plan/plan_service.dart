@@ -158,6 +158,7 @@ class PlanService {
     return profile.copyWith(
       level: next,
       levelStartedOn: dateOnly(now),
+      levelUnlockSnoozed: false,
     );
   }
 
@@ -166,25 +167,16 @@ class PlanService {
     return profile.copyWith(
       level: PlanRules.repeatLevel(profile.level),
       levelStartedOn: dateOnly(now),
+      levelUnlockSnoozed: false,
     );
   }
 
-  /// Unlock next level when the 5-of-7 rule passes. Returns unchanged profile otherwise.
-  UserProfile maybeUnlockLevel({
-    required UserProfile profile,
-    required List<SessionRecord> sessions,
-  }) {
-    if (!PlanRules.canUnlockNextLevel(
-      level: profile.level,
-      sessions: sessions,
-      today: now,
-    )) {
-      return profile;
-    }
-    final int next = (profile.level + 1).clamp(1, 5);
+  /// Explicit advance after the user taps Start Level N (never call silently).
+  UserProfile advanceLevel(UserProfile profile, int nextLevel) {
     return profile.copyWith(
-      level: next,
+      level: nextLevel.clamp(1, 5),
       levelStartedOn: dateOnly(now),
+      levelUnlockSnoozed: false,
     );
   }
 }

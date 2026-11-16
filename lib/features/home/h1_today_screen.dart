@@ -10,10 +10,13 @@ import '../../core/data/providers.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
+import '../../core/plan/level_progression.dart';
 import '../../core/plan/plan_models.dart';
 import '../../core/plan/plan_rules.dart';
 import '../../core/widgets/widgets.dart';
 import 'home_copy.dart';
+import 'level_unlock_actions.dart';
+import 'level_unlock_card.dart';
 import 'week_strip_builder.dart';
 
 /// H1 Today — week's strip, level card, today's list, start CTA.
@@ -61,6 +64,16 @@ class H1TodayScreen extends ConsumerWidget {
               );
             }
 
+            final bool showUnlock = LevelProgression.shouldShowUnlockCard(
+              profile: profile,
+              sessions: sessions,
+              today: now,
+              daySpan: levelContent == null
+                  ? null
+                  : HomeCopy.daysInLevel(levelContent),
+            );
+            final int? nextLevel = LevelProgression.offeredLevel(profile);
+
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.xl,
@@ -72,6 +85,28 @@ class H1TodayScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _TodayHeader(l10n: l10n, streak: streak),
+                  if (showUnlock && nextLevel != null) ...[
+                    const SizedBox(height: AppSpacing.lg),
+                    LevelUnlockCard(
+                      l10n: l10n,
+                      nextLevel: nextLevel,
+                      onStart: () async {
+                        final bool advanced = await LevelUnlockActions.startNext(
+                          context: context,
+                          ref: ref,
+                          nextLevel: nextLevel,
+                        );
+                        if (advanced && context.mounted) {
+                          LevelUnlockActions.showStartedConfirm(
+                            context,
+                            l10n,
+                            nextLevel,
+                          );
+                        }
+                      },
+                      onStay: () => LevelUnlockActions.snooze(ref),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacing.lg),
                   WeekStrip(
                     days: buildTodayWeekStrip(

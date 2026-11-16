@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,9 +12,11 @@ import '../../app/theme/tokens.dart';
 import '../../core/domain/enums.dart';
 import '../../core/widgets/primary_button.dart';
 import '../../core/widgets/selectable_card.dart';
+import '../home/level_unlock_actions.dart';
+import '../home/level_unlock_card.dart';
 import 'session_controller.dart';
 
-/// S4 Session complete — time, streak, next, feel check.
+/// S4 Session complete — time, streak, next, feel check, optional level unlock.
 class S4DoneScreen extends ConsumerStatefulWidget {
   const S4DoneScreen({
     super.key,
@@ -30,6 +34,8 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
   bool _saving = false;
   bool _saved = false;
   bool _suggestStepDown = false;
+  bool _showUnlock = false;
+  int? _nextLevel;
   SessionNext? _destination;
 
   Future<void> _onContinue() async {
@@ -56,8 +62,10 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
       _destination = result.goTo;
       _suggestStepDown =
           result.suggestStepDown && feel == SessionFeel.mildDiscomfort;
+      _showUnlock = result.levelUnlockReady && result.nextLevel != null;
+      _nextLevel = result.nextLevel;
     });
-    if (_suggestStepDown) {
+    if (_suggestStepDown || _showUnlock) {
       return;
     }
     await _leave();
@@ -103,6 +111,7 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
     final String timeLabel = summary.durationSeconds >= 90
         ? l10n.s4TimeMinutes((summary.durationSeconds / 60).ceil())
         : l10n.s4TimeSeconds(summary.durationSeconds);
+    final int? nextLevel = _nextLevel;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.darkScreen,
@@ -135,6 +144,39 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
                   label: l10n.s4NextLabel,
                   value: summary.nextLabel ?? l10n.s4NextNone,
                 ),
+                if (_showUnlock && nextLevel != null) ...[
+                  const SizedBox(height: AppSpacing.lg),
+                  LevelUnlockCard(
+                    l10n: l10n,
+                    nextLevel: nextLevel,
+                    dark: true,
+                    onStart: () async {
+                      final bool advanced = await LevelUnlockActions.startNext(
+                        context: context,
+                        ref: ref,
+                        nextLevel: nextLevel,
+                      );
+                      if (!context.mounted) {
+                        return;
+                      }
+                      if (advanced) {
+                        setState(() => _showUnlock = false);
+                        LevelUnlockActions.showStartedConfirm(
+                          context,
+                          l10n,
+                          nextLevel,
+                        );
+                      }
+                    },
+                    onStay: () async {
+                      await LevelUnlockActions.snooze(ref);
+                      if (!context.mounted) {
+                        return;
+                      }
+                      setState(() => _showUnlock = false);
+                    },
+                  ),
+                ],
                 const SizedBox(height: AppSpacing.xl),
                 Text(
                   l10n.s4FeelPrompt,
@@ -185,7 +227,15 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
                 const Spacer(),
                 PrimaryButton(
                   label: l10n.commonContinue,
-                  onPressed: (_feel == null || _saving) ? null : _onContinue,
+                  onPressed: (_feel == null || _saving)
+                      ? null
+                      : () {
+                          if (_saved) {
+                            unawaited(_leave());
+                          } else {
+                            unawaited(_onContinue());
+                          }
+                        },
                 ),
               ],
             ),

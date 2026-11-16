@@ -36,6 +36,9 @@ class _FakeReminders implements ReminderService {
   Future<void> reschedule() async {}
 
   @override
+  Future<void> clearLevelUnlockNotice() async {}
+
+  @override
   Future<void> disableReminder() async {
     disabled = true;
     enabled = false;

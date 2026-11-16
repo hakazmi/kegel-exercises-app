@@ -1684,6 +1684,48 @@ abstract class AppLocalizations {
   /// **'Strengthening levels stay below until the relaxation weeks are done. If the pain has settled and a clinician agrees, you can start Level 1.'**
   String get h2UnlockNoteRelaxation;
 
+  /// No description provided for @h2StatusUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocked'**
+  String get h2StatusUnlocked;
+
+  /// No description provided for @h2StatusUnlocksWhen.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlocks when you complete 5 of the last 7 days'**
+  String get h2StatusUnlocksWhen;
+
+  /// No description provided for @h2StartLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Level {level}'**
+  String h2StartLevel(int level);
+
+  /// No description provided for @h1LevelUnlockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {level} unlocked'**
+  String h1LevelUnlockedTitle(int level);
+
+  /// No description provided for @h1LevelUnlockedStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Level {level}'**
+  String h1LevelUnlockedStart(int level);
+
+  /// No description provided for @h1LevelUnlockedStay.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay on this level a bit longer'**
+  String get h1LevelUnlockedStay;
+
+  /// No description provided for @h1LevelStartedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'You are on Level {level}.'**
+  String h1LevelStartedConfirm(int level);
+
   /// No description provided for @h2RepeatOrStepDown.
   ///
   /// In en, this message translates to:

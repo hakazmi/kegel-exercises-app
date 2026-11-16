@@ -963,6 +963,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'Strengthening levels stay below until the relaxation weeks are done. If the pain has settled and a clinician agrees, you can start Level 1.';
 
   @override
+  String get h2StatusUnlocked => 'Unlocked';
+
+  @override
+  String get h2StatusUnlocksWhen =>
+      'Unlocks when you complete 5 of the last 7 days';
+
+  @override
+  String h2StartLevel(int level) {
+    return 'Start Level $level';
+  }
+
+  @override
+  String h1LevelUnlockedTitle(int level) {
+    return 'Level $level unlocked';
+  }
+
+  @override
+  String h1LevelUnlockedStart(int level) {
+    return 'Start Level $level';
+  }
+
+  @override
+  String get h1LevelUnlockedStay => 'Stay on this level a bit longer';
+
+  @override
+  String h1LevelStartedConfirm(int level) {
+    return 'You are on Level $level.';
+  }
+
+  @override
   String get h2RepeatOrStepDown => 'Repeat or step down a level';
 
   @override

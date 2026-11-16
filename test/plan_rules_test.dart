@@ -187,10 +187,10 @@ void main() {
   });
 
   group('level unlock', () {
-    test('unlocks when 5 of last 7 calendar days completed at level', () {
+    test('unlocks when span complete and 5 of last 7 days at level', () {
       final DateTime today = DateTime(2026, 11, 12);
       final List<SessionRecord> sessions = <SessionRecord>[
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 7; i++)
           _session(at: today.subtract(Duration(days: i)), level: 1),
       ];
       expect(
@@ -207,6 +207,22 @@ void main() {
       final DateTime today = DateTime(2026, 11, 12);
       final List<SessionRecord> sessions = <SessionRecord>[
         for (int i = 0; i < 4; i++)
+          _session(at: today.subtract(Duration(days: i)), level: 1),
+      ];
+      expect(
+        PlanRules.canUnlockNextLevel(
+          level: 1,
+          sessions: sessions,
+          today: today,
+        ),
+        isFalse,
+      );
+    });
+
+    test('does not unlock when 5 of 7 but span incomplete', () {
+      final DateTime today = DateTime(2026, 11, 12);
+      final List<SessionRecord> sessions = <SessionRecord>[
+        for (int i = 0; i < 5; i++)
           _session(at: today.subtract(Duration(days: i)), level: 1),
       ];
       expect(

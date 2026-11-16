@@ -21,6 +21,7 @@ class UserProfile {
     this.onboardingDone = false,
     this.tutorialDone = false,
     this.paywallSeen = false,
+    this.levelUnlockSnoozed = false,
   });
 
   final Goal? goal;
@@ -53,6 +54,9 @@ class UserProfile {
   final bool onboardingDone;
   final bool tutorialDone;
   final bool paywallSeen;
+
+  /// When true, hide the Level unlocked card until the next completed session.
+  final bool levelUnlockSnoozed;
 
   /// Fresh install defaults before onboarding.
   factory UserProfile.initial() {
@@ -89,6 +93,7 @@ class UserProfile {
     bool? onboardingDone,
     bool? tutorialDone,
     bool? paywallSeen,
+    bool? levelUnlockSnoozed,
     bool clearGoal = false,
     bool clearExperience = false,
     bool clearLevelStartedOn = false,
@@ -113,6 +118,7 @@ class UserProfile {
       onboardingDone: onboardingDone ?? this.onboardingDone,
       tutorialDone: tutorialDone ?? this.tutorialDone,
       paywallSeen: paywallSeen ?? this.paywallSeen,
+      levelUnlockSnoozed: levelUnlockSnoozed ?? this.levelUnlockSnoozed,
     );
   }
 
@@ -134,6 +140,7 @@ class UserProfile {
         'onboardingDone': onboardingDone,
         'tutorialDone': tutorialDone,
         'paywallSeen': paywallSeen,
+        'levelUnlockSnoozed': levelUnlockSnoozed,
       };
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
@@ -166,6 +173,7 @@ class UserProfile {
       onboardingDone: json['onboardingDone'] as bool? ?? false,
       tutorialDone: json['tutorialDone'] as bool? ?? false,
       paywallSeen: json['paywallSeen'] as bool? ?? false,
+      levelUnlockSnoozed: json['levelUnlockSnoozed'] as bool? ?? false,
     );
   }
 }

@@ -10,10 +10,12 @@ import '../../core/data/providers.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
+import '../../core/plan/level_progression.dart';
 import '../../core/plan/plan_rules.dart';
 import '../../core/plan/plan_service.dart';
 import '../../core/widgets/widgets.dart';
 import 'home_copy.dart';
+import 'level_unlock_actions.dart';
 
 /// H2 Levels — five levels, lock state, repeat / step down.
 class H2LevelsScreen extends ConsumerWidget {
@@ -28,11 +30,20 @@ class H2LevelsScreen extends ConsumerWidget {
         ref.watch(levelsProvider);
     final AsyncValue<List<SessionRecord>> sessionsAsync =
         ref.watch(sessionsProvider);
+    final List<SessionRecord> sessions =
+        sessionsAsync.asData?.value ?? const <SessionRecord>[];
+    final DateTime today = ref.watch(appClockProvider).now();
     final int dayInLevel = PlanRules.dayInLevel(
       profile: profile,
-      sessions: sessionsAsync.asData?.value ?? const <SessionRecord>[],
+      sessions: sessions,
     );
     final bool relaxation = profile.track == TrackId.relaxationFirst;
+    final bool unlockReady = LevelProgression.isUnlockReady(
+      profile: profile,
+      sessions: sessions,
+      today: today,
+    );
+    final int? nextLevel = LevelProgression.offeredLevel(profile);
     final double bottomInset = MediaQuery.paddingOf(context).bottom;
     final bool showAdjust = !relaxation;
 
@@ -90,10 +101,37 @@ class H2LevelsScreen extends ConsumerWidget {
                         current: !relaxation && level.id == profile.level,
                         dayInLevel: dayInLevel,
                         locked: level.id > 1 && !isPremium,
+                        isNext: !relaxation &&
+                            nextLevel != null &&
+                            level.id == nextLevel,
+                        unlockReady: unlockReady &&
+                            !relaxation &&
+                            nextLevel != null &&
+                            level.id == nextLevel,
                         relaxationPending: relaxation && level.id == 1,
                         onLockedTap: () => context.push(
                           '${AppRoutes.paywall}?source=locked_content',
                         ),
+                        onStartNext: unlockReady &&
+                                !relaxation &&
+                                nextLevel != null &&
+                                level.id == nextLevel
+                            ? () async {
+                                final bool advanced =
+                                    await LevelUnlockActions.startNext(
+                                  context: context,
+                                  ref: ref,
+                                  nextLevel: nextLevel,
+                                );
+                                if (advanced && context.mounted) {
+                                  LevelUnlockActions.showStartedConfirm(
+                                    context,
+                                    l10n,
+                                    nextLevel,
+                                  );
+                                }
+                              }
+                            : null,
                       ),
                       const SizedBox(height: AppSpacing.sm),
                     ],
@@ -356,8 +394,11 @@ class _LevelRow extends StatelessWidget {
     required this.current,
     required this.dayInLevel,
     required this.locked,
+    required this.isNext,
+    required this.unlockReady,
     required this.relaxationPending,
     required this.onLockedTap,
+    this.onStartNext,
   });
 
   final AppLocalizations l10n;
@@ -365,8 +406,11 @@ class _LevelRow extends StatelessWidget {
   final bool current;
   final int dayInLevel;
   final bool locked;
+  final bool isNext;
+  final bool unlockReady;
   final bool relaxationPending;
   final VoidCallback onLockedTap;
+  final VoidCallback? onStartNext;
 
   @override
   Widget build(BuildContext context) {
@@ -378,8 +422,10 @@ class _LevelRow extends StatelessWidget {
 
     return AppCard(
       borderColor: current ? AppColors.borderStrong : AppColors.border,
-      backgroundColor: locked ? AppColors.surfaceMuted : AppColors.surface,
-      onTap: locked ? onLockedTap : null,
+      backgroundColor: locked && !unlockReady
+          ? AppColors.surfaceMuted
+          : AppColors.surface,
+      onTap: locked && !unlockReady ? onLockedTap : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -390,14 +436,16 @@ class _LevelRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: current
                       ? AppColors.primary
-                      : (locked ? AppColors.border : AppColors.mint),
+                      : (locked && !unlockReady
+                          ? AppColors.border
+                          : AppColors.mint),
                   borderRadius: AppRadii.mdAll,
                 ),
                 child: SizedBox(
                   width: 36,
                   height: 36,
                   child: Center(
-                    child: locked
+                    child: locked && !unlockReady
                         ? const Icon(
                             Icons.lock,
                             size: 18,
@@ -431,6 +479,20 @@ class _LevelRow extends StatelessWidget {
                       HomeCopy.levelMeta(l10n, level),
                       style: AppTypography.caption,
                     ),
+                    if (isNext) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        unlockReady
+                            ? l10n.h2StatusUnlocked
+                            : l10n.h2StatusUnlocksWhen,
+                        style: AppTypography.caption.copyWith(
+                          color: unlockReady
+                              ? AppColors.primary
+                              : AppColors.textSecondary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -454,7 +516,7 @@ class _LevelRow extends StatelessWidget {
                     ),
                   ),
                 )
-              else if (locked)
+              else if (locked && !unlockReady)
                 DecoratedBox(
                   decoration: const BoxDecoration(
                     color: AppColors.ink,
@@ -504,6 +566,13 @@ class _LevelRow extends StatelessWidget {
                   style: AppTypography.caption,
                 ),
               ],
+            ),
+          ],
+          if (unlockReady && onStartNext != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            PrimaryButton(
+              label: l10n.h2StartLevel(level.id),
+              onPressed: onStartNext,
             ),
           ],
           if (relaxationPending) ...[
