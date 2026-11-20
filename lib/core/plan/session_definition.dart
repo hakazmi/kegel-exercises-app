@@ -13,9 +13,11 @@ class SessionBlockDef {
     this.relaxSec,
     this.sec,
     this.thumbnailAsset,
+    this.exerciseId,
+    this.phaseCue,
   });
 
-  /// hold | rest | quick | breathing | reverse_kegel | stretch
+  /// hold | rest | quick | breathing | reverse_kegel | stretch | movement
   final String type;
   final String titleKey;
   final int? reps;
@@ -25,6 +27,12 @@ class SessionBlockDef {
 
   /// Illustration for S1 row; rest uses stopwatch.
   final String? thumbnailAsset;
+
+  /// Content exercise id when [type] is movement / stretch.
+  final String? exerciseId;
+
+  /// Optional override for the squeeze-phase word (e.g. Lift, Squeeze).
+  final String? phaseCue;
 
   bool get isRest => type == 'rest';
 
@@ -97,28 +105,58 @@ abstract final class SessionDefinitionBuilder {
     required LevelContent level,
     required TodayItem item,
     required int sessionsToday,
+    TrackContent? track,
+    Map<String, ExerciseContent>? exercisesById,
   }) {
     switch (item.kind) {
       case SessionKind.strengthening:
-        return _strengthening(level, item, sessionsToday);
-      case SessionKind.breathing:
-        return SessionDefinition(
-          id: item.id,
-          level: level.id,
-          position: level.position,
-          kind: SessionKind.breathing,
-          label: item.label,
-          sessionsToday: sessionsToday,
-          blocks: <SessionBlockDef>[
-            SessionBlockDef(
-              type: 'breathing',
-              titleKey: 'breathing',
-              sec: level.dailyBreathingSec,
-              thumbnailAsset: 'assets/images/child.svg',
-            ),
-          ],
+        return _strengthening(
+          level,
+          item,
+          sessionsToday,
+          track: track,
+          exercisesById: exercisesById,
         );
+      case SessionKind.body:
+        return _fromExerciseList(
+          level: level,
+          item: item,
+          sessionsToday: sessionsToday,
+          kind: SessionKind.body,
+          exerciseIds: item.exerciseIds,
+          exercisesById: exercisesById ?? const <String, ExerciseContent>{},
+        );
+      case SessionKind.breathing:
       case SessionKind.relaxation:
+        if (item.exerciseIds.isNotEmpty) {
+          return _fromExerciseList(
+            level: level,
+            item: item,
+            sessionsToday: sessionsToday,
+            kind: item.kind,
+            exerciseIds: item.exerciseIds,
+            exercisesById: exercisesById ?? const <String, ExerciseContent>{},
+          );
+        }
+        if (item.kind == SessionKind.breathing) {
+          return SessionDefinition(
+            id: item.id,
+            level: level.id,
+            position: level.position,
+            kind: SessionKind.breathing,
+            label: item.label,
+            sessionsToday: sessionsToday,
+            blocks: <SessionBlockDef>[
+              SessionBlockDef(
+                type: 'breathing',
+                titleKey: 'breathing',
+                sec: level.dailyBreathingSec,
+                thumbnailAsset: 'assets/images/child.svg',
+                exerciseId: 'diaphragmatic_breathing',
+              ),
+            ],
+          );
+        }
         return SessionDefinition(
           id: item.id,
           level: level.id,
@@ -132,6 +170,7 @@ abstract final class SessionDefinitionBuilder {
               titleKey: 'reverseKegel',
               sec: item.durationSeconds > 0 ? item.durationSeconds : 120,
               thumbnailAsset: 'assets/images/child.svg',
+              exerciseId: 'reverse_kegel',
             ),
           ],
         );
@@ -149,7 +188,7 @@ abstract final class SessionDefinitionBuilder {
       item: TodayItem(
         id: 'strength_$sessionNumber',
         kind: SessionKind.strengthening,
-        label: 'Session $sessionNumber',
+        label: '',
         durationSeconds: estimateStrengtheningSeconds(
           slowReps: level.slowHolds['reps'] as int? ?? 5,
           holdSec: level.slowHolds['holdSec'] as int? ??
@@ -171,16 +210,72 @@ abstract final class SessionDefinitionBuilder {
   static SessionDefinition _strengthening(
     LevelContent level,
     TodayItem item,
-    int sessionsToday,
-  ) {
-    final int slowReps = level.slowHolds['reps'] as int? ?? 5;
-    final int holdSec = level.slowHolds['holdSec'] as int? ??
+    int sessionsToday, {
+    TrackContent? track,
+    Map<String, ExerciseContent>? exercisesById,
+  }) {
+    int slowReps = level.slowHolds['reps'] as int? ?? 5;
+    int holdSec = level.slowHolds['holdSec'] as int? ??
         level.slowHolds['holdSecMin'] as int? ??
         3;
-    final int relaxSec = level.slowHolds['relaxSec'] as int? ?? 3;
+    int relaxSec = level.slowHolds['relaxSec'] as int? ?? 3;
+    if (track?.gentlerHolds == true && track?.gentleHold != null) {
+      final Map<String, dynamic> g = track!.gentleHold!;
+      final int? maxHold = g['holdSecMax'] as int?;
+      final int? gRelax = g['relaxSec'] as int?;
+      final int? maxReps = g['repsMax'] as int?;
+      if (maxHold != null && holdSec > maxHold) {
+        holdSec = maxHold;
+      }
+      if (gRelax != null) {
+        relaxSec = gRelax;
+      }
+      if (maxReps != null && slowReps > maxReps) {
+        slowReps = maxReps;
+      }
+    }
     final int quickReps = level.quickSqueezes['reps'] as int? ?? 5;
     final int quickSqueeze = level.quickSqueezes['squeezeSec'] as int? ?? 1;
     final int quickRelax = level.quickSqueezes['relaxSec'] as int? ?? 2;
+
+    final List<SessionBlockDef> blocks = <SessionBlockDef>[
+      SessionBlockDef(
+        type: 'hold',
+        titleKey: 'slowHolds',
+        reps: slowReps,
+        squeezeSec: holdSec,
+        relaxSec: relaxSec,
+        thumbnailAsset: 'assets/images/lying.svg',
+        exerciseId: 'slow_hold',
+      ),
+      const SessionBlockDef(
+        type: 'rest',
+        titleKey: 'rest',
+        sec: restSec,
+        thumbnailAsset: 'assets/images/stopwatch.svg',
+      ),
+      SessionBlockDef(
+        type: 'quick',
+        titleKey: 'quickSqueezes',
+        reps: quickReps,
+        squeezeSec: quickSqueeze,
+        relaxSec: quickRelax,
+        thumbnailAsset: 'assets/images/bridge.svg',
+        exerciseId: 'quick_squeeze',
+      ),
+    ];
+
+    final String trackId = track?.id ?? '';
+    final List<String> extras = level.kegelExtrasForTrack(trackId);
+    for (final String exerciseId in extras) {
+      final ExerciseContent? ex = exercisesById?[exerciseId];
+      if (ex == null) {
+        continue;
+      }
+      blocks.add(
+        movementBlockFromExercise(ex),
+      );
+    }
 
     return SessionDefinition(
       id: item.id,
@@ -190,31 +285,170 @@ abstract final class SessionDefinitionBuilder {
       label: item.label,
       sessionNumber: item.sessionNumber,
       sessionsToday: sessionsToday,
-      blocks: <SessionBlockDef>[
-        SessionBlockDef(
-          type: 'hold',
-          titleKey: 'slowHolds',
-          reps: slowReps,
-          squeezeSec: holdSec,
-          relaxSec: relaxSec,
-          thumbnailAsset: 'assets/images/lying.svg',
-        ),
-        const SessionBlockDef(
-          type: 'rest',
-          titleKey: 'rest',
-          sec: restSec,
-          thumbnailAsset: 'assets/images/stopwatch.svg',
-        ),
-        SessionBlockDef(
-          type: 'quick',
-          titleKey: 'quickSqueezes',
-          reps: quickReps,
-          squeezeSec: quickSqueeze,
-          relaxSec: quickRelax,
-          thumbnailAsset: 'assets/images/bridge.svg',
-        ),
-      ],
+      blocks: blocks,
     );
+  }
+
+  static SessionDefinition _fromExerciseList({
+    required LevelContent level,
+    required TodayItem item,
+    required int sessionsToday,
+    required SessionKind kind,
+    required List<String> exerciseIds,
+    required Map<String, ExerciseContent> exercisesById,
+  }) {
+    final List<SessionBlockDef> blocks = <SessionBlockDef>[];
+    for (final String id in exerciseIds) {
+      final ExerciseContent? ex = exercisesById[id];
+      if (ex == null) {
+        continue;
+      }
+      blocks.add(blockFromExercise(ex, level: level));
+    }
+    if (blocks.isEmpty) {
+      blocks.add(
+        SessionBlockDef(
+          type: 'breathing',
+          titleKey: 'breathing',
+          sec: level.dailyBreathingSec,
+          thumbnailAsset: 'assets/images/child.svg',
+          exerciseId: 'diaphragmatic_breathing',
+        ),
+      );
+    }
+    return SessionDefinition(
+      id: item.id,
+      level: level.id,
+      position: level.position,
+      kind: kind,
+      label: item.label,
+      sessionsToday: sessionsToday,
+      blocks: blocks,
+    );
+  }
+
+  /// Maps a content exercise to a timed block.
+  static SessionBlockDef blockFromExercise(
+    ExerciseContent ex, {
+    required LevelContent level,
+  }) {
+    switch (ex.id) {
+      case 'diaphragmatic_breathing':
+        return SessionBlockDef(
+          type: 'breathing',
+          titleKey: 'breathing',
+          sec: ex.holdSec > 0 ? ex.holdSec : level.dailyBreathingSec,
+          thumbnailAsset: ex.illustration ?? 'assets/images/child.svg',
+          exerciseId: ex.id,
+        );
+      case 'reverse_kegel':
+        return SessionBlockDef(
+          type: 'reverse_kegel',
+          titleKey: 'reverseKegel',
+          sec: ex.holdSec > 0 ? ex.holdSec : 120,
+          thumbnailAsset: ex.illustration ?? 'assets/images/child.svg',
+          exerciseId: ex.id,
+        );
+      case 'childs_pose':
+      case 'happy_baby':
+      case 'supported_back_release':
+        return SessionBlockDef(
+          type: 'stretch',
+          titleKey: ex.id,
+          sec: ex.holdSec > 0 ? ex.holdSec : 90,
+          thumbnailAsset: ex.illustration ?? 'assets/images/child.svg',
+          exerciseId: ex.id,
+        );
+      case 'strong_hold':
+        return SessionBlockDef(
+          type: 'hold',
+          titleKey: ex.id,
+          reps: ex.defaultReps,
+          squeezeSec: ex.holdSec > 0 ? ex.holdSec : 8,
+          relaxSec: ex.holdSec > 0 ? ex.holdSec : 8,
+          thumbnailAsset: ex.illustration ?? 'assets/images/lying.svg',
+          exerciseId: ex.id,
+        );
+      default:
+        return movementBlockFromExercise(ex);
+    }
+  }
+
+  static SessionBlockDef movementBlockFromExercise(ExerciseContent ex) {
+    final int hold = ex.holdSec > 0 ? ex.holdSec : 3;
+    final int relax = hold.clamp(2, 10);
+    return SessionBlockDef(
+      type: 'movement',
+      titleKey: ex.id,
+      reps: ex.defaultReps,
+      squeezeSec: hold > 0 ? hold : 3,
+      relaxSec: relax,
+      thumbnailAsset: ex.illustration ?? 'assets/images/standing.svg',
+      exerciseId: ex.id,
+      phaseCue: _phaseCueFor(ex.id),
+    );
+  }
+
+  /// Phase cue keys (`lift` / `squeeze` / `hold`) for movement blocks.
+  static String? _phaseCueFor(String exerciseId) {
+    switch (exerciseId) {
+      case 'bridge_with_hold':
+        return 'lift';
+      case 'squat_with_coordination':
+        return 'squeeze';
+      case 'sit_to_stand_squeeze':
+        return 'squeeze';
+      case 'the_knack':
+        return 'squeeze';
+      case 'pillow_squeeze_lift':
+        return 'squeeze';
+      case 'standing_walking_holds':
+        return 'hold';
+      default:
+        return null;
+    }
+  }
+
+  /// Estimated duration for a body card from exercise ids.
+  static int estimateBodyDuration(
+    List<String> exerciseIds,
+    Map<String, ExerciseContent> byId,
+  ) {
+    int total = 0;
+    for (final String id in exerciseIds) {
+      final ExerciseContent? ex = byId[id];
+      if (ex == null) {
+        continue;
+      }
+      total += movementBlockFromExercise(ex).durationSeconds;
+    }
+    return total.clamp(60, 600);
+  }
+
+  /// Estimated duration for a breathe card.
+  static int estimateBreatheDuration(
+    List<String> exerciseIds,
+    Map<String, ExerciseContent> byId,
+    int fallbackBreathingSec,
+  ) {
+    if (exerciseIds.isEmpty) {
+      return fallbackBreathingSec;
+    }
+    int total = 0;
+    for (final String id in exerciseIds) {
+      final ExerciseContent? ex = byId[id];
+      if (ex == null) {
+        continue;
+      }
+      if (ex.id == 'diaphragmatic_breathing') {
+        total += ex.holdSec > 0 ? ex.holdSec : fallbackBreathingSec;
+      } else if (ex.holdSec > 0) {
+        total += ex.holdSec;
+      } else {
+        total += movementBlockFromExercise(ex).durationSeconds;
+      }
+    }
+    return total.clamp(60, 900);
   }
 
   /// Duration helper used by PlanService defaults.

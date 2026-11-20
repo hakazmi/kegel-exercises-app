@@ -5,9 +5,12 @@ import 'package:material_ui/material_ui.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/content/info_copy.dart';
 import '../../core/domain/enums.dart';
+import '../../core/motion/app_motion.dart';
 import '../../core/widgets/widgets.dart';
 import 'onboarding_controller.dart';
+import 'widgets/onboarding_stage.dart';
 import 'widgets/onboarding_scaffold.dart';
 
 /// O4 Experience — single choice.
@@ -27,43 +30,85 @@ class O4ExperienceScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Center(
-            child: Illustration(
-              assetPath: 'assets/images/target.svg',
-              semanticLabel: l10n.o4TargetSemantic,
-              width: 56,
-              height: 56,
+          Reveal(
+            from: RevealFrom.drop,
+            child: Stack(
+              children: [
+                ExperienceScene(semanticLabel: l10n.o4HeroSemantic),
+                Positioned(
+                  top: AppSpacing.xs,
+                  right: AppSpacing.xs,
+                  child: InfoButton(content: InfoCopy.kegel(l10n)),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(l10n.o4Title, style: AppTypography.display),
+          Reveal(
+            from: RevealFrom.left,
+            delay: const Duration(milliseconds: 60),
+            child: Text(l10n.o4Title, style: AppTypography.display),
+          ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            l10n.o4Subtitle,
-            style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+          Reveal(
+            from: RevealFrom.left,
+            delay: const Duration(milliseconds: 110),
+            child: Text(
+              l10n.o4Subtitle,
+              style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          SelectableCard(
-            title: l10n.o4None,
-            selected: draft.experience == Experience.none,
-            onTap: () => controller.setExperience(Experience.none),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          SelectableCard(
-            title: l10n.o4Unsure,
-            selected: draft.experience == Experience.unsure,
-            onTap: () => controller.setExperience(Experience.unsure),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          SelectableCard(
-            title: l10n.o4Confident,
-            selected: draft.experience == Experience.confident,
-            onTap: () => controller.setExperience(Experience.confident),
-          ),
+          for (final (int i, (Experience, String, String, IconData, Color, Color)
+              option) in <(Experience, String, String, IconData, Color, Color)>[
+            (
+              Experience.none,
+              l10n.o4None,
+              l10n.o4GuideHint,
+              Icons.lightbulb_outline_rounded,
+              AppColors.goalEjaculationBg,
+              AppColors.goalEjaculationFg,
+            ),
+            (
+              Experience.unsure,
+              l10n.o4Unsure,
+              l10n.o4GuideHint,
+              Icons.help_outline_rounded,
+              AppColors.goalBladderBg,
+              AppColors.goalBladderFg,
+            ),
+            (
+              Experience.confident,
+              l10n.o4Confident,
+              l10n.o4ConfidentHint,
+              Icons.verified_outlined,
+              AppColors.goalSurgeryBg,
+              AppColors.goalSurgeryFg,
+            ),
+          ].indexed) ...[
+            Reveal(
+              from: i.isEven ? RevealFrom.left : RevealFrom.right,
+              delay: AppMotion.stagger(
+                i,
+                base: const Duration(milliseconds: 160),
+              ),
+              child: SelectableCard(
+                title: option.$2,
+                subtitle: option.$3,
+                leading: Icon(option.$4),
+                iconBackground: option.$5,
+                iconForeground: option.$6,
+                selected: draft.experience == option.$1,
+                onTap: () => controller.setExperience(option.$1),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+          ],
         ],
       ),
       footer: PrimaryButton(
         label: l10n.commonNext,
+        trailingArrow: draft.experience != null,
         enabled: draft.experience != null,
         onPressed: draft.experience == null
             ? null

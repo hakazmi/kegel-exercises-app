@@ -48,7 +48,7 @@ class SessionCompleteSummary {
     required this.longestHoldSeconds,
     required this.streak,
     required this.wasFirstEver,
-    this.nextLabel,
+    this.nextItem,
   });
 
   final int durationSeconds;
@@ -59,7 +59,9 @@ class SessionCompleteSummary {
 
   final int streak;
   final bool wasFirstEver;
-  final String? nextLabel;
+
+  /// Next unfinished Today item (UI localizes via [HomeCopy.itemTitle]).
+  final TodayItem? nextItem;
 }
 
 /// Drives [SessionEngine] for the active countdown/player flow.
@@ -93,11 +95,27 @@ class SessionController extends Notifier<SessionPlayState?> {
       orElse: () => levels.first,
     );
     final TodayItem item = _resolveItem(plan, itemId);
+    final List<TrackContent> tracks = await ref.read(tracksProvider.future);
+    final List<ExerciseContent> exercises =
+        await ref.read(exercisesProvider.future);
+    TrackContent? trackContent;
+    for (final TrackContent t in tracks) {
+      if (t.id == profile.track.contentId) {
+        trackContent = t;
+        break;
+      }
+    }
+    trackContent ??= tracks.isEmpty ? null : tracks.first;
+    final Map<String, ExerciseContent> byId = <String, ExerciseContent>{
+      for (final ExerciseContent e in exercises) e.id: e,
+    };
     final SessionDefinition definition =
         SessionDefinitionBuilder.fromLevelAndItem(
       level: level,
       item: item,
       sessionsToday: profile.sessionsPerDay.clamp(1, 3),
+      track: trackContent,
+      exercisesById: byId,
     );
 
     final SessionEngine engine = SessionEngine(
@@ -133,6 +151,12 @@ class SessionController extends Notifier<SessionPlayState?> {
   void pause() => _engine?.pause();
 
   void resume() => _engine?.resume();
+
+  /// Forward button: next phase (squeeze → hold → relax → rest …).
+  void skipPhase() => _engine?.skipPhase();
+
+  /// Forward button on body sessions: next exercise.
+  void skipBlock() => _engine?.skipBlock();
 
   void setVibration(bool value) {
     final UserProfile profile = ref.read(userProfileProvider);
@@ -326,20 +350,20 @@ class SessionController extends Notifier<SessionPlayState?> {
       restWeekday: profile.restWeekday,
     );
 
-    String? nextLabel;
+    TodayItem? nextItem;
     try {
       final TodayPlan plan = await ref.read(todayPlanProvider.future);
       for (final TodayItem item in plan.items) {
         if (item.id == current.itemId) {
           continue;
         }
-        if (!item.done) {
-          nextLabel = item.label;
+        if (!item.done && !item.locked) {
+          nextItem = item;
           break;
         }
       }
     } on Object {
-      nextLabel = null;
+      nextItem = null;
     }
 
     unawaited(
@@ -357,7 +381,7 @@ class SessionController extends Notifier<SessionPlayState?> {
         longestHoldSeconds: next.longestHoldSeconds,
         streak: streak,
         wasFirstEver: wasFirstEver,
-        nextLabel: nextLabel,
+        nextItem: nextItem,
       ),
     );
   }
@@ -416,7 +440,7 @@ class SessionController extends Notifier<SessionPlayState?> {
     return const TodayItem(
       id: 'strength_1',
       kind: SessionKind.strengthening,
-      label: 'Session 1',
+      label: '',
       durationSeconds: 55,
       done: false,
       sessionNumber: 1,

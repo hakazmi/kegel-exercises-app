@@ -17,6 +17,8 @@ import 'package:kegelexercisesapp/features/progress/g2_checkin_screen.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'helpers/preload.dart';
+
 class _RecordingAnalytics implements AnalyticsService {
   final List<String> events = <String>[];
 
@@ -97,6 +99,7 @@ Future<void> _pump(
   ProviderContainer container,
   Widget home,
 ) async {
+  await preloadContent(tester, container);
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
@@ -366,8 +369,19 @@ void main() {
   testWidgets('G1 shows streak and calendar marks from sessions',
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
+    // One session a day, so each of the three days counts as a full
+    // training day (a day counts only when all planned sessions are done).
     final ProviderContainer container = await _container(
       clock: clock,
+      profile: UserProfile.initial().copyWith(
+        onboardingDone: true,
+        tutorialDone: true,
+        goal: Goal.bladderControl,
+        sessionsPerDay: 1,
+        level: 1,
+        track: TrackId.generalBladder,
+        restWeekday: DateTime.sunday,
+      ),
       sessions: <SessionRecord>[
         _session(day: DateTime(2026, 11, 9)),
         _session(day: DateTime(2026, 11, 10)),
@@ -437,8 +451,14 @@ void main() {
     await tester.tap(find.text('A few times'));
     await tester.pump();
     await tester.tap(find.text('Save'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+    // Saving writes to the database and reloads history; give it real
+    // async between frames.
+    for (int i = 0; i < 10; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     final List<CheckInRecord> saved =
         await container.read(checkInRepositoryProvider).getAll();

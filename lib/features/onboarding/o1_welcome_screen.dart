@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
@@ -7,11 +10,13 @@ import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/constants/links.dart';
+import '../../core/motion/app_motion.dart';
 import '../../core/widgets/widgets.dart';
 import 'onboarding_controller.dart';
 import 'widgets/onboarding_scaffold.dart';
+import 'widgets/onboarding_stage.dart';
 
-/// O1 Welcome — age gate and disclaimer.
+/// O1 Welcome — 3D hero, feature cards, age gate and disclaimer.
 class O1WelcomeScreen extends ConsumerWidget {
   const O1WelcomeScreen({super.key});
 
@@ -27,6 +32,28 @@ class O1WelcomeScreen extends ConsumerWidget {
     final OnboardingController controller =
         ref.read(onboardingControllerProvider.notifier);
 
+    final List<({IconData icon, String text, Color bg, Color fg})> features =
+        <({IconData icon, String text, Color bg, Color fg})>[
+      (
+        icon: Icons.water_drop_rounded,
+        text: l10n.o1FeatureBladder,
+        bg: AppColors.goalBladderBg,
+        fg: AppColors.goalBladderFg,
+      ),
+      (
+        icon: Icons.route_rounded,
+        text: l10n.o1FeaturePlan,
+        bg: AppColors.goalErectionBg,
+        fg: AppColors.goalErectionFg,
+      ),
+      (
+        icon: Icons.health_and_safety_outlined,
+        text: l10n.o1FeaturePrivate,
+        bg: AppColors.goalSurgeryBg,
+        fg: AppColors.goalSurgeryFg,
+      ),
+    ];
+
     return OnboardingScaffold(
       step: 1,
       showHeader: false,
@@ -34,52 +61,65 @@ class O1WelcomeScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Hero(l10n: l10n),
-          const SizedBox(height: AppSpacing.xl),
-          Text(l10n.o1Title, style: AppTypography.display),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            l10n.o1Body,
-            style: AppTypography.body.copyWith(color: AppColors.textSecondary),
-          ),
+          Reveal(from: RevealFrom.drop, child: _Hero(l10n: l10n)),
           const SizedBox(height: AppSpacing.lg),
-          _Bullet(text: l10n.o1BulletPlan),
-          _Bullet(text: l10n.o1BulletDiscreet),
-          _Bullet(text: l10n.o1BulletPrivate),
-          const SizedBox(height: AppSpacing.lg),
-          InkWell(
-            onTap: () => controller.setAcceptedAge(!draft.acceptedAge),
-            borderRadius: AppRadii.mdAll,
-            child: ConstrainedBox(
-              constraints:
-                  const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: Checkbox(
-                      value: draft.acceptedAge,
-                      onChanged: (bool? value) =>
-                          controller.setAcceptedAge(value ?? false),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: const VisualDensity(
-                        horizontal: -4,
-                        vertical: -4,
-                      ),
+          Reveal(
+            from: RevealFrom.left,
+            delay: const Duration(milliseconds: 120),
+            child: Text.rich(
+              TextSpan(
+                style: AppTypography.display,
+                children: <InlineSpan>[
+                  TextSpan(text: l10n.o1TitleBefore),
+                  TextSpan(
+                    text: l10n.o1TitleAccent,
+                    style: AppTypography.display.copyWith(
+                      color: AppColors.primary,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.xs),
+                  TextSpan(text: l10n.o1TitleAfter),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Reveal(
+            from: RevealFrom.left,
+            delay: const Duration(milliseconds: 180),
+            child: Text(
+              l10n.o1Body,
+              style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Reveal(
+            from: RevealFrom.rise,
+            delay: const Duration(milliseconds: 220),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (int i = 0; i < features.length; i++) ...[
+                  if (i > 0) const SizedBox(width: AppSpacing.xs),
                   Expanded(
-                    child: Text(
-                      l10n.o1AgeCheckbox,
-                      style: AppTypography.body
-                          .copyWith(fontWeight: FontWeight.w700),
+                    child: _FeatureCard(
+                      icon: features[i].icon,
+                      text: features[i].text,
+                      bg: features[i].bg,
+                      fg: features[i].fg,
                     ),
                   ),
                 ],
-              ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Reveal(
+            from: RevealFrom.rise,
+            delay: const Duration(milliseconds: 420),
+            child: _AgeToggle(
+              label: l10n.o1AgeCheckbox,
+              value: draft.acceptedAge,
+              onChanged: controller.setAcceptedAge,
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -106,6 +146,8 @@ class O1WelcomeScreen extends ConsumerWidget {
       ),
       footer: PrimaryButton(
         label: l10n.o1GetStarted,
+        trailingArrow: draft.acceptedAge,
+        shimmer: draft.acceptedAge,
         enabled: draft.acceptedAge,
         onPressed: draft.acceptedAge
             ? () async {
@@ -120,66 +162,123 @@ class O1WelcomeScreen extends ConsumerWidget {
   }
 }
 
+/// 3D welcome scene: the cut-out athlete squatting on a glowing floor, a
+/// glass tile with the pelvic floor linked to his hips, and rising chevrons.
 class _Hero extends StatelessWidget {
   const _Hero({required this.l10n});
 
   final AppLocalizations l10n;
 
+  static const double _height = 300;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints box) {
+        final double w = box.maxWidth;
+        const double manHeight = _height - 6;
+        const double manWidth = manHeight * 456 / 900;
+        final double manLeft = w - manWidth - 34;
+        const double tileSize = 118;
+        const double tileTop = 58;
+        return OnboardingStage(
+          height: _height,
+          semanticLabel: l10n.o1HeroSemantic,
+          children: [
+            ConnectorLine(
+              from: const Offset(tileSize / 2, tileTop + tileSize + 4),
+              to: Offset(manLeft + manWidth * 0.36, _height * 0.6),
+            ),
+            Positioned(
+              left: manLeft,
+              bottom: 6,
+              child: const CutoutFigure(
+                asset: OnboardingArt.welcomeMan,
+                height: manHeight,
+              ),
+            ),
+            Positioned(
+              left: 0,
+              top: tileTop,
+              child: Reveal(
+                from: RevealFrom.left,
+                delay: const Duration(milliseconds: 220),
+                child: FloatBob(
+                  lift: 5,
+                  period: const Duration(milliseconds: 2600),
+                  child: GlassTile(
+                    size: tileSize,
+                    badge: true,
+                    tint: AppColors.mint,
+                    child: Image.asset(
+                      OnboardingArt.pelvis,
+                      fit: BoxFit.contain,
+                      excludeFromSemantics: true,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const Positioned(
+              right: 0,
+              top: 24,
+              child: RisingChevrons(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({
+    required this.icon,
+    required this.text,
+    required this.bg,
+    required this.fg,
+  });
+
+  final IconData icon;
+  final String text;
+  final Color bg;
+  final Color fg;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 180,
-      decoration: const BoxDecoration(
-        color: AppColors.mint,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.sm,
       ),
-      child: Stack(
-        alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadii.lgAll,
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppElevation.level1,
+      ),
+      child: Column(
         children: [
-          Positioned(
-            left: 28,
-            top: 28,
-            child: Illustration(
-              assetPath: 'assets/images/calendar.svg',
-              semanticLabel: l10n.o1CalendarSemantic,
-              width: 36,
-              height: 36,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: AppRadii.mdAll,
             ),
+            child: Icon(icon, color: fg, size: 22),
           ),
-          Positioned(
-            right: 36,
-            top: 24,
-            child: Illustration(
-              assetPath: 'assets/images/shield.svg',
-              semanticLabel: l10n.o1ShieldSemantic,
-              width: 36,
-              height: 36,
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+              height: 1.25,
             ),
-          ),
-          Positioned(
-            left: 40,
-            bottom: 28,
-            child: Illustration(
-              assetPath: 'assets/images/stopwatch.svg',
-              semanticLabel: l10n.o1StopwatchSemantic,
-              width: 32,
-              height: 32,
-            ),
-          ),
-          Positioned(
-            right: 44,
-            bottom: 24,
-            child: Illustration(
-              assetPath: 'assets/images/target.svg',
-              semanticLabel: l10n.o1TargetSemantic,
-              width: 32,
-              height: 32,
-            ),
-          ),
-          Illustration(
-            assetPath: 'assets/images/standing.svg',
-            semanticLabel: l10n.o1HeroSemantic,
-            height: 130,
           ),
         ],
       ),
@@ -187,22 +286,95 @@ class _Hero extends StatelessWidget {
   }
 }
 
-class _Bullet extends StatelessWidget {
-  const _Bullet({required this.text});
+/// Large tappable 18+ confirmation with an animated check.
+class _AgeToggle extends StatelessWidget {
+  const _AgeToggle({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
 
-  final String text;
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.check_circle, color: AppColors.primary, size: 20),
-          const SizedBox(width: AppSpacing.xs),
-          Expanded(child: Text(text, style: AppTypography.body)),
-        ],
+    return Semantics(
+      checked: value,
+      child: PressScale(
+        onTap: () {
+          unawaited(HapticFeedback.selectionClick());
+          onChanged(!value);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 240),
+          constraints: const BoxConstraints(minHeight: 56),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: value ? AppColors.mint : AppColors.surface,
+            borderRadius: AppRadii.lgAll,
+            border: Border.all(
+              color: value ? AppColors.primary : AppColors.border,
+              width: value ? 2 : 1.5,
+            ),
+            boxShadow: AppElevation.level1,
+          ),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: value ? AppColors.primary : AppColors.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: value ? AppColors.primary : AppColors.borderStrong,
+                    width: 2,
+                  ),
+                ),
+                child: AnimatedScale(
+                  scale: value ? 1 : 0,
+                  duration: const Duration(milliseconds: 260),
+                  curve: AppMotion.dropCurve,
+                  child: const Icon(
+                    Icons.check_rounded,
+                    size: 18,
+                    color: AppColors.textOnPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTypography.body.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.xs,
+                  vertical: 2,
+                ),
+                decoration: const BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  borderRadius: AppRadii.mdAll,
+                ),
+                child: Text(
+                  '18+',
+                  style: AppTypography.caption.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

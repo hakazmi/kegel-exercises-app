@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,7 +15,8 @@ import '../../core/domain/user_profile.dart';
 import '../../core/services/analytics_service.dart';
 import '../../core/services/haptics_service.dart';
 import '../../core/widgets/widgets.dart';
-import 'anatomy_diagram.dart';
+import 'side_pelvic_demo.dart';
+import 'tutorial_scenes.dart';
 
 /// T1 muscle-finding tutorial: 3 cards, practice, then felt-lift check.
 class T1TutorialScreen extends ConsumerStatefulWidget {
@@ -55,6 +57,9 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
         'felt_lift': feltLift ? 'yes' : 'not_sure',
       },
     );
+
+    // Ticks "How to do a Kegel" on today's plan.
+    await ref.read(guideSeenOnProvider.notifier).markToday();
 
     if (!widget.replay) {
       final UserProfile profile = ref.read(userProfileProvider);
@@ -228,7 +233,11 @@ class _CardsStep extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       if (cardIndex == 0) ...<Widget>[
-                        const AnatomyDiagram(),
+                        MusclesScene(semanticLabel: l10n.t1AnatomySemantic),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+                      if (cardIndex == 1) ...<Widget>[
+                        FindScene(semanticLabel: l10n.s1LyingSemantic),
                         const SizedBox(height: AppSpacing.md),
                       ],
                       _Dots(count: 3, index: cardIndex),
@@ -243,24 +252,24 @@ class _CardsStep extends StatelessWidget {
                         style: AppTypography.body
                             .copyWith(color: AppColors.textSecondary),
                       ),
-                      if (cardIndex == 1) ...<Widget>[
-                        const SizedBox(height: AppSpacing.xl),
-                        Center(
-                          child: Illustration(
-                            assetPath: 'assets/images/lying.svg',
-                            semanticLabel: l10n.s1LyingSemantic,
-                            height: 140,
-                          ),
-                        ),
+                      if (cardIndex == 0) ...<Widget>[
                         const SizedBox(height: AppSpacing.lg),
-                        AppCard(
-                          backgroundColor: AppColors.surfaceMuted,
-                          child: Text(
-                            l10n.t1Card2UrineNote,
-                            style: AppTypography.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                        _TipCard(
+                          icon: Icons.verified_user_outlined,
+                          iconColor: AppColors.goalSurgeryFg,
+                          background: AppColors.goalSurgeryBg,
+                          title: l10n.t1AnatomyPelvicFloor,
+                          body: l10n.t1AvoidCheckRelaxed,
+                        ),
+                      ],
+                      if (cardIndex == 1) ...<Widget>[
+                        const SizedBox(height: AppSpacing.lg),
+                        _TipCard(
+                          icon: Icons.lightbulb_outline_rounded,
+                          iconColor: AppColors.goalEjaculationFg,
+                          background: AppColors.goalEjaculationBg,
+                          title: l10n.t1TipTitle,
+                          body: l10n.t1Card2UrineNote,
                         ),
                       ],
                     ],
@@ -303,6 +312,59 @@ class _CardsStep extends StatelessWidget {
   }
 }
 
+class _TipCard extends StatelessWidget {
+  const _TipCard({
+    required this.icon,
+    required this.iconColor,
+    required this.background,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final Color background;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: AppRadii.lgAll,
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTypography.body.copyWith(fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  body,
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// "Do and don't" — checklist centred vertically in the free space.
 class _AvoidCard extends StatelessWidget {
   const _AvoidCard({required this.l10n});
@@ -329,8 +391,12 @@ class _AvoidCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(l10n.t1Card3Title, style: AppTypography.display),
+                    const SizedBox(height: AppSpacing.sm),
+                    // The real movement: squeeze and lift, hold, let go.
+                    const PelvicFloorDemoLoop(height: 210),
                     const SizedBox(height: AppSpacing.lg),
+                    Text(l10n.t1Card3Title, style: AppTypography.display),
+                    const SizedBox(height: AppSpacing.md),
                     _AvoidRow(
                       positive: true,
                       text: l10n.t1AvoidCheckRelaxed,
@@ -423,45 +489,69 @@ class _PracticeStep extends StatelessWidget {
           dark: true,
         ),
         Expanded(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  l10n.t1PracticeSubtitle,
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.sessionTextSecondary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                SessionRing(
-                  key: ValueKey<String>('$rep-$isSqueeze'),
-                  phase: phase,
-                  duration: duration,
-                  size: 220,
-                  onCompleted: onPhaseDone,
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints box) {
+              // The X-ray demo gets most of the height; the timer ring sits
+              // underneath and drives the phases.
+              final double demo = math.min(
+                math.min(box.maxWidth - AppSpacing.xl * 2, 320),
+                math.max(180, box.maxHeight - 230),
+              );
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: box.maxHeight),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        isSqueeze ? l10n.t1PhaseSqueeze : l10n.t1PhaseRelax,
-                        style: AppTypography.title.copyWith(
-                          color: AppColors.sessionText,
-                          fontSize: 28,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xl,
+                        ),
+                        child: Text(
+                          l10n.t1PracticeSubtitle,
+                          textAlign: TextAlign.center,
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.sessionTextSecondary,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        l10n.t1RepOf(rep, totalReps),
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.sessionTextSecondary,
+                      const SizedBox(height: AppSpacing.md),
+                      SidePelvicDemo(squeezing: isSqueeze, size: demo),
+                      const SizedBox(height: AppSpacing.lg),
+                      SessionRing(
+                        key: ValueKey<String>('$rep-$isSqueeze'),
+                        phase: phase,
+                        duration: duration,
+                        size: 150,
+                        onCompleted: onPhaseDone,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              isSqueeze
+                                  ? l10n.t1PhaseSqueeze
+                                  : l10n.t1PhaseRelax,
+                              style: AppTypography.title.copyWith(
+                                color: AppColors.sessionText,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              l10n.t1RepOf(rep, totalReps),
+                              style: AppTypography.caption.copyWith(
+                                color: AppColors.sessionTextSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ],
@@ -496,7 +586,7 @@ class _FeltLiftStep extends StatelessWidget {
                 const Expanded(
                   child: Center(
                     child: SingleChildScrollView(
-                      child: AnatomyDiagram(),
+                      child: PelvicFloorDemoLoop(height: 220),
                     ),
                   ),
                 ),

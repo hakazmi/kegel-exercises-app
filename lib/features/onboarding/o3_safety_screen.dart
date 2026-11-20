@@ -5,9 +5,12 @@ import 'package:material_ui/material_ui.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/content/info_copy.dart';
+import '../../core/motion/app_motion.dart';
 import '../../core/widgets/widgets.dart';
 import 'onboarding_controller.dart';
 import 'onboarding_state.dart';
+import 'widgets/onboarding_stage.dart';
 import 'widgets/onboarding_scaffold.dart';
 
 /// O3 Safety check — multi-select with pain / catheter / surgery routing.
@@ -40,6 +43,41 @@ class O3SafetyScreen extends ConsumerWidget {
     final bool showSurgeryConfirm =
         draft.recentSurgery && !draft.catheter;
 
+    final List<_SafetyOption> options = <_SafetyOption>[
+      _SafetyOption(
+        title: l10n.o3Pain,
+        icon: Icons.accessibility_new_rounded,
+        selected: draft.pain,
+        iconBackground: AppColors.streakBg,
+        iconForeground: AppColors.streakFg,
+        onChanged: (bool v) => controller.toggleSafety(pain: v),
+      ),
+      _SafetyOption(
+        title: l10n.o3PainSexual,
+        icon: Icons.male_rounded,
+        selected: draft.painSexual,
+        iconBackground: AppColors.goalBladderBg,
+        iconForeground: AppColors.goalBladderFg,
+        onChanged: (bool v) => controller.toggleSafety(painSexual: v),
+      ),
+      _SafetyOption(
+        title: l10n.o3Surgery,
+        icon: Icons.medical_services_outlined,
+        selected: draft.recentSurgery,
+        iconBackground: AppColors.goalEjaculationBg,
+        iconForeground: AppColors.goalEjaculationFg,
+        onChanged: (bool v) => controller.toggleSafety(recentSurgery: v),
+      ),
+      _SafetyOption(
+        title: l10n.o3Catheter,
+        icon: Icons.water_drop_outlined,
+        selected: draft.catheter,
+        iconBackground: AppColors.goalErectionBg,
+        iconForeground: AppColors.goalErectionFg,
+        onChanged: (bool v) => controller.toggleSafety(catheter: v),
+      ),
+    ];
+
     return OnboardingScaffold(
       step: 3,
       onBack: () => context.go(AppRoutes.goal),
@@ -48,56 +86,75 @@ class O3SafetyScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Center(
-            child: Illustration(
-              assetPath: 'assets/images/shield.svg',
-              semanticLabel: l10n.o3ShieldSemantic,
-              width: 56,
-              height: 56,
+          Reveal(
+            from: RevealFrom.drop,
+            child: Stack(
+              children: [
+                SafetyScene(semanticLabel: l10n.o3HeroSemantic),
+                Positioned(
+                  top: AppSpacing.xs,
+                  right: AppSpacing.xs,
+                  child: InfoButton(content: InfoCopy.safetyWhy(l10n)),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(l10n.o3Title, style: AppTypography.display),
+          Reveal(
+            from: RevealFrom.left,
+            delay: const Duration(milliseconds: 60),
+            child: Text(l10n.o3Title, style: AppTypography.display),
+          ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            l10n.o3Subtitle,
-            style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+          Reveal(
+            from: RevealFrom.left,
+            delay: const Duration(milliseconds: 110),
+            child: Text(
+              l10n.o3Subtitle,
+              style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+            ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          MultiSelectCard(
-            title: l10n.o3Pain,
-            selected: draft.pain,
-            onChanged: (bool value) => controller.toggleSafety(pain: value),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          MultiSelectCard(
-            title: l10n.o3PainSexual,
-            selected: draft.painSexual,
-            onChanged: (bool value) =>
-                controller.toggleSafety(painSexual: value),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          MultiSelectCard(
-            title: l10n.o3Surgery,
-            selected: draft.recentSurgery,
-            onChanged: (bool value) =>
-                controller.toggleSafety(recentSurgery: value),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          MultiSelectCard(
-            title: l10n.o3Catheter,
-            selected: draft.catheter,
-            onChanged: (bool value) => controller.toggleSafety(catheter: value),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          MultiSelectCard(
-            title: l10n.o3None,
-            selected: draft.noneOfThese,
-            onChanged: (bool value) {
-              if (value) {
-                controller.toggleSafety(noneOfThese: true);
-              }
-            },
+          for (final (int i, _SafetyOption option) in options.indexed) ...[
+            Reveal(
+              from: i.isEven ? RevealFrom.left : RevealFrom.right,
+              delay: AppMotion.stagger(
+                i,
+                base: const Duration(milliseconds: 160),
+              ),
+              child: MultiSelectCard(
+                title: option.title,
+                leading: option.icon,
+                selected: option.selected,
+                accent: AppColors.primary,
+                selectedBackground: AppColors.mint,
+                iconBackground: option.iconBackground,
+                iconForeground: option.iconForeground,
+                onChanged: option.onChanged,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+          ],
+          Reveal(
+            from: RevealFrom.rise,
+            delay: AppMotion.stagger(
+              4,
+              base: const Duration(milliseconds: 160),
+            ),
+            child: MultiSelectCard(
+              title: l10n.o3None,
+              leading: Icons.not_interested_rounded,
+              selected: draft.noneOfThese,
+              accent: AppColors.goalErectionFg,
+              selectedBackground: AppColors.goalErectionBg,
+              iconBackground: AppColors.goalErectionBg,
+              iconForeground: AppColors.goalErectionFg,
+              onChanged: (bool value) {
+                if (value) {
+                  controller.toggleSafety(noneOfThese: true);
+                }
+              },
+            ),
           ),
         ],
       ),
@@ -122,6 +179,7 @@ class O3SafetyScreen extends ConsumerWidget {
           : null,
       footer: PrimaryButton(
         label: draft.catheter ? l10n.o3ContinueBlocked : l10n.commonNext,
+        trailingArrow: canContinue && !draft.catheter,
         enabled: canContinue,
         onPressed: !canContinue
             ? null
@@ -142,6 +200,24 @@ class O3SafetyScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _SafetyOption {
+  const _SafetyOption({
+    required this.title,
+    required this.icon,
+    required this.selected,
+    required this.onChanged,
+    required this.iconBackground,
+    required this.iconForeground,
+  });
+
+  final String title;
+  final IconData icon;
+  final bool selected;
+  final ValueChanged<bool> onChanged;
+  final Color iconBackground;
+  final Color iconForeground;
 }
 
 /// Pinned safety messages between the options list and the primary button.
@@ -202,7 +278,7 @@ class _SafetyMessagePanel extends StatelessWidget {
             children: [
               for (int i = 0; i < messages.length; i++) ...[
                 if (i > 0) const SizedBox(height: AppSpacing.md),
-                messages[i],
+                Reveal(from: RevealFrom.drop, child: messages[i]),
               ],
             ],
           ),

@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../app/theme/system_ui.dart';
 import '../../../app/theme/tokens.dart';
+import '../../../core/motion/app_motion.dart';
 import '../../../core/widgets/progress_header.dart';
 
 /// Shared chrome for O1–O6: progress header and scrollable body.
@@ -46,7 +47,48 @@ class OnboardingScaffold extends StatelessWidget {
       value: AppSystemUi.lightScreen,
       child: Scaffold(
         backgroundColor: AppColors.background,
-        body: SafeArea(
+        body: Stack(
+          children: [
+            // Soft green / sky blobs matching the sample onboarding chrome.
+            Positioned(
+              top: -120,
+              right: -100,
+              child: IgnorePointer(
+                child: Container(
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: <Color>[
+                        AppColors.accent.withValues(alpha: 0.12),
+                        AppColors.accent.withValues(alpha: 0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -80,
+              left: -90,
+              child: IgnorePointer(
+                child: Container(
+                  width: 240,
+                  height: 240,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: <Color>[
+                        AppColors.sky.withValues(alpha: 0.18),
+                        AppColors.sky.withValues(alpha: 0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SafeArea(
           child: Column(
             children: [
               if (showHeader)
@@ -97,10 +139,16 @@ class OnboardingScaffold extends StatelessWidget {
                     AppSpacing.xl,
                     AppSpacing.md,
                   ),
-                  child: footer,
+                  child: Reveal(
+                    from: RevealFrom.rise,
+                    delay: const Duration(milliseconds: 260),
+                    child: footer!,
+                  ),
                 ),
             ],
           ),
+        ),
+          ],
         ),
       ),
     );
@@ -147,7 +195,7 @@ class _ScrollingBody extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: <Color>[
-                    Color(0x00F5F7F6),
+                    Color(0x00F5F6F8),
                     AppColors.background,
                   ],
                 ),

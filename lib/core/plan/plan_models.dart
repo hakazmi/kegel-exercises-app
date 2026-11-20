@@ -1,6 +1,6 @@
 import '../domain/enums.dart';
 
-/// One item on today's list (strengthening slot or breathing).
+/// One timed item on today's list (Kegel, body, breathing, or relaxation).
 class TodayItem {
   const TodayItem({
     required this.id,
@@ -10,6 +10,8 @@ class TodayItem {
     required this.done,
     this.optional = false,
     this.sessionNumber,
+    this.locked = false,
+    this.exerciseIds = const <String>[],
   });
 
   final String id;
@@ -21,6 +23,27 @@ class TodayItem {
 
   /// 1-based strengthening slot when [kind] is strengthening.
   final int? sessionNumber;
+
+  /// Premium lock (body card for free users at Level 2+).
+  final bool locked;
+
+  /// Exercise ids that compose this session (body / breathe cards).
+  final List<String> exerciseIds;
+}
+
+/// Tick-only habit row (never opens the player).
+class TodayHabitItem {
+  const TodayHabitItem({
+    required this.id,
+    required this.exerciseId,
+    required this.label,
+    required this.done,
+  });
+
+  final String id;
+  final String exerciseId;
+  final String label;
+  final bool done;
 }
 
 /// Result of [PlanService.todayPlan].
@@ -31,6 +54,7 @@ class TodayPlan {
     required this.dayInLevel,
     required this.level,
     required this.track,
+    this.habits = const <TodayHabitItem>[],
   });
 
   final TodayPlanState state;
@@ -38,6 +62,11 @@ class TodayPlan {
   final int dayInLevel;
   final int level;
   final TrackId track;
+  final List<TodayHabitItem> habits;
+
+  /// Timed items that can open S1 (excludes locked body).
+  List<TodayItem> get playableItems =>
+      items.where((TodayItem i) => !i.locked).toList();
 }
 
 /// Estimated session length for a level's standard strengthening block.

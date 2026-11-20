@@ -46,6 +46,7 @@ class MainShell extends StatelessWidget {
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: AppSystemUi.lightScreen,
         child: Scaffold(
+          extendBody: true,
           body: navigationShell,
           bottomNavigationBar: BottomTabBar(
             current: current,

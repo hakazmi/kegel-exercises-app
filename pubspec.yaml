@@ -31,6 +31,8 @@ dependencies:
   vibration: ^3.2.1
   package_info_plus: ^10.2.2
   flutter_timezone: ^5.1.1
+  animated_notch_bottom_bar: ^1.0.4
+  video_player: ^2.14.1
 
 dev_dependencies:
   flutter_test:
@@ -45,8 +47,17 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/onboarding/
+    - assets/images/onboarding/cutouts/
     - assets/content/
     - assets/content/articles/
+    # Background-removed position cutouts for the 3D day panels.
+    - assets/positions/
+    # Pelvic-floor squeeze / relax demo (cropped, watermark-free).
+    - assets/videos/pf_squeeze.mp4
+    - assets/videos/pf_relax.mp4
+    - assets/videos/pf_relaxed.jpg
+    - assets/videos/pf_squeezed.jpg
 
   fonts:
     - family: Manrope

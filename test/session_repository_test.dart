@@ -2,12 +2,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kegelexercisesapp/core/data/database/app_database.dart';
 import 'package:kegelexercisesapp/core/data/repositories/checkin_repository.dart';
 import 'package:kegelexercisesapp/core/data/repositories/data_reset_service.dart';
+import 'package:kegelexercisesapp/core/data/repositories/habit_repository.dart';
 import 'package:kegelexercisesapp/core/data/repositories/session_repository.dart';
 import 'package:kegelexercisesapp/core/data/repositories/settings_repository.dart';
 import 'package:kegelexercisesapp/core/domain/enums.dart';
 import 'package:kegelexercisesapp/core/domain/session_record.dart';
 import 'package:kegelexercisesapp/core/domain/user_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+// CheckInRecord lives with check-in repository types.
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -93,10 +96,14 @@ void main() {
       ),
     );
 
+    final HabitRepository habits = HabitRepository(db);
+    final WalkingRepository walking = WalkingRepository(db);
     final DataResetService reset = DataResetService(
       settings: settings,
       sessions: sessions,
       checkIns: checkIns,
+      habits: habits,
+      walking: walking,
     );
     await reset.deleteEverything();
 

@@ -1,6 +1,12 @@
 import 'enums.dart';
 import 'safety_flags.dart';
 
+/// Rest weekday for a plan that starts on [start]: the 7th day of the first
+/// week, i.e. the weekday just before the start weekday. Joining on a
+/// Wednesday trains Wednesday to Monday and rests on Tuesday.
+int restWeekdayForStart(DateTime start) =>
+    start.weekday == DateTime.monday ? DateTime.sunday : start.weekday - 1;
+
 /// Persisted user plan and preferences (shared_preferences).
 class UserProfile {
   const UserProfile({
@@ -14,6 +20,7 @@ class UserProfile {
     required this.track,
     required this.level,
     required this.levelStartedOn,
+    this.planStartedOn,
     this.restWeekday = DateTime.sunday,
     this.discreetNotifications = true,
     this.voiceOn = false,
@@ -45,7 +52,13 @@ class UserProfile {
   /// Calendar date the current level started (date-only, local).
   final DateTime? levelStartedOn;
 
-  /// ISO weekday for the weekly rest day (1=Mon … 7=Sun). Default Sunday.
+  /// Calendar date the user finished onboarding (date-only, local).
+  final DateTime? planStartedOn;
+
+  /// ISO weekday for the weekly rest day (1=Mon … 7=Sun).
+  ///
+  /// Onboarding sets it from the start date with [restWeekdayForStart];
+  /// Sunday is only the fallback before onboarding.
   final int restWeekday;
 
   final bool discreetNotifications;
@@ -86,6 +99,7 @@ class UserProfile {
     TrackId? track,
     int? level,
     DateTime? levelStartedOn,
+    DateTime? planStartedOn,
     int? restWeekday,
     bool? discreetNotifications,
     bool? voiceOn,
@@ -110,6 +124,7 @@ class UserProfile {
       level: level ?? this.level,
       levelStartedOn:
           clearLevelStartedOn ? null : (levelStartedOn ?? this.levelStartedOn),
+      planStartedOn: planStartedOn ?? this.planStartedOn,
       restWeekday: restWeekday ?? this.restWeekday,
       discreetNotifications:
           discreetNotifications ?? this.discreetNotifications,
@@ -133,6 +148,7 @@ class UserProfile {
         'track': track.storageValue,
         'level': level,
         'levelStartedOn': levelStartedOn?.toIso8601String(),
+        'planStartedOn': planStartedOn?.toIso8601String(),
         'restWeekday': restWeekday,
         'discreetNotifications': discreetNotifications,
         'voiceOn': voiceOn,
@@ -147,7 +163,21 @@ class UserProfile {
     final String? goalRaw = json['goal'] as String?;
     final String? experienceRaw = json['experience'] as String?;
     final String? started = json['levelStartedOn'] as String?;
-    final int rest = (json['restWeekday'] as int? ?? DateTime.sunday).clamp(1, 7);
+    final DateTime? levelStart =
+        started == null ? null : DateTime.parse(started);
+    int rest = (json['restWeekday'] as int? ?? DateTime.sunday).clamp(1, 7);
+    DateTime? planStart;
+    if (json.containsKey('planStartedOn')) {
+      final String? raw = json['planStartedOn'] as String?;
+      planStart = raw == null ? null : DateTime.parse(raw);
+    } else if ((json['onboardingDone'] as bool? ?? false) &&
+        levelStart != null) {
+      // One-time migration: profiles saved before the rest day followed the
+      // start date had a fixed Sunday. Best guess for the start date is the
+      // current level start (still Level 1 for every tester so far).
+      planStart = levelStart;
+      rest = restWeekdayForStart(levelStart);
+    }
     return UserProfile(
       goal: goalRaw == null ? null : GoalX.parse(goalRaw),
       safetyFlags: SafetyFlags.fromJson(
@@ -165,7 +195,8 @@ class UserProfile {
         json['track'] as String? ?? TrackId.generalBladder.storageValue,
       ),
       level: json['level'] as int? ?? 1,
-      levelStartedOn: started == null ? null : DateTime.parse(started),
+      levelStartedOn: levelStart,
+      planStartedOn: planStart,
       restWeekday: rest,
       discreetNotifications: json['discreetNotifications'] as bool? ?? true,
       voiceOn: json['voiceOn'] as bool? ?? false,

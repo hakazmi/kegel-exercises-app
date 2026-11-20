@@ -10,12 +10,18 @@ import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/content/content_models.dart';
 import '../../core/data/providers.dart';
+import '../../core/domain/enums.dart';
 import '../../core/domain/user_profile.dart';
+import '../../core/widgets/pelvic_floor_demo.dart';
 import 'engine/engine_models.dart';
 import 'session_controller.dart';
 import 'session_exit.dart';
+import 'session_phase_copy.dart';
 import 'session_time_format.dart';
+import 'widgets/breathe_player_view.dart';
+import 'widgets/player_controls.dart';
 import 'widgets/session_muscle_ring.dart';
 
 /// S3 Player — ring, cues, pause/voice/vibration/exit.
@@ -117,11 +123,19 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
         return l10n.s1BlockBreathing;
       case 'reverseKegel':
         return l10n.s1BlockReverseKegel;
-      case 'stretch':
-        return l10n.s3BlockStretch;
-      default:
-        return key;
     }
+    // Stretch / movement / strong hold: real exercise name from content.
+    // Never collapse child's pose / happy baby / back release to "Stretch".
+    final List<ExerciseContent>? exercises =
+        ref.watch(exercisesProvider).asData?.value;
+    if (exercises != null) {
+      for (final ExerciseContent ex in exercises) {
+        if (ex.id == key) {
+          return ex.name;
+        }
+      }
+    }
+    return key;
   }
 
   String _cue(AppLocalizations l10n, int elapsedSeconds) {
@@ -155,7 +169,10 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
         _goDone();
         return;
       }
-      final String word = next.engineState.phaseWord;
+      final String word = SessionPhaseCopy.label(
+        AppLocalizations.of(context),
+        next.engineState.phaseWord,
+      );
       if (word.isNotEmpty && word != _lastAnnounced) {
         _lastAnnounced = word;
         SemanticsService.sendAnnouncement(
@@ -186,6 +203,7 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
 
     final EngineState es = play.engineState;
     final bool paused = es.machine == EngineMachineState.paused;
+    final String phaseLabel = SessionPhaseCopy.label(l10n, es.phaseWord);
     final String blockTitle = _blockTitle(l10n, es.blockTitleKey);
     final String header = es.rep != null && es.totalReps != null
         ? l10n.s3BlockRepHeader(blockTitle, es.rep!, es.totalReps!)
@@ -193,6 +211,44 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
     final String? nextKey = es.nextBlockTitleKey;
     final String nextTitle =
         nextKey == null ? l10n.s3NoNextBlock : _blockTitle(l10n, nextKey);
+    final SessionKind kind = play.definition.kind;
+    final bool isBody = kind == SessionKind.body;
+    final SessionController controller =
+        ref.read(sessionControllerProvider.notifier);
+    void togglePause() =>
+        paused ? controller.resume() : controller.pause();
+    // Forward: next exercise in body sessions, next phase everywhere else.
+    void forward() => isBody ? controller.skipBlock() : controller.skipPhase();
+
+    if (kind == SessionKind.breathing || kind == SessionKind.relaxation) {
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, Object? result) {
+          if (!didPop) {
+            _confirmExit();
+          }
+        },
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: AppSystemUi.darkScreen,
+          child: Scaffold(
+            backgroundColor: AppColors.sessionBackground,
+            body: BreathePlayerView(
+              l10n: l10n,
+              state: es,
+              phaseLabel: phaseLabel,
+              blockTitle: blockTitle,
+              nextTitle: nextTitle,
+              cue: _cue(l10n, es.elapsedSeconds),
+              voiceOn: profile.voiceOn,
+              onToggleVoice: () => controller.setVoice(!profile.voiceOn),
+              onExit: _confirmExit,
+              onTogglePause: togglePause,
+              onForward: forward,
+            ),
+          ),
+        ),
+      );
+    }
 
     return PopScope(
       canPop: false,
@@ -232,6 +288,23 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
                         color: AppColors.sessionTextSecondary,
                       ),
                     ),
+                    const SizedBox(width: AppSpacing.sm),
+                    PlayerToggle(
+                      on: profile.voiceOn,
+                      onIcon: Icons.volume_up_rounded,
+                      offIcon: Icons.volume_off_rounded,
+                      label: l10n.s3Voice,
+                      onTap: () => controller.setVoice(!profile.voiceOn),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    PlayerToggle(
+                      on: profile.vibrationOn,
+                      onIcon: Icons.vibration_rounded,
+                      offIcon: Icons.mobile_off_rounded,
+                      label: l10n.s3Vibration,
+                      onTap: () =>
+                          controller.setVibration(!profile.vibrationOn),
+                    ),
                   ],
                 ),
               ),
@@ -252,15 +325,25 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
                           children: [
                             Semantics(
                               liveRegion: true,
-                              label: es.phaseWord,
-                              child: SessionMuscleRing(
-                                engineState: es,
-                                size: ringSize,
-                              ),
+                              label: phaseLabel,
+                              // Reverse Kegels move the other way, so they
+                              // keep the drawn ring instead of the squeeze
+                              // video.
+                              child: es.blockTitleKey == 'reverseKegel'
+                                  ? SessionMuscleRing(
+                                      engineState: es,
+                                      phaseLabel: phaseLabel,
+                                      size: ringSize,
+                                    )
+                                  : _DemoRing(
+                                      es: es,
+                                      size: ringSize,
+                                      label: phaseLabel,
+                                    ),
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             Text(
-                              es.phaseWord,
+                              phaseLabel,
                               style: AppTypography.display.copyWith(
                                 color: AppColors.sessionText,
                                 fontSize: 36,
@@ -341,46 +424,16 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
                   AppSpacing.xl,
                   AppSpacing.md,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _ControlButton(
-                      icon: paused ? Icons.play_arrow : Icons.pause,
-                      label: paused ? l10n.s3Resume : l10n.s3Pause,
-                      onPressed: () {
-                        if (paused) {
-                          ref.read(sessionControllerProvider.notifier).resume();
-                        } else {
-                          ref.read(sessionControllerProvider.notifier).pause();
-                        }
-                      },
-                    ),
-                    _ControlButton(
-                      icon: profile.voiceOn ? Icons.volume_up : Icons.volume_off,
-                      label: l10n.s3Voice,
-                      onPressed: () {
-                        ref
-                            .read(sessionControllerProvider.notifier)
-                            .setVoice(!profile.voiceOn);
-                      },
-                    ),
-                    _ControlButton(
-                      icon: profile.vibrationOn
-                          ? Icons.vibration
-                          : Icons.phone_android,
-                      label: l10n.s3Vibration,
-                      onPressed: () {
-                        ref
-                            .read(sessionControllerProvider.notifier)
-                            .setVibration(!profile.vibrationOn);
-                      },
-                    ),
-                    _ControlButton(
-                      icon: Icons.close,
-                      label: l10n.s3Exit,
-                      onPressed: _confirmExit,
-                    ),
-                  ],
+                child: PlayerControls(
+                  paused: paused,
+                  onTogglePause: togglePause,
+                  onForward: forward,
+                  onExit: _confirmExit,
+                  pauseLabel: l10n.s3Pause,
+                  resumeLabel: l10n.s3Resume,
+                  forwardLabel:
+                      isBody ? l10n.s3ForwardExercise : l10n.s3ForwardPhase,
+                  exitLabel: l10n.s3Exit,
                 ),
               ),
             ],
@@ -392,42 +445,49 @@ class _S3PlayerScreenState extends ConsumerState<S3PlayerScreen>
   }
 }
 
-class _ControlButton extends StatelessWidget {
-  const _ControlButton({
-    required this.icon,
-    required this.label,
-    required this.onPressed,
-  });
 
-  final IconData icon;
+/// The 3D pelvic floor video following the engine: it squeezes and lifts
+/// on Squeeze, freezes while you Hold, and lowers on Relax, with the phase
+/// progress ring around it.
+class _DemoRing extends StatelessWidget {
+  const _DemoRing({required this.es, required this.size, required this.label});
+
+  final EngineState es;
+  final double size;
   final String label;
-  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: AppRadii.mdAll,
-        child: SizedBox(
-          width: 72,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: AppColors.sessionText, size: 28),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                label,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.sessionTextSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    final bool paused = es.machine == EngineMachineState.paused;
+    final EngineMachineState m =
+        paused ? (es.pausedFrom ?? EngineMachineState.rest) : es.machine;
+    final PfPhase phase = switch (m) {
+      EngineMachineState.squeeze =>
+        es.phaseWord == SessionPhaseKey.hold ? PfPhase.hold : PfPhase.squeeze,
+      EngineMachineState.relax => PfPhase.relax,
+      _ => PfPhase.rest,
+    };
+    final Color color = switch (phase) {
+      PfPhase.relax => AppColors.phaseRelax,
+      PfPhase.rest => AppColors.phaseRest,
+      _ => AppColors.phaseSqueezeHold,
+    };
+    // Squeeze briskly (well under the phase length), relax more slowly.
+    final int left = math.max(es.secondsRemaining, 1) * 1000;
+    final Duration motion = Duration(
+      milliseconds: phase == PfPhase.relax
+          ? (left * 0.7).round().clamp(800, 3000)
+          : (left * 0.4).round().clamp(800, 1500),
+    );
+    return PelvicFloorRing(
+      phase: phase,
+      progress: m == EngineMachineState.done ? 1 : es.phaseProgress,
+      color: color,
+      size: size,
+      motion: motion,
+      cycle: es.blockIndex * 1000 + (es.rep ?? 0),
+      paused: paused,
+      semanticLabel: label,
     );
   }
 }

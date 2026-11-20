@@ -5,7 +5,8 @@ import '../time/app_clock.dart';
 
 /// Pure plan rules. No Flutter imports.
 ///
-/// Rest day comes from [UserProfile.restWeekday] (default Sunday). See
+/// Rest day comes from [UserProfile.restWeekday], which onboarding sets to
+/// day 7 of the user's first week ([restWeekdayForStart]). See
 /// docs/decisions.md. Rest never applies before the first completed session.
 abstract final class PlanRules {
   static const int maxStrengtheningPerDay = 3;
@@ -43,7 +44,9 @@ abstract final class PlanRules {
     return sessions.any((SessionRecord s) => s.completed);
   }
 
-  /// A calendar day counts for streak / unlock when ≥1 completed session exists.
+  /// A calendar day counts for the week-strip / streak when ≥1 completed
+  /// session exists. Level day and unlock use [completedTrainingDaysAtLevel]
+  /// (full required slots), not this helper.
   static bool dayCounts(DateTime day, List<SessionRecord> sessions) {
     final DateTime d = dateOnly(day);
     return sessions.any(
@@ -53,6 +56,10 @@ abstract final class PlanRules {
   }
 
   /// Completed calendar days (date-only) from history, newest last.
+  ///
+  /// Used for streak and the week strip (any completed session). Unlock and
+  /// [dayInLevel] require a full day's strengthening via
+  /// [completedTrainingDaysAtLevel].
   static List<DateTime> completedDays(List<SessionRecord> sessions) {
     final Set<DateTime> days = <DateTime>{};
     for (final SessionRecord s in sessions) {
@@ -107,30 +114,38 @@ abstract final class PlanRules {
 
   /// Level day index counted from completed training days in this level (not calendar).
   /// Rest days never advance [dayInLevel]. Missed calendar days do not rewind it.
-  /// Relaxation-first counts days with a completed relaxation or breathing session.
+  ///
+  /// A strengthening day counts only when the required session count for that day
+  /// is finished ([requiredStrengtheningSlots]) — so Session 2 of Day 1 stays Day 1.
+  /// Unlock / span helpers use the same rule. Relaxation-first counts days with a
+  /// completed relaxation or breathing session.
   static int dayInLevel({
     required UserProfile profile,
     required List<SessionRecord> sessions,
   }) {
     final bool relaxationOnly = profile.track == TrackId.relaxationFirst;
-    final int completedTrainingDays = sessions
-        .where((SessionRecord s) {
-          if (!s.completed) {
-            return false;
-          }
-          if (relaxationOnly) {
+    if (relaxationOnly) {
+      final int completedTrainingDays = sessions
+          .where((SessionRecord s) {
+            if (!s.completed) {
+              return false;
+            }
             return s.kind == SessionKind.relaxation ||
                 s.kind == SessionKind.breathing;
-          }
-          return s.level == profile.level &&
-              s.kind == SessionKind.strengthening;
-        })
-        .map((SessionRecord s) => dateOnly(s.completedAt ?? s.startedAt))
-        .toSet()
-        .length;
+          })
+          .map((SessionRecord s) => dateOnly(s.completedAt ?? s.startedAt))
+          .toSet()
+          .length;
+      return completedTrainingDays + 1;
+    }
 
     // dayInLevel is 1-based for the next/current plan day; min 1.
-    return completedTrainingDays + 1;
+    return completedTrainingDaysAtLevel(
+          level: profile.level,
+          sessions: sessions,
+          sessionsPerDay: profile.sessionsPerDay,
+        ) +
+        1;
   }
 
   /// Training-day span for a level (matches `assets/content/levels.json`).
@@ -150,51 +165,68 @@ abstract final class PlanRules {
     }
   }
 
-  /// Unique calendar days with a completed strengthening session at [level].
+  /// Unique calendar days at [level] with a full day's required strengthening.
+  ///
+  /// Matches [dayInLevel]: a day counts only when session count ≥
+  /// [requiredStrengtheningSlots] for [sessionsPerDay].
   static int completedTrainingDaysAtLevel({
     required int level,
     required List<SessionRecord> sessions,
+    int sessionsPerDay = 1,
   }) {
-    return sessions
-        .where(
-          (SessionRecord s) =>
-              s.completed &&
-              s.level == level &&
-              s.kind == SessionKind.strengthening,
-        )
-        .map((SessionRecord s) => dateOnly(s.completedAt ?? s.startedAt))
-        .toSet()
-        .length;
+    final int required = requiredStrengtheningSlots(sessionsPerDay);
+    final Map<DateTime, int> byDay = <DateTime, int>{};
+    for (final SessionRecord s in sessions) {
+      if (!s.completed ||
+          s.level != level ||
+          s.kind != SessionKind.strengthening) {
+        continue;
+      }
+      final DateTime day = dateOnly(s.completedAt ?? s.startedAt);
+      byDay[day] = (byDay[day] ?? 0) + 1;
+    }
+    return byDay.values.where((int count) => count >= required).length;
   }
 
   /// True when the level's day span is finished (enough training days done).
   static bool isLevelSpanComplete({
     required int level,
     required List<SessionRecord> sessions,
+    int sessionsPerDay = 1,
     int? daySpan,
   }) {
     final int span = daySpan ?? levelDaySpan(level);
-    return completedTrainingDaysAtLevel(level: level, sessions: sessions) >=
+    return completedTrainingDaysAtLevel(
+          level: level,
+          sessions: sessions,
+          sessionsPerDay: sessionsPerDay,
+        ) >=
         span;
   }
 
-  /// Completed calendar days at [level] inside the last [levelUnlockWindowDays].
+  /// Fully completed training days at [level] inside the last
+  /// [levelUnlockWindowDays] (same slot rule as [dayInLevel]).
   static int completedDaysInUnlockWindow({
     required int level,
     required List<SessionRecord> sessions,
     required DateTime today,
+    int sessionsPerDay = 1,
   }) {
+    final int required = requiredStrengtheningSlots(sessionsPerDay);
     final DateTime end = dateOnly(today);
     int completed = 0;
     for (int i = 0; i < levelUnlockWindowDays; i++) {
       final DateTime day = end.subtract(Duration(days: i));
-      final bool has = sessions.any(
-        (SessionRecord s) =>
-            s.completed &&
-            s.level == level &&
-            isSameDay(dateOnly(s.completedAt ?? s.startedAt), day),
-      );
-      if (has) {
+      final int count = sessions
+          .where(
+            (SessionRecord s) =>
+                s.completed &&
+                s.level == level &&
+                s.kind == SessionKind.strengthening &&
+                isSameDay(dateOnly(s.completedAt ?? s.startedAt), day),
+          )
+          .length;
+      if (count >= required) {
         completed += 1;
       }
     }
@@ -203,11 +235,14 @@ abstract final class PlanRules {
 
   /// Unlock when the level span is complete and ≥5 of the last 7 days are done.
   /// Never true on the relaxation-first track or at Level 5.
+  ///
+  /// [sessionsPerDay] must match the profile so unlock and [dayInLevel] agree.
   static bool canUnlockNextLevel({
     required int level,
     required List<SessionRecord> sessions,
     required DateTime today,
     TrackId track = TrackId.generalBladder,
+    int sessionsPerDay = 1,
     int? daySpan,
   }) {
     if (track == TrackId.relaxationFirst) {
@@ -219,6 +254,7 @@ abstract final class PlanRules {
     if (!isLevelSpanComplete(
       level: level,
       sessions: sessions,
+      sessionsPerDay: sessionsPerDay,
       daySpan: daySpan,
     )) {
       return false;
@@ -227,6 +263,7 @@ abstract final class PlanRules {
           level: level,
           sessions: sessions,
           today: today,
+          sessionsPerDay: sessionsPerDay,
         ) >=
         levelUnlockMinCompletedDays;
   }

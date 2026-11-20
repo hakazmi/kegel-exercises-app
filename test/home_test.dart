@@ -10,6 +10,8 @@ import 'package:kegelexercisesapp/core/domain/enums.dart';
 import 'package:kegelexercisesapp/core/domain/safety_flags.dart';
 import 'package:kegelexercisesapp/core/domain/session_record.dart';
 import 'package:kegelexercisesapp/core/domain/user_profile.dart';
+import 'package:kegelexercisesapp/core/services/notification_gateway.dart';
+import 'package:kegelexercisesapp/core/services/reminder_service.dart';
 import 'package:kegelexercisesapp/core/time/app_clock.dart';
 import 'package:kegelexercisesapp/core/widgets/primary_button.dart';
 import 'package:kegelexercisesapp/features/home/h1_today_screen.dart';
@@ -20,7 +22,10 @@ import 'package:kegelexercisesapp/features/shell/placeholder_screen.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<ProviderContainer> _container({
+import 'helpers/preload.dart';
+
+Future<ProviderContainer> _container(
+  WidgetTester tester, {
   UserProfile? profile,
   List<SessionRecord> sessions = const <SessionRecord>[],
   AppClock? clock,
@@ -33,6 +38,7 @@ Future<ProviderContainer> _container({
     overrides: [
       sharedPreferencesProvider.overrideWithValue(prefs),
       appDatabaseProvider.overrideWithValue(db),
+      notificationGatewayProvider.overrideWithValue(FakeNotificationGateway()),
       if (clock != null) appClockProvider.overrideWithValue(clock),
     ],
   );
@@ -54,7 +60,8 @@ Future<ProviderContainer> _container({
   }
   container.invalidate(sessionsProvider);
   container.invalidate(todayPlanProvider);
-  await container.read(todayPlanProvider.future);
+  await preloadContent(tester, container);
+  await tester.runAsync(() => container.read(todayPlanProvider.future));
   return container;
 }
 
@@ -76,6 +83,8 @@ Future<void> _pumpHome(
     ),
   );
   await tester.pump();
+  // Reveal delays finish under AppMotion.reduce without looping.
+  await tester.pump(const Duration(milliseconds: 100));
 }
 
 SessionRecord _session({
@@ -108,6 +117,7 @@ void main() {
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(
+      tester,
       clock: clock,
       sessions: <SessionRecord>[
         _session(day: wednesday, kind: SessionKind.strengthening),
@@ -146,6 +156,7 @@ void main() {
     final DateTime sunday = DateTime(2026, 11, 8, 12);
     final FakeClock clock = FakeClock(sunday);
     final ProviderContainer container = await _container(
+      tester,
       clock: clock,
       sessions: <SessionRecord>[
         _session(
@@ -176,6 +187,7 @@ void main() {
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(
+      tester,
       clock: clock,
       sessions: <SessionRecord>[
         _session(day: wednesday, kind: SessionKind.strengthening),
@@ -215,6 +227,7 @@ void main() {
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(
+      tester,
       clock: clock,
       sessions: <SessionRecord>[
         _session(
@@ -248,6 +261,7 @@ void main() {
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(
+      tester,
       clock: clock,
       profile: UserProfile.initial().copyWith(
         onboardingDone: true,
@@ -314,6 +328,7 @@ void main() {
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(
+      tester,
       clock: clock,
       profile: UserProfile.initial().copyWith(
         onboardingDone: true,
@@ -335,7 +350,7 @@ void main() {
   testWidgets('H1 week strip shows Rest aligned as dayNumber text',
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
-    final ProviderContainer container = await _container(clock: clock);
+    final ProviderContainer container = await _container(tester, clock: clock);
     addTearDown(container.dispose);
     await _pumpHome(tester, container);
 
@@ -347,6 +362,7 @@ void main() {
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(
+      tester,
       clock: clock,
       profile: UserProfile.initial().copyWith(
         onboardingDone: true,
@@ -384,7 +400,7 @@ void main() {
   testWidgets('H2 locked level opens paywall with locked_content source',
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
-    final ProviderContainer container = await _container(clock: clock);
+    final ProviderContainer container = await _container(tester, clock: clock);
     addTearDown(container.dispose);
 
     final GoRouter router = GoRouter(
@@ -428,13 +444,13 @@ void main() {
     await tester.tap(find.text('Build'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
-    expect(find.textContaining('Paywall (locked_content)'), findsOneWidget);
+    expect(find.text('Paywall (locked_content)'), findsOneWidget);
   });
 
   testWidgets('shell back from Progress returns to Today',
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
-    final ProviderContainer container = await _container(clock: clock);
+    final ProviderContainer container = await _container(tester, clock: clock);
     addTearDown(container.dispose);
 
     final GoRouter router = GoRouter(

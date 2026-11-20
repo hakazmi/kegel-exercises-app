@@ -27,16 +27,22 @@
   "devDataOpen": "Open data debug",
 
   "o1Title": "Train your pelvic floor in a few minutes a day",
+  "o1TitleBefore": "Train your pelvic floor in a ",
+  "o1TitleAccent": "few minutes",
+  "o1TitleAfter": " a day",
   "o1Body": "Guided exercises for bladder control and pelvic health. No equipment.",
   "o1BulletPlan": "A plan that grows with you, level by level",
   "o1BulletDiscreet": "Discreet: train anywhere, nobody can tell",
   "o1BulletPrivate": "Private: your data stays on this phone",
+  "o1FeatureBladder": "Better bladder control",
+  "o1FeaturePlan": "A plan that grows with you",
+  "o1FeaturePrivate": "Private on this phone",
   "o1AgeCheckbox": "I am 18 or older",
   "o1Disclaimer": "This app is not a medical device and does not diagnose, treat, cure or prevent any medical condition. Talk to a healthcare professional for medical advice.",
   "o1GetStarted": "Get started",
   "o1Terms": "Terms",
   "o1Privacy": "Privacy Policy",
-  "o1HeroSemantic": "Person standing, with calendar, shield, stopwatch and target icons",
+  "o1HeroSemantic": "Athletic man squatting beside a pelvic bone graphic with pelvic floor muscles highlighted in red",
   "o1CalendarSemantic": "Calendar",
   "o1ShieldSemantic": "Shield",
   "o1StopwatchSemantic": "Stopwatch",
@@ -44,11 +50,17 @@
 
   "o2Title": "What do you want to work on?",
   "o2Subtitle": "Pick one. You can change it later in Settings.",
+  "o2HeroSemantic": "Green shield with pelvic health graphic",
   "o2GoalBladder": "Bladder control",
+  "o2GoalBladderSubtitle": "Holds, quick squeezes and urge habits",
   "o2GoalErection": "Erection support",
+  "o2GoalErectionSubtitle": "Holds, bridges and walking goals",
   "o2GoalEjaculation": "Ejaculation control",
+  "o2GoalEjaculationSubtitle": "Squeezes plus reverse Kegels",
   "o2GoalSurgery": "Recovery after prostate surgery",
+  "o2GoalSurgerySubtitle": "Gentler holds after catheter removal",
   "o2GoalGeneral": "General pelvic health",
+  "o2GoalGeneralSubtitle": "A balanced mix of strength and ease",
 
   "o3Title": "Do any of these apply to you?",
   "o3Subtitle": "Select all that apply. This keeps your plan safe.",
@@ -63,10 +75,12 @@
   "o3SurgeryConfirm": "I have checked, continue",
   "o3SurgeryUnderstand": "I understand",
   "o3ShieldSemantic": "Safety shield",
+  "o3HeroSemantic": "Man holding lower abdomen beside a pelvic graphic with a green check",
   "o3ContinueBlocked": "Continue to Today",
 
   "o4Title": "Have you done Kegel exercises before?",
   "o4Subtitle": "This decides whether we show the muscle-finding tutorial first.",
+  "o4HeroSemantic": "Man thinking about his Kegel exercise experience",
   "o4None": "No",
   "o4Unsure": "Yes, but I am not sure I do them right",
   "o4Confident": "Yes, I am confident",
@@ -92,6 +106,7 @@
   "o5RemindMe": "Remind me",
   "o5NotNow": "Not now",
   "o5CalendarSemantic": "Calendar",
+  "o5HeroSemantic": "Man meditating beside a stopwatch showing daily training time",
   "o5DayMon": "M",
   "o5DayTue": "T",
   "o5DayWed": "W",
@@ -190,7 +205,7 @@
   "t1AnatomyPubicBone": "Pubic bone",
   "t1AnatomyTailbone": "Tailbone",
   "t1AnatomyPelvicFloor": "Pelvic floor",
-  "t1AnatomySemantic": "Side view: the pelvic floor runs from the pubic bone to the tailbone, under the bladder",
+  "t1AnatomySemantic": "Animated pelvic floor view: red muscles squeeze, hold, then relax around the central opening between the sitting bones",
 
   "s1LevelDay": "Level {level} · Day {day}",
   "@s1LevelDay": {
@@ -294,6 +309,12 @@
   },
   "s3NoNextBlock": "Finish",
   "s3BlockStretch": "Stretch",
+  "s3PhaseHold": "Hold",
+  "s3PhaseRest": "Rest",
+  "s3PhaseBreatheIn": "Breathe in",
+  "s3PhaseBreatheOut": "Breathe out",
+  "s3PhaseDone": "Done",
+  "s3PhaseLift": "Lift",
   "s3Pause": "Pause",
   "s3Resume": "Resume",
   "s3Voice": "Voice",
@@ -520,6 +541,14 @@
       "level": {"type": "int"}
     }
   },
+  "h2TestCompleteLevel": "Complete level (test)",
+  "h2TestCompleted": "Completed",
+  "h2TestCompleteConfirm": "You are on Level {level}. Test jump only — remove before store release.",
+  "@h2TestCompleteConfirm": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
 
   "h1LevelUnlockedTitle": "Level {level} unlocked",
   "@h1LevelUnlockedTitle": {
@@ -714,6 +743,9 @@
   "l2NotFound": "Article not found.",
 
   "x1Title": "Settings",
+  "x1SectionTesting": "Testing",
+  "x1TestingPremium": "Unlock Premium (Levels 2–5)",
+  "x1TestingReset": "Reset app — start onboarding again",
   "x1SectionPlan": "Plan",
   "x1SectionReminders": "Reminders",
   "x1SectionSession": "Session",
@@ -773,5 +805,305 @@
     "placeholders": {
       "version": {"type": "String"}
     }
-  }
+  },
+
+  "h1SectionPelvicFloor": "Pelvic floor",
+  "h1SectionBody": "Body and function",
+  "h1SectionBreathe": "Relax and breathe",
+  "h1SectionHabits": "Daily habits",
+  "h1BodyCardTitle": "Body and function",
+  "h1BodyCardLocked": "Unlock with Premium",
+  "h1HabitDone": "Done today",
+  "h1HabitMarkDone": "Mark done",
+  "h1HabitClear": "Clear",
+
+  "exCueButtocksRelaxed": "Buttocks, thighs and stomach stay relaxed. Keep breathing.",
+  "exCueKeepBreathing": "Keep breathing. Do not hold your breath.",
+  "exCueLegsLift": "Let the legs do the lifting; the squeeze stays gentle. Keep breathing.",
+  "exCueReverseLetGo": "Let go and lengthen. Do not push down.",
+
+  "exHabitAfterDribbleTitle": "After-dribble squeeze",
+  "exHabitAfterDribbleSteps": "After you finish urinating, squeeze the pelvic floor firmly once, then relax, before you leave the toilet. This is not the same as stopping the urine stream mid-flow — that test is only for finding the muscles once, never as a regular exercise.",
+  "exHabitUrgeControlTitle": "Urge-control steps",
+  "exHabitUrgeControlSteps": "When a sudden urge comes: stay still. Soften the belly and breathe. If it helps, use a few gentle pelvic floor squeezes or one easy hold — not repeated hard maximum squeezes. Wait until the urgency settles, then walk calmly to the toilet.",
+
+  "exWalkingCardioNote": "Brisk walking is general cardiovascular activity. It is not a pelvic floor (Kegel) exercise. Regular activity may support erectile function; results vary and it is not a treatment or cure.",
+  "exWalkingDoctorNote": "If you have a heart condition or have not exercised in a while, check with your doctor first.",
+  "exWalkingSurgeryNote": "Walk only as your care team allows.",
+  "g1WalkingTitle": "Brisk walking this week",
+  "g1WalkingGoal": "Aim for about 40 minutes on 4 days this week",
+  "g1WalkingProgress": "{minutes} min · {days} of 4 days",
+  "@g1WalkingProgress": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "days": {"type": "int"}
+    }
+  },
+  "g1WalkingAdd": "Add walking minutes",
+  "g1WalkingAddConfirm": "Save",
+  "g1WalkingMinutesLabel": "Minutes",
+  "g1WalkingQuickAdd": "+{minutes} min",
+  "@g1WalkingQuickAdd": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "g1WalkingCustom": "Other",
+  "g1HeroDaysThisWeek": "days this week",
+  "g1CalTrainedCount": "{count, plural, =0{No training days yet} =1{1 training day} other{{count} training days}}",
+  "@g1CalTrainedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "g1CalRest": "Rest day",
+
+  "h1GreetingMorning": "Good morning",
+  "h1GreetingAfternoon": "Good afternoon",
+  "h1GreetingEvening": "Good evening",
+  "h1JourneyTitle": "Today's plan",
+  "h1JourneySubtitle": "{done} of {total} done",
+  "@h1JourneySubtitle": {
+    "placeholders": {
+      "done": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "h1UpNext": "Up next",
+  "h1ItemStart": "Start",
+  "h1ItemAlreadyDone": "Already done today.",
+  "h1HabitsHint": "Tick each one once you have done it today. Tap again to clear.",
+
+  "s1InsideTitle": "What's inside",
+  "s1RemindersTitle": "Remember",
+
+  "s4SubtitleSession": "Session {number} · Day {day}",
+  "@s4SubtitleSession": {
+    "placeholders": {
+      "number": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+  "s4SubtitleGeneric": "One more part of today done.",
+
+  "o6RestDayNote": "Your weekly rest day is {weekday}.",
+  "@o6RestDayNote": {
+    "placeholders": {
+      "weekday": {"type": "String"}
+    }
+  },
+  "weekdayMonday": "Monday",
+  "weekdayTuesday": "Tuesday",
+  "weekdayWednesday": "Wednesday",
+  "weekdayThursday": "Thursday",
+  "weekdayFriday": "Friday",
+  "weekdaySaturday": "Saturday",
+  "weekdaySunday": "Sunday",
+
+  "h1PlanWeek": "Plan week {week}",
+  "@h1PlanWeek": {
+    "placeholders": {
+      "week": {"type": "int"}
+    }
+  },
+  "h1ThisWeek": "This week",
+  "o4GuideHint": "We'll show you a short guide before your first session",
+  "o4ConfidentHint": "Go straight to your first session",
+
+  "infoButtonLabel": "About {topic}",
+  "@infoButtonLabel": {
+    "placeholders": {
+      "topic": {"type": "String"}
+    }
+  },
+  "infoGotIt": "Got it",
+  "infoWhySlowHold": "Why it's here: builds endurance, so you can keep the squeeze for longer.",
+  "infoWhyQuickSqueeze": "Why it's here: builds the fast reaction you need for a sudden cough or sneeze.",
+  "infoWhyStrongHold": "Why it's here: a firmer squeeze used in the erection support plan from Level 3.",
+  "infoWhyStandingHolds": "Why it's here: leaks often happen upright, so holds move to standing and walking as you progress.",
+  "infoWhyBridge": "Why it's here: pairs the pelvic floor squeeze with the hip muscles that support it.",
+  "infoWhySquat": "Why it's here: practises relaxing on the way down and squeezing on the way up, the pattern of everyday movement.",
+  "infoWhySitToStand": "Why it's here: standing up is a common moment for leaks, so you practise the squeeze at exactly that moment.",
+  "infoWhyKnack": "Why it's here: squeezing just before a cough, sneeze or lift trains control in the moments that cause leaks.",
+  "infoWhyPillowSqueeze": "Why it's here: the inner thigh muscles work together with the pelvic floor.",
+  "infoWhyBreathing": "Why it's here: teaches the pelvic floor to let go fully between squeezes.",
+  "infoWhyReverseKegel": "Why it's here: lengthens and relaxes the muscles, useful when they feel tight or squeezing is uncomfortable.",
+  "infoWhyStretch": "Why it's here: a gentle stretch that helps the pelvic floor relax.",
+  "infoWhyAfterDribble": "Why it's here: prostate charities recommend it to clear the last drops that stay in the urethra after you finish.",
+  "infoWhyUrgeControl": "Why it's here: bladder guidelines include these steps; staying calm and still gives a sudden urge time to fade.",
+  "infoWhyWalking": "Why it's here: regular aerobic activity supports heart and blood vessel health.",
+
+  "infoPelvicTitle": "Pelvic floor session",
+  "infoPelvicBody": "Guided slow holds and quick squeezes. Squeeze and lift as if stopping yourself passing wind, then let go fully before the next one.",
+  "infoBodyBody": "Short movements that add a pelvic floor squeeze to everyday actions. Today's moves:",
+  "infoBreatheBody": "Slow belly breathing and gentle relaxation. Letting the muscles go is part of the training. Today's parts:",
+  "infoHabitsBody": "Small habits for during the day, not timed sessions. Tick each one when you have done it today; tap again to untick. Habits never affect your streak or level.",
+  "infoRestTitle": "Your plan week",
+  "infoRestBody": "Your plan runs in 7-day weeks starting on the day you joined. Days 1 to 6 are training days and day 7 is a rest day, when only breathing is planned. Muscles recover on rest days, and a rest day never breaks your streak.",
+  "infoStreakBody": "Days in a row with at least one completed session. Your weekly rest day never breaks it, and missed days start a new streak with no penalty.",
+  "infoWeekRingBody": "Sessions completed since Monday. The ring on the streak card shows training days this week out of 6; the 7th day is for rest.",
+  "infoHoldBody": "The longest hold the app has guided you through. A phone cannot measure your muscles, so this is the programmed hold you completed, not a measurement.",
+  "infoLevelsTitle": "How levels work",
+  "infoLevelsBody": "Each level adds longer holds or more reps. The next level unlocks when you finish this level's days and trained on at least 5 of the last 7 days. You can repeat or step down a level any time.",
+  "infoCheckInTitle": "About check-ins",
+  "infoCheckInBody": "One question about your goal, answered now and again every 4 weeks, so you can compare your own answers side by side. There are no predictions or scores from other people.",
+
+  "infoGoalTitle": "What this plan includes",
+  "infoGoalBladder": "Slow holds and quick squeezes, plus squeezing before coughs, lifts and standing up. Daily habits for after-dribble and sudden urges.",
+  "infoGoalErection": "Standard levels with stronger holds from Level 3, bridges and squats, and a weekly brisk walking goal.",
+  "infoGoalEjaculation": "Standard levels with more relaxation: reverse Kegels and extra breathing every day, so you learn to let go as well as squeeze.",
+  "infoGoalSurgery": "Gentler holds of up to 10 seconds with 4 seconds of rest. Starts only after the catheter is removed and your care team agrees.",
+  "infoGoalGeneral": "A balanced plan of slow holds, quick squeezes, everyday squeezes and relaxation.",
+  "infoGoalNote": "You can change your goal any time in Settings.",
+  "infoSafetyTitle": "Why we ask",
+  "infoSafetyBody": "Pain can mean the muscles are too tight, so squeezing may make it worse; you start with relaxation instead. Recent surgery and a catheter need your care team's go-ahead before you start.",
+  "infoKegelTitle": "What is a Kegel exercise?",
+  "infoKegelBody": "Squeezing and lifting your pelvic floor muscles, the ones you use to stop passing wind, then letting them go fully. It needs no equipment and nobody can see you doing it.",
+  "infoRemindersTitle": "About reminders",
+  "infoRemindersBody": "Reminders are discreet by default: the lock screen never mentions what the app is for. At most 2 a day, never for marketing, and you can change them any time in Settings.",
+  "infoVoiceBody": "A spoken \"Squeeze\" and \"Relax\" during sessions. Off by default so your phone stays quiet around other people.",
+  "infoSessionsBody": "How many short sessions you plan each day. One is a fine start; more than 3 strengthening sessions a day is never planned, because tired muscles recover slower.",
+
+  "splashTagline": "Pelvic floor trainer",
+
+  "h2DayLabel": "Day {day}",
+  "@h2DayLabel": {
+    "placeholders": {
+      "day": {"type": "int"}
+    }
+  },
+  "h2LevelShort": "Level {level}",
+  "@h2LevelShort": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "h2DayPlanTitle": "Day plan",
+  "s3ForwardPhase": "Next phase",
+  "s3ForwardExercise": "Next exercise",
+  "brCycles": "Cycles",
+  "brCycle": "Cycle",
+  "brInhale": "Inhale",
+  "brExhale": "Exhale",
+
+  "poseStanding": "Standing",
+  "poseSitting": "Sitting",
+  "poseLyingOnBack": "Lying on your back",
+  "poseGluteBridge": "Glute bridge",
+  "poseSquatting": "Squatting",
+  "poseKneeling": "Kneeling",
+  "poseRestBreathing": "Calm breathing",
+  "h2LevelCompleteTitle": "Level {level} complete",
+  "@h2LevelCompleteTitle": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "h2ReviewDays": "Review days",
+  "h2DoneTab": "Done",
+  "h2TagCurrent": "Current",
+  "h2TagCompleted": "Completed",
+  "h2StartDay": "Start day {day}",
+  "@h2StartDay": {
+    "placeholders": {
+      "day": {"type": "int"}
+    }
+  },
+  "h2StepDownUnavailable": "You're on Level 1, the first level, so there is no level to step down to.",
+  "h2OpenDay": "Open day",
+  "h2FocusL1": "Find the right muscles. Squeeze for 3 seconds, then let go fully.",
+  "h2FocusL2": "Squeeze for 5 seconds while sitting, plus a few quick squeezes.",
+  "h2FocusL3": "Squeeze for 7 seconds, sitting and standing.",
+  "h2FocusL4": "Squeeze for 8 to 10 seconds, plus bridges and squats.",
+  "h2FocusL5": "Squeeze for 10 seconds during everyday moves.",
+  "h2AchievedL1": "You can find, squeeze and fully relax the right muscles.",
+  "h2AchievedL2": "You can hold a squeeze for 5 seconds while sitting.",
+  "h2AchievedL3": "You can hold for 7 seconds, sitting and standing.",
+  "h2AchievedL4": "You can hold for 8 to 10 seconds in bridges and squats.",
+  "h2AchievedL5": "You keep the routine going in everyday moves.",
+  "h2StatTime": "Total time",
+  "h2StatExercises": "Exercises",
+  "h2StatParts": "Parts",
+  "h2TimeSplitTitle": "Where your time goes",
+  "h2RhythmSqueeze": "Squeeze",
+  "h2RhythmRelax": "Relax",
+  "h2RhythmReps": "{reps} rounds",
+  "@h2RhythmReps": {"placeholders": {"reps": {"type": "int"}}},
+  "h2PartsCount": "{count, plural, =1{1 part} other{{count} parts}}",
+  "@h2PartsCount": {"placeholders": {"count": {"type": "int"}}},
+  "t1TipTitle": "Quick tip",
+  "pfDemoTitle": "Watch the muscles",
+  "pfDemoSemantic": "Pelvic floor muscles squeeze and lift, hold, then relax and lower again",
+  "pfDemoSqueezeHint": "Lift in and up",
+  "pfDemoHoldHint": "Stay still, breathe",
+  "pfDemoRelaxHint": "Let go fully",
+  "htTitle": "Pelvic floor test",
+  "htPressPrompt": "Press and hold the button, then squeeze",
+  "htHoldPrompt": "Squeeze and hold. Let go of the button when you relax.",
+  "htPress": "Press",
+  "htHold": "Hold",
+  "htSeconds": "seconds",
+  "htBest": "Best {seconds} s",
+  "@htBest": {"placeholders": {"seconds": {"type": "String"}}},
+  "htTooShort": "That was very short. Press and keep holding the button for as long as you squeeze.",
+  "htResult": "You held for {seconds} s",
+  "@htResult": {"placeholders": {"seconds": {"type": "String"}}},
+  "htAccidentQ": "Did you accidentally let go or partly relax the muscle at any point during the squeeze?",
+  "htNo": "No",
+  "htYes": "Yes",
+  "htAccidentNote": "No problem. Take a breath, relax fully, and try again. Only a steady, unbroken squeeze counts.",
+  "htTestAgain": "Test again",
+  "htReasonQ": "Which one do you think you had trouble with?",
+  "htReasonStrength": "I couldn't hold it with full strength.",
+  "htReasonEndurance": "It was hard to hold for long. I let go quickly.",
+  "htReasonNone": "I didn't have any problems!",
+  "htStrengthTitle": "Strength vs. endurance",
+  "htStrengthBody": "Strength is how hard you can squeeze: the most effort you can put into one squeeze. Endurance is how long you can keep a squeeze going without letting go.",
+  "htStrengthPoint1": "If you can squeeze strongly but only for a short time, your strength is ahead of your endurance.",
+  "htStrengthPoint2": "If you can hold a light squeeze for a long time, your endurance is ahead of your strength.",
+  "htStrengthFooter": "Your plan trains both: slow holds build endurance and quick squeezes build strength.",
+  "htEnduranceTitle": "Holding gets easier step by step",
+  "htEnduranceBody": "Letting go early is very common at the start. Holding is a skill: the muscles learn to keep working while you breathe normally.",
+  "htEndurancePoint1": "Squeeze at a level you can keep, not as hard as possible.",
+  "htEndurancePoint2": "Keep breathing. Holding your breath makes the hold shorter.",
+  "htEnduranceFooter": "Your plan starts with 3-second holds and adds a little time level by level.",
+  "htNoneTitle": "Nice, steady control",
+  "htNoneBody": "A steady squeeze with no breaks is exactly what you want. Keep your belly, buttocks and thighs relaxed so only the pelvic floor works.",
+  "htNonePoint1": "Repeat the test about once a week to see your hold time change.",
+  "htNonePoint2": "Always relax fully after each hold, for at least as long as you held.",
+  "htNoneFooter": "Your results are saved on this phone and shown in Progress.",
+  "htGotIt": "Got it",
+  "htSaveQ": "What would you like to do?",
+  "htSave": "Save my result",
+  "htTryAgain": "Try again",
+  "htSaved": "Saved. You can see it in Progress.",
+  "htDone": "Done",
+  "htTodayLearnTitle": "How to do a Kegel",
+  "htTodayLearnSub": "Find the muscles and learn the movement",
+  "htTodayTestTitle": "Pelvic floor test",
+  "htTodayTestSub": "See how long you can hold a squeeze",
+  "htTodayToolsTitle": "Technique and test",
+  "htProgressTitle": "Hold test",
+  "htProgressEmpty": "Do the pelvic floor test to see your hold time here.",
+  "htProgressLatest": "Latest",
+  "htProgressBest": "Best",
+  "htProgressTests": "Tests",
+  "htProgressStart": "Take the test",
+  "htValue": "{seconds} s",
+  "@htValue": {"placeholders": {"seconds": {"type": "String"}}},
+  "h2Motivation1": "Day one. Every routine starts here.",
+  "h2Motivation2": "Small squeezes, done well, add up.",
+  "h2Motivation3": "Steady breathing, steady squeeze.",
+  "h2Motivation4": "You're building a habit, one day at a time.",
+  "h2Motivation5": "Quality over quantity. Make each one count.",
+  "h2Motivation6": "Almost a full week. Keep it going.",
+  "h2Motivation7": "A week of practice behind you. Nice work.",
+  "h2Motivation8": "New week, same focus.",
+  "h2Motivation9": "Let go fully after every squeeze.",
+  "h2Motivation10": "Showing up beats pushing hard.",
+  "h2Motivation11": "Find the lift, hold it, let it go.",
+  "h2Motivation12": "You know the moves now. Own them.",
+  "h2Motivation13": "A short session still counts. Show up today.",
+  "h2Motivation14": "Two weeks of practice. Be proud of that.",
+  "h2MotivationLast": "Last day of this level. Finish strong."
 }

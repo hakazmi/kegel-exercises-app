@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../content/content_models.dart';
 import '../content/content_repository.dart';
+import '../domain/enums.dart';
 import '../domain/session_record.dart';
 import '../domain/user_profile.dart';
 import '../plan/plan_models.dart';
@@ -12,6 +14,8 @@ import '../time/app_clock.dart';
 import 'database/app_database.dart';
 import 'repositories/checkin_repository.dart';
 import 'repositories/data_reset_service.dart';
+import 'repositories/habit_repository.dart';
+import 'repositories/hold_test_repository.dart';
 import 'repositories/session_repository.dart';
 import 'repositories/settings_repository.dart';
 
@@ -34,19 +38,20 @@ class DebugDayOffsetNotifier extends Notifier<int> {
   void shift(int delta) => state = state + delta;
 }
 
-/// Premium entitlement stub until RevenueCat (Prompt 10). Debug can override.
+/// Premium entitlement stub until RevenueCat (Prompt 10).
+/// Debug builds default to unlocked so Levels 2–5 can be tested; toggle in Settings.
 final isPremiumOverrideProvider =
     NotifierProvider<PremiumOverrideNotifier, bool>(PremiumOverrideNotifier.new);
 
-/// Holds the debug Premium override (defaults to false).
+/// Holds the debug Premium override.
 class PremiumOverrideNotifier extends Notifier<bool> {
   @override
-  bool build() => false;
+  bool build() => kDebugMode;
 
   void set(bool value) => state = value;
 }
 
-/// Whether Premium features are unlocked. Defaults to false.
+/// Whether Premium features are unlocked.
 final isPremiumProvider = Provider<bool>((Ref ref) {
   return ref.watch(isPremiumOverrideProvider);
 });
@@ -79,13 +84,63 @@ final checkInRepositoryProvider = Provider<CheckInRepository>((Ref ref) {
   return CheckInRepository(ref.watch(appDatabaseProvider));
 });
 
+final habitRepositoryProvider = Provider<HabitRepository>((Ref ref) {
+  return HabitRepository(ref.watch(appDatabaseProvider));
+});
+
+final walkingRepositoryProvider = Provider<WalkingRepository>((Ref ref) {
+  return WalkingRepository(ref.watch(appDatabaseProvider));
+});
+
 final dataResetServiceProvider = Provider<DataResetService>((Ref ref) {
   return DataResetService(
     settings: ref.watch(settingsRepositoryProvider),
     sessions: ref.watch(sessionRepositoryProvider),
     checkIns: ref.watch(checkInRepositoryProvider),
+    habits: ref.watch(habitRepositoryProvider),
+    walking: ref.watch(walkingRepositoryProvider),
+    holdTests: ref.watch(holdTestRepositoryProvider),
   );
 });
+
+final holdTestRepositoryProvider = Provider<HoldTestRepository>((Ref ref) {
+  return HoldTestRepository(ref.watch(sharedPreferencesProvider));
+});
+
+/// Saved pelvic floor hold tests, oldest first. On-device only.
+final holdTestsProvider =
+    NotifierProvider<HoldTestsNotifier, List<HoldTestResult>>(
+  HoldTestsNotifier.new,
+);
+
+class HoldTestsNotifier extends Notifier<List<HoldTestResult>> {
+  @override
+  List<HoldTestResult> build() => ref.watch(holdTestRepositoryProvider).all();
+
+  Future<void> add(double seconds) async {
+    final HoldTestRepository repo = ref.read(holdTestRepositoryProvider);
+    await repo.add(
+      HoldTestResult(at: ref.read(appClockProvider).now(), seconds: seconds),
+    );
+    state = repo.all();
+  }
+}
+
+/// Day the "How to do a Kegel" guide was last finished (null = never).
+final guideSeenOnProvider = NotifierProvider<GuideSeenNotifier, DateTime?>(
+  GuideSeenNotifier.new,
+);
+
+class GuideSeenNotifier extends Notifier<DateTime?> {
+  @override
+  DateTime? build() => ref.watch(holdTestRepositoryProvider).guideSeenOn();
+
+  Future<void> markToday() async {
+    final DateTime now = ref.read(appClockProvider).now();
+    await ref.read(holdTestRepositoryProvider).markGuideSeen(now);
+    state = DateTime(now.year, now.month, now.day);
+  }
+}
 
 final contentRepositoryProvider = Provider<ContentRepository>((Ref ref) {
   return ContentRepository();
@@ -137,15 +192,34 @@ final todayPlanProvider = FutureProvider<TodayPlan>((Ref ref) async {
       await ref.watch(sessionsProvider.future);
   final List<LevelContent> levels =
       await ref.watch(levelsProvider.future);
+  final List<TrackContent> tracks =
+      await ref.watch(tracksProvider.future);
+  final List<ExerciseContent> exercises =
+      await ref.watch(exercisesProvider.future);
   final LevelContent level = levels.firstWhere(
     (LevelContent l) => l.id == profile.level,
     orElse: () => levels.first,
   );
+  final TrackContent track = tracks.firstWhere(
+    (TrackContent t) => t.id == profile.track.contentId,
+    orElse: () => tracks.first,
+  );
+  final Map<String, ExerciseContent> byId = <String, ExerciseContent>{
+    for (final ExerciseContent e in exercises) e.id: e,
+  };
+  final DateTime today = ref.watch(appClockProvider).now();
+  final Set<String> habitsDone =
+      await ref.watch(habitRepositoryProvider).doneHabitIdsOn(today);
   final int strengthSeconds =
       SessionDefinitionBuilder.strengtheningDurationForLevel(level);
   return ref.watch(planServiceProvider).todayPlan(
         profile: profile,
         sessions: sessions,
+        trackContent: track,
+        levelContent: level,
+        exercisesById: byId,
+        habitsDoneToday: habitsDone,
+        isPremium: ref.watch(isPremiumProvider),
         strengtheningDurationSeconds: strengthSeconds,
       );
 });
@@ -153,6 +227,11 @@ final todayPlanProvider = FutureProvider<TodayPlan>((Ref ref) async {
 /// Cached level definitions from content JSON.
 final levelsProvider = FutureProvider<List<LevelContent>>((Ref ref) {
   return ref.watch(contentRepositoryProvider).loadLevels();
+});
+
+/// Cached track definitions from content JSON.
+final tracksProvider = FutureProvider<List<TrackContent>>((Ref ref) {
+  return ref.watch(contentRepositoryProvider).loadTracks();
 });
 
 /// Cached exercise definitions from content JSON.
@@ -163,4 +242,11 @@ final exercisesProvider = FutureProvider<List<ExerciseContent>>((Ref ref) {
 /// Learn article index (bodies load on the article screen).
 final articlesProvider = FutureProvider<List<ArticleContent>>((Ref ref) {
   return ref.watch(contentRepositoryProvider).loadArticles();
+});
+
+/// Walking week stats for Progress (minutes + days with any minutes).
+final walkingWeekProvider =
+    FutureProvider<({int minutes, int days})>((Ref ref) async {
+  final DateTime today = ref.watch(appClockProvider).now();
+  return ref.watch(walkingRepositoryProvider).weekStats(today);
 });

@@ -12,12 +12,18 @@ coverage/
 .idea/
 .vscode/
 *.iml
+*.swp
+*.swo
 
 # OS
 .DS_Store
+Thumbs.db
+desktop.ini
 
-# Android signing / secrets
+# Android signing / secrets / local
 android/key.properties
+android/local.properties
+android/.gradle/
 *.jks
 *.keystore
 .env
@@ -38,5 +44,28 @@ GoogleService-Info.plist
 **/linux/flutter/ephemeral/
 **/windows/flutter/ephemeral/
 
+# Build artifacts / packages
+*.apk
+*.aab
+*.ipa
+*.app.dSYM.zip
+*.symbols
+
+# Python / image tooling (local only)
+tools/
+__pycache__/
+*.pyc
+.rembg/
+*.onnx
+
+# Intermediate / source dump images (keep final cutouts + used heroes)
+assets/images/onboarding/*_src.jpg
+assets/images/onboarding/*_clean.jpg
+assets/position_*.jpg
+
 # Misc
 *.log
+*.tmp
+*.temp
+.cursor/
+agent-transcripts/

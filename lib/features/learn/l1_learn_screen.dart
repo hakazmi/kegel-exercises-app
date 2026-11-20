@@ -7,6 +7,7 @@ import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/content/content_models.dart';
 import '../../core/data/providers.dart';
+import '../../core/motion/app_motion.dart';
 import '../../core/widgets/widgets.dart';
 
 /// Fixed thumbnail slot so every Learn row title shares the same left edge.
@@ -53,22 +54,32 @@ class L1LearnScreen extends ConsumerWidget {
                 Text(l10n.tabLearn, style: AppTypography.display),
                 const SizedBox(height: AppSpacing.lg),
                 if (featured != null) ...[
-                  _FeaturedCard(
-                    l10n: l10n,
-                    article: featured,
-                    onTap: () => _open(context, featured!),
+                  Reveal(
+                    from: RevealFrom.drop,
+                    child: _FeaturedCard(
+                      l10n: l10n,
+                      article: featured,
+                      onTap: () => _open(context, featured!),
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                 ],
                 Text(l10n.l1ArticlesHeading, style: AppTypography.title),
                 const SizedBox(height: AppSpacing.sm),
                 for (int i = 0; i < list.length; i++) ...[
-                  if (i > 0)
-                    const Divider(height: 1, color: AppColors.border),
-                  _ArticleRow(
-                    l10n: l10n,
-                    article: list[i],
-                    onTap: () => _open(context, list[i]),
+                  if (i > 0) const SizedBox(height: AppSpacing.sm),
+                  Reveal(
+                    from: i.isEven ? RevealFrom.left : RevealFrom.right,
+                    delay: AppMotion.stagger(
+                      i,
+                      base: const Duration(milliseconds: 120),
+                    ),
+                    child: _ArticleRow(
+                      l10n: l10n,
+                      tint: _tints[i % _tints.length],
+                      article: list[i],
+                      onTap: () => _open(context, list[i]),
+                    ),
                   ),
                 ],
               ],
@@ -78,6 +89,15 @@ class L1LearnScreen extends ConsumerWidget {
       ),
     );
   }
+
+  /// Pastel tile colours, cycled down the list.
+  static const List<Color> _tints = <Color>[
+    AppColors.lavender,
+    AppColors.peach,
+    AppColors.sky,
+    AppColors.blush,
+    AppColors.pistachio,
+  ];
 
   void _open(BuildContext context, ArticleContent article) {
     if (article.opensTutorial) {
@@ -102,7 +122,7 @@ class _FeaturedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.mint,
+      color: AppColors.lavender,
       borderRadius: AppRadii.xlAll,
       child: InkWell(
         onTap: onTap,
@@ -111,9 +131,16 @@ class _FeaturedCard extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
-              _LearnThumbnail(
-                assetPath: article.image,
-                semanticLabel: article.title,
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.xs),
+                decoration: const BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadii.lgAll,
+                ),
+                child: _LearnThumbnail(
+                  assetPath: article.image,
+                  semanticLabel: article.title,
+                ),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
@@ -123,7 +150,7 @@ class _FeaturedCard extends StatelessWidget {
                     Text(
                       l10n.l1StartHere(article.minutes).toUpperCase(),
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.primary,
+                        color: AppColors.ink,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -138,7 +165,7 @@ class _FeaturedCard extends StatelessWidget {
                     Text(
                       l10n.l1ReplayTutorial,
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.textSecondary,
+                        color: AppColors.ink,
                       ),
                     ),
                   ],
@@ -156,49 +183,87 @@ class _ArticleRow extends StatelessWidget {
   const _ArticleRow({
     required this.l10n,
     required this.article,
+    required this.tint,
     required this.onTap,
   });
 
   final AppLocalizations l10n;
   final ArticleContent article;
+
+  /// Pastel colour behind the article's picture.
+  final Color tint;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints:
-              const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-            child: Row(
-              children: [
-                _LearnThumbnail(
-                  assetPath: article.image,
-                  semanticLabel: article.title,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
+    return PressScale(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
+        padding: const EdgeInsets.all(AppSpacing.xs),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: AppRadii.xlAll,
+          boxShadow: AppElevation.level1,
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              decoration: BoxDecoration(
+                color: tint,
+                borderRadius: AppRadii.lgAll,
+              ),
+              child: _LearnThumbnail(
+                assetPath: article.image,
+                semanticLabel: article.title,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     article.title,
                     style: AppTypography.body.copyWith(
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
+                      height: 1.25,
                     ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  l10n.l1Minutes(article.minutes),
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.textSecondary,
+                  const SizedBox(height: AppSpacing.xxs),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.schedule_rounded,
+                        size: 14,
+                        color: AppColors.textSecondary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.l1Minutes(article.minutes),
+                        style: AppTypography.caption,
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            Container(
+              width: 32,
+              height: 32,
+              margin: const EdgeInsets.only(right: AppSpacing.xxs),
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceMuted,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: AppColors.ink,
+              ),
+            ),
+          ],
         ),
       ),
     );

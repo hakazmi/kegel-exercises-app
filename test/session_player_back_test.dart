@@ -24,7 +24,8 @@ const LevelContent _level1 = LevelContent(
   slowHolds: <String, dynamic>{'reps': 5, 'holdSec': 3, 'relaxSec': 3},
   quickSqueezes: <String, dynamic>{'reps': 5, 'squeezeSec': 1, 'relaxSec': 2},
   position: 'lying_or_sitting',
-  extras: <String>[],
+  bodyCard: <String, List<String>>{},
+  kegelExtras: <String, List<String>>{},
   dailyBreathingSec: 120,
 );
 

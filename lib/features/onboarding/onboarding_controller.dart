@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/providers.dart';
@@ -122,6 +123,8 @@ class OnboardingController extends Notifier<OnboardingDraft> {
       track: track,
       level: 1,
       levelStartedOn: now,
+      planStartedOn: now,
+      restWeekday: restWeekdayForStart(now),
       onboardingDone: true,
       tutorialDone: false,
     );
@@ -129,13 +132,19 @@ class OnboardingController extends Notifier<OnboardingDraft> {
     await ref.read(userProfileProvider.notifier).save(profile);
 
     // Schedule after profile is saved so loadInput sees reminderEnabled.
-    if (reminderOn) {
-      await ref.read(reminderServiceProvider).enableReminder(
-            minutesFromMidnight: draft.reminderTime,
-            days: draft.reminderDays,
-          );
-    } else {
-      await ref.read(reminderServiceProvider).disableReminder();
+    // Reminders are best-effort: a notification failure must never stop the
+    // user from finishing onboarding.
+    try {
+      if (reminderOn) {
+        await ref.read(reminderServiceProvider).enableReminder(
+              minutesFromMidnight: draft.reminderTime,
+              days: draft.reminderDays,
+            );
+      } else {
+        await ref.read(reminderServiceProvider).disableReminder();
+      }
+    } on Object catch (error) {
+      debugPrint('Reminder update skipped: $error');
     }
 
     if (!catheterExit) {

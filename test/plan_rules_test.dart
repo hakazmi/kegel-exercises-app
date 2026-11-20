@@ -291,7 +291,8 @@ void main() {
 
   group('missed days / dayInLevel', () {
     test('dayInLevel counts completed training days, not calendar gaps', () {
-      final UserProfile profile = _profile();
+      // One required session per day so a single session completes each day.
+      final UserProfile profile = _profile(sessionsPerDay: 1);
       final List<SessionRecord> sessions = <SessionRecord>[
         _session(at: DateTime(2026, 11, 2), dayInLevel: 1),
         // gap of several calendar days
@@ -303,8 +304,31 @@ void main() {
       );
     });
 
+    test('partial day does not advance dayInLevel', () {
+      final UserProfile profile = _profile(sessionsPerDay: 2);
+      final List<SessionRecord> sessions = <SessionRecord>[
+        _session(at: DateTime(2026, 11, 16, 10), dayInLevel: 1),
+      ];
+      expect(
+        PlanRules.dayInLevel(profile: profile, sessions: sessions),
+        1,
+      );
+    });
+
+    test('required sessions finished advances dayInLevel', () {
+      final UserProfile profile = _profile(sessionsPerDay: 2);
+      final List<SessionRecord> sessions = <SessionRecord>[
+        _session(at: DateTime(2026, 11, 16, 10), dayInLevel: 1),
+        _session(at: DateTime(2026, 11, 16, 18), dayInLevel: 1),
+      ];
+      expect(
+        PlanRules.dayInLevel(profile: profile, sessions: sessions),
+        2,
+      );
+    });
+
     test('breathing sessions do not advance dayInLevel', () {
-      final UserProfile profile = _profile();
+      final UserProfile profile = _profile(sessionsPerDay: 1);
       final List<SessionRecord> sessions = <SessionRecord>[
         _session(at: DateTime(2026, 11, 2)),
         _session(
@@ -515,6 +539,66 @@ void main() {
       final PlanService service = PlanService(clock: clock);
       final UserProfile next = service.stepDown(_profile(level: 3));
       expect(next.level, 2);
+    });
+  });
+
+  group('rest day follows the start date', () {
+    test('rest is day 7 of the first week (weekday before the start)', () {
+      // 2026-11-11 is a Wednesday → train Wed–Mon, rest Tuesday.
+      expect(restWeekdayForStart(DateTime(2026, 11, 11)), DateTime.tuesday);
+      // Monday start wraps to a Sunday rest.
+      expect(restWeekdayForStart(DateTime(2026, 11, 9)), DateTime.sunday);
+      // Sunday start rests on Saturday.
+      expect(restWeekdayForStart(DateTime(2026, 11, 15)), DateTime.saturday);
+    });
+
+    test('first six days from the start are never rest days', () {
+      final DateTime start = DateTime(2026, 11, 11);
+      final int rest = restWeekdayForStart(start);
+      final List<SessionRecord> history = <SessionRecord>[
+        _session(at: start),
+      ];
+      for (int i = 0; i < 6; i++) {
+        expect(
+          PlanRules.isRestDay(
+            date: start.add(Duration(days: i)),
+            restWeekday: rest,
+            sessions: history,
+          ),
+          isFalse,
+          reason: 'day ${i + 1}',
+        );
+      }
+      expect(
+        PlanRules.isRestDay(
+          date: start.add(const Duration(days: 6)),
+          restWeekday: rest,
+          sessions: history,
+        ),
+        isTrue,
+      );
+    });
+
+    test('legacy profile without planStartedOn migrates from level start', () {
+      final UserProfile migrated = UserProfile.fromJson(<String, dynamic>{
+        'onboardingDone': true,
+        'levelStartedOn': DateTime(2026, 11, 11).toIso8601String(),
+        'restWeekday': DateTime.sunday,
+      });
+      expect(migrated.planStartedOn, DateTime(2026, 11, 11));
+      expect(migrated.restWeekday, DateTime.tuesday);
+    });
+
+    test('saved profile keeps its rest day (no repeat migration)', () {
+      final UserProfile saved = UserProfile.initial().copyWith(
+        onboardingDone: true,
+        levelStartedOn: DateTime(2026, 11, 11),
+        planStartedOn: DateTime(2026, 11, 11),
+        restWeekday: DateTime.friday,
+      );
+      final UserProfile loaded = UserProfile.fromJson(saved.toJson());
+      expect(loaded.restWeekday, DateTime.friday);
+      expect(loaded.planStartedOn, DateTime(2026, 11, 11));
     });
   });
 }

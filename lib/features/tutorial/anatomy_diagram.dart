@@ -2,17 +2,18 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/theme/tokens.dart';
-import '../../core/widgets/illustration.dart';
 
-/// Side-view pelvic floor diagram with overlaid labels (SVG has no text).
+/// Animated pelvic-floor diagram: squeeze → hold → relax GIF with labels.
 ///
-/// Labels are positioned in the native 260×180 viewBox so they clear the
-/// figure lines at the real rendered aspect ratio.
+/// Shows red PF muscles and the central sphincter opening in the relax phase,
+/// matching the clinical bottom-up anatomy used in onboarding.
 class AnatomyDiagram extends StatelessWidget {
   const AnatomyDiagram({super.key});
 
-  static const double viewBoxWidth = 260;
-  static const double viewBoxHeight = 180;
+  static const String _gifAsset =
+      'assets/images/onboarding/pf_squeeze_hold_relax.gif';
+  static const String _relaxFallback =
+      'assets/images/onboarding/pf_phase_relax.jpg';
 
   @override
   Widget build(BuildContext context) {
@@ -21,150 +22,89 @@ class AnatomyDiagram extends StatelessWidget {
       label: l10n.t1AnatomySemantic,
       image: true,
       child: AspectRatio(
-        aspectRatio: viewBoxWidth / viewBoxHeight,
-        child: ClipRRect(
-          borderRadius: AppRadii.xlAll,
-          child: ColoredBox(
-            color: AppColors.mint,
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                final double w = constraints.maxWidth;
-                final double h = constraints.maxHeight;
-
-                TextStyle labelStyle({
-                  required double size,
-                  required FontWeight weight,
-                  required Color color,
-                }) {
-                  return TextStyle(
-                    fontFamily: AppTypography.fontFamily,
-                    fontSize: size,
-                    fontWeight: weight,
-                    color: color,
-                    height: 1.1,
-                  );
-                }
-
-                /// Centres [child] on viewBox point ([x], [y]).
-                Widget centeredAt(double x, double y, Widget child) {
-                  return Positioned(
-                    left: (x / viewBoxWidth) * w,
-                    top: (y / viewBoxHeight) * h,
-                    child: FractionalTranslation(
-                      translation: const Offset(-0.5, -0.5),
-                      child: child,
-                    ),
-                  );
-                }
-
-                /// Places [child] with its left edge at [x] and baseline at [y].
-                Widget baselineAt(double x, double y, Widget child) {
-                  return Positioned(
-                    left: (x / viewBoxWidth) * w,
-                    top: (y / viewBoxHeight) * h,
-                    child: FractionalTranslation(
-                      translation: const Offset(0, -1),
-                      child: child,
-                    ),
-                  );
-                }
-
-                /// Places [child] with its right edge at [x] and baseline at [y].
-                Widget rightBaselineAt(double x, double y, Widget child) {
-                  return Positioned(
-                    left: (x / viewBoxWidth) * w,
-                    top: (y / viewBoxHeight) * h,
-                    child: FractionalTranslation(
-                      translation: const Offset(-1, -1),
-                      child: child,
-                    ),
-                  );
-                }
-
-                /// Centres horizontally on [x], baseline at [y].
-                Widget centeredBaselineAt(double x, double y, Widget child) {
-                  return Positioned(
-                    left: (x / viewBoxWidth) * w,
-                    top: (y / viewBoxHeight) * h,
-                    child: FractionalTranslation(
-                      translation: const Offset(-0.5, -1),
-                      child: child,
-                    ),
-                  );
-                }
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ExcludeSemantics(
-                      child: Illustration(
-                        assetPath: 'assets/images/anatomy_side.svg',
-                        semanticLabel: l10n.t1AnatomySemantic,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    ExcludeSemantics(
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          centeredAt(
-                            104,
-                            75,
-                            Text(
-                              l10n.t1AnatomyBladder,
-                              style: labelStyle(
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                          baselineAt(
-                            14,
-                            152,
-                            Text(
-                              l10n.t1AnatomyPubicBone,
-                              style: labelStyle(
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                          // Right-aligned to mirror Pubic bone's left inset (14).
-                          rightBaselineAt(
-                            246,
-                            150,
-                            Text(
-                              l10n.t1AnatomyTailbone,
-                              style: labelStyle(
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                          centeredBaselineAt(
-                            124,
-                            170,
-                            Text(
-                              l10n.t1AnatomyPelvicFloor,
-                              style: labelStyle(
-                                size: 13,
-                                weight: FontWeight.w800,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              },
+        aspectRatio: 1,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: AppRadii.xlAll,
+            border: Border.all(color: AppColors.border),
+            boxShadow: AppElevation.level2,
+          ),
+          child: ClipRRect(
+            borderRadius: AppRadii.xlAll,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                ColoredBox(
+                  color: AppColors.surfaceMuted,
+                  child: Image.asset(
+                    _gifAsset,
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                    errorBuilder: (
+                      BuildContext context,
+                      Object error,
+                      StackTrace? stackTrace,
+                    ) {
+                      return Image.asset(
+                        _relaxFallback,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
+                ),
+                Positioned(
+                  right: AppSpacing.md,
+                  bottom: AppSpacing.md,
+                  child: _MuscleCallout(label: l10n.t1AnatomyPelvicFloor),
+                ),
+              ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MuscleCallout extends StatelessWidget {
+  const _MuscleCallout({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.94),
+        borderRadius: AppRadii.pillAll,
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.35)),
+        boxShadow: AppElevation.level1,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 10,
+            height: 10,
+            decoration: const BoxDecoration(
+              color: Color(0xFFD24A4A),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            label,
+            style: AppTypography.caption.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }

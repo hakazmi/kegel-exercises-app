@@ -9,7 +9,20 @@
       "slowHolds": { "reps": 5, "holdSec": 3, "relaxSec": 3 },
       "quickSqueezes": { "reps": 5, "squeezeSec": 1, "relaxSec": 2 },
       "position": "lying_or_sitting",
-      "extras": [],
+      "bodyCard": {
+        "general_bladder": [],
+        "erection_support": [],
+        "ejaculation_control": [],
+        "after_prostate_surgery": [],
+        "relaxation_first": []
+      },
+      "kegelExtras": {
+        "general_bladder": [],
+        "erection_support": [],
+        "ejaculation_control": [],
+        "after_prostate_surgery": [],
+        "relaxation_first": []
+      },
       "dailyBreathingSec": 120
     },
     {
@@ -20,7 +33,20 @@
       "slowHolds": { "reps": 8, "holdSec": 5, "relaxSec": 5 },
       "quickSqueezes": { "reps": 8, "squeezeSec": 1, "relaxSec": 2 },
       "position": "sitting",
-      "extras": [],
+      "bodyCard": {
+        "general_bladder": ["sit_to_stand_squeeze"],
+        "erection_support": ["bridge_with_hold"],
+        "ejaculation_control": ["sit_to_stand_squeeze"],
+        "after_prostate_surgery": ["pillow_squeeze_lift", "the_knack"],
+        "relaxation_first": []
+      },
+      "kegelExtras": {
+        "general_bladder": [],
+        "erection_support": [],
+        "ejaculation_control": [],
+        "after_prostate_surgery": [],
+        "relaxation_first": []
+      },
       "dailyBreathingSec": 120
     },
     {
@@ -31,7 +57,20 @@
       "slowHolds": { "reps": 10, "holdSec": 7, "relaxSec": 7 },
       "quickSqueezes": { "reps": 10, "squeezeSec": 1, "relaxSec": 2 },
       "position": "sitting_and_standing",
-      "extras": [],
+      "bodyCard": {
+        "general_bladder": ["sit_to_stand_squeeze", "the_knack", "standing_walking_holds"],
+        "erection_support": ["strong_hold", "bridge_with_hold", "standing_walking_holds"],
+        "ejaculation_control": ["standing_walking_holds"],
+        "after_prostate_surgery": ["sit_to_stand_squeeze", "the_knack", "standing_walking_holds"],
+        "relaxation_first": []
+      },
+      "kegelExtras": {
+        "general_bladder": [],
+        "erection_support": ["strong_hold"],
+        "ejaculation_control": [],
+        "after_prostate_surgery": [],
+        "relaxation_first": []
+      },
       "dailyBreathingSec": 120
     },
     {
@@ -42,7 +81,20 @@
       "slowHolds": { "reps": 10, "holdSecMin": 8, "holdSecMax": 10, "relaxSec": 7 },
       "quickSqueezes": { "reps": 12, "squeezeSec": 1, "relaxSec": 2 },
       "position": "standing",
-      "extras": ["bridge_with_hold", "squat_with_coordination"],
+      "bodyCard": {
+        "general_bladder": ["bridge_with_hold", "squat_with_coordination", "the_knack"],
+        "erection_support": ["bridge_with_hold", "squat_with_coordination", "strong_hold"],
+        "ejaculation_control": ["bridge_with_hold", "squat_with_coordination"],
+        "after_prostate_surgery": ["sit_to_stand_squeeze", "the_knack", "bridge_with_hold"],
+        "relaxation_first": []
+      },
+      "kegelExtras": {
+        "general_bladder": [],
+        "erection_support": ["strong_hold"],
+        "ejaculation_control": [],
+        "after_prostate_surgery": [],
+        "relaxation_first": []
+      },
       "dailyBreathingSec": 120
     },
     {
@@ -53,7 +105,20 @@
       "slowHolds": { "reps": 10, "holdSec": 10, "relaxSec": 7 },
       "quickSqueezes": { "reps": 15, "squeezeSec": 1, "relaxSec": 2 },
       "position": "any",
-      "extras": ["standing_walking_holds", "the_knack"],
+      "bodyCard": {
+        "general_bladder": ["standing_walking_holds", "squat_with_coordination", "the_knack"],
+        "erection_support": ["strong_hold", "bridge_with_hold", "squat_with_coordination", "standing_walking_holds"],
+        "ejaculation_control": ["standing_walking_holds", "bridge_with_hold", "squat_with_coordination"],
+        "after_prostate_surgery": ["standing_walking_holds", "the_knack", "squat_with_coordination"],
+        "relaxation_first": []
+      },
+      "kegelExtras": {
+        "general_bladder": [],
+        "erection_support": ["strong_hold"],
+        "ejaculation_control": [],
+        "after_prostate_surgery": [],
+        "relaxation_first": []
+      },
       "dailyBreathingSec": 120
     }
   ]

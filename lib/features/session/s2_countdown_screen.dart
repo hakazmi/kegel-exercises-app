@@ -7,6 +7,7 @@ import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/motion/app_motion.dart';
 import 'engine/engine_models.dart';
 import 'session_controller.dart';
 import 'session_exit.dart';
@@ -125,16 +126,23 @@ class _S2CountdownScreenState extends ConsumerState<S2CountdownScreen> {
                         fontSize: 32,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Text(
-                      '$seconds',
-                      style: AppTypography.display.copyWith(
-                        color: AppColors.accent,
-                        fontSize: 72,
-                        fontWeight: FontWeight.w800,
+                    const SizedBox(height: AppSpacing.xxl),
+                    PulseHalo(
+                      color: AppColors.accent,
+                      size: 150,
+                      child: Container(
+                        width: 150,
+                        height: 150,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.sessionSurface,
+                          border: Border.all(color: AppColors.accent, width: 3),
+                        ),
+                        child: _CountdownNumber(seconds: seconds),
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.xxl),
                     Text(
                       l10n.s2TapToSkip,
                       style: AppTypography.body.copyWith(
@@ -148,6 +156,43 @@ class _S2CountdownScreenState extends ConsumerState<S2CountdownScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The countdown digit: each new second scales and fades in.
+class _CountdownNumber extends StatelessWidget {
+  const _CountdownNumber({required this.seconds});
+
+  final int seconds;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget text = Text(
+      '$seconds',
+      key: ValueKey<int>(seconds),
+      style: AppTypography.display.copyWith(
+        color: AppColors.accent,
+        fontSize: 72,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+    if (AppMotion.isReduced(context)) {
+      return text;
+    }
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 380),
+      transitionBuilder: (Widget child, Animation<double> animation) =>
+          FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 1.6, end: 1)
+              .chain(CurveTween(curve: Curves.easeOutBack))
+              .animate(animation),
+          child: child,
+        ),
+      ),
+      child: text,
     );
   }
 }

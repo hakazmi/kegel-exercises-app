@@ -50,6 +50,9 @@ class SessionEngine {
   EngineMachineState? _pausedFrom;
   int _activeSegment = -1;
   int _longestHold = 0;
+
+  /// Segment indices the user skipped (their holds never count).
+  final Set<int> _skipped = <int>{};
   bool _exited = false;
   bool _completed = false;
   EngineState _state = EngineState.idle;
@@ -85,6 +88,7 @@ class SessionEngine {
     _exited = false;
     _completed = false;
     _longestHold = 0;
+    _skipped.clear();
     _activeSegment = -1;
     _pausedAccumulated = Duration.zero;
     _pauseBegan = null;
@@ -156,6 +160,75 @@ class SessionEngine {
     _emitFromElapsed(fireEvents: true);
   }
 
+  /// Jumps to the start of the next phase (e.g. squeeze → relax → next rep).
+  /// On the last phase this finishes the session. In the countdown it is
+  /// the same as [skipCountdown].
+  void skipPhase() {
+    if (_state.machine == EngineMachineState.countdown) {
+      skipCountdown();
+      return;
+    }
+    final int current = _currentSegmentIndex();
+    if (current < 0) {
+      return;
+    }
+    _jumpToSegment(current + 1, skippedFrom: current);
+  }
+
+  /// Jumps to the first phase of the next block (next exercise).
+  void skipBlock() {
+    if (_state.machine == EngineMachineState.countdown) {
+      skipCountdown();
+      return;
+    }
+    final int current = _currentSegmentIndex();
+    if (current < 0) {
+      return;
+    }
+    final int block = _segments[current].blockIndex;
+    int target = current + 1;
+    while (target < _segments.length && _segments[target].blockIndex == block) {
+      target++;
+    }
+    _jumpToSegment(target, skippedFrom: current, skipUntil: target);
+  }
+
+  /// Segment the engine is in now (resolved from elapsed time).
+  int _currentSegmentIndex() {
+    if (_startedAt == null || _completed || _exited || _segments.isEmpty) {
+      return -1;
+    }
+    final Duration elapsed = _elapsed;
+    Duration cursor = Duration.zero;
+    for (int i = 0; i < _segments.length; i++) {
+      cursor += _segments[i].duration;
+      if (elapsed < cursor) {
+        return i;
+      }
+    }
+    return _segments.length - 1;
+  }
+
+  /// Moves the clock origin so elapsed time equals the start of [target].
+  ///
+  /// Skipped segments from [skippedFrom] up to [skipUntil] (exclusive) are
+  /// recorded so a skipped hold never counts toward the longest hold.
+  void _jumpToSegment(int target, {required int skippedFrom, int? skipUntil}) {
+    if (_state.machine == EngineMachineState.paused) {
+      resume();
+    }
+    for (int i = skippedFrom; i < (skipUntil ?? skippedFrom + 1); i++) {
+      _skipped.add(i);
+    }
+    Duration start = Duration.zero;
+    for (int i = 0; i < target && i < _segments.length; i++) {
+      start += _segments[i].duration;
+    }
+    // elapsed = now - startedAt - pausedAccumulated  →  solve for startedAt.
+    _startedAt = clock.now().subtract(start + _pausedAccumulated);
+    _emitFromElapsed(fireEvents: true);
+  }
+
   /// Leaves the session without marking it complete.
   void exit() {
     _exited = true;
@@ -198,7 +271,7 @@ class SessionEngine {
         _emitSegment(seg, into, i);
         return;
       }
-      if (seg.prescribedHoldSeconds != null) {
+      if (seg.prescribedHoldSeconds != null && !_skipped.contains(i)) {
         _longestHold = math.max(_longestHold, seg.prescribedHoldSeconds!);
       }
       cursor = end;
@@ -278,7 +351,7 @@ class SessionEngine {
     _setState(
       EngineState(
         machine: EngineMachineState.done,
-        phaseWord: 'Done',
+        phaseWord: SessionPhaseKey.done,
         phaseProgress: 1,
         blockIndex: _definition.blocks.isEmpty
             ? 0

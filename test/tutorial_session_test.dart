@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kegelexercisesapp/core/widgets/pelvic_floor_demo.dart';
 import 'package:kegelexercisesapp/app/app.dart';
 import 'package:kegelexercisesapp/app/l10n/app_localizations.dart';
 import 'package:kegelexercisesapp/app/router.dart';
@@ -26,7 +27,8 @@ const LevelContent _level1 = LevelContent(
   slowHolds: <String, dynamic>{'reps': 5, 'holdSec': 3, 'relaxSec': 3},
   quickSqueezes: <String, dynamic>{'reps': 5, 'squeezeSec': 1, 'relaxSec': 2},
   position: 'lying_or_sitting',
-  extras: <String>[],
+  bodyCard: <String, List<String>>{},
+  kegelExtras: <String, List<String>>{},
   dailyBreathingSec: 120,
 );
 
@@ -143,13 +145,6 @@ Future<void> _advancePractice(WidgetTester tester) async {
   await tester.pump();
 }
 
-bool _rectsOverlap(Rect a, Rect b) {
-  return a.left < b.right &&
-      a.right > b.left &&
-      a.top < b.bottom &&
-      a.bottom > b.top;
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -174,7 +169,7 @@ void main() {
     expect(rect.right, closeTo(surface.width - AppSpacing.xl, 0.5));
   });
 
-  testWidgets('Anatomy diagram labels do not overlap at native size',
+  testWidgets('Anatomy diagram is square and labels the pelvic floor',
       (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
@@ -182,40 +177,16 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: Center(
-            child: SizedBox(
-              width: AnatomyDiagram.viewBoxWidth,
-              child: AnatomyDiagram(),
-            ),
+            child: SizedBox(width: 320, child: AnatomyDiagram()),
           ),
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
 
-    final List<Rect> labels = <Rect>[
-      tester.getRect(find.text('Bladder')),
-      tester.getRect(find.text('Pubic bone')),
-      tester.getRect(find.text('Tailbone')),
-      tester.getRect(find.text('Pelvic floor')),
-    ];
-    for (int i = 0; i < labels.length; i++) {
-      for (int j = i + 1; j < labels.length; j++) {
-        expect(
-          _rectsOverlap(labels[i], labels[j]),
-          isFalse,
-          reason: 'labels $i and $j overlap',
-        );
-      }
-    }
-
+    expect(find.text('Pelvic floor'), findsOneWidget);
     final Size diagramSize = tester.getSize(find.byType(AnatomyDiagram));
-    expect(
-      diagramSize.width / diagramSize.height,
-      closeTo(
-        AnatomyDiagram.viewBoxWidth / AnatomyDiagram.viewBoxHeight,
-        0.01,
-      ),
-    );
+    expect(diagramSize.width / diagramSize.height, closeTo(1, 0.01));
   });
 
   test('S1 meta uses ICU plural for parts', () {
@@ -271,7 +242,7 @@ void main() {
 
     await _advancePractice(tester);
     expect(find.text('Did you feel the lift?'), findsOneWidget);
-    expect(find.byType(AnatomyDiagram), findsWidgets);
+    expect(find.byType(PelvicFloorDemoLoop), findsOneWidget);
 
     await tester.tap(find.text('Not sure'));
     await tester.pumpAndSettle();

@@ -5,61 +5,205 @@
       "id": "slow_hold",
       "name": "Slow hold",
       "description": "Squeeze, hold, fully release",
-      "type": "strength"
+      "type": "strength",
+      "illustration": "assets/images/lying.svg",
+      "cues": ["exCueButtocksRelaxed", "exCueKeepBreathing"],
+      "defaultReps": 5,
+      "holdSec": 3,
+      "positions": ["lying", "sitting"],
+      "contraindications": ["catheter", "pain"]
     },
     {
       "id": "quick_squeeze",
       "name": "Quick squeeze",
       "description": "Squeeze hard for 1 second, release at once",
-      "type": "strength"
+      "type": "strength",
+      "illustration": "assets/images/bridge.svg",
+      "cues": ["exCueButtocksRelaxed", "exCueKeepBreathing"],
+      "defaultReps": 5,
+      "holdSec": 1,
+      "positions": ["lying", "sitting"],
+      "contraindications": ["catheter", "pain"]
     },
     {
       "id": "strong_hold",
       "name": "Strong hold",
       "description": "Near-maximum squeeze, held",
-      "type": "strength"
+      "type": "strength",
+      "illustration": "assets/images/lying.svg",
+      "cues": ["exCueButtocksRelaxed", "exCueKeepBreathing"],
+      "defaultReps": 5,
+      "holdSec": 8,
+      "positions": ["sitting", "standing"],
+      "contraindications": ["catheter", "pain"]
     },
     {
       "id": "standing_walking_holds",
       "name": "Standing and walking holds",
       "description": "Slow holds while upright, then while walking",
-      "type": "function"
+      "type": "function",
+      "illustration": "assets/images/standing.svg",
+      "cues": ["exCueButtocksRelaxed", "exCueKeepBreathing"],
+      "defaultReps": 5,
+      "holdSec": 5,
+      "positions": ["standing"],
+      "contraindications": ["catheter", "pain"]
     },
     {
       "id": "bridge_with_hold",
       "name": "Bridge with hold",
       "description": "Squeeze, lift hips, hold, lower and release",
-      "type": "function"
+      "type": "function",
+      "illustration": "assets/images/bridge.svg",
+      "cues": ["exCueLegsLift", "exCueKeepBreathing"],
+      "defaultReps": 10,
+      "holdSec": 5,
+      "positions": ["lying"],
+      "contraindications": ["catheter", "pain"]
     },
     {
       "id": "squat_with_coordination",
       "name": "Squat with coordination",
       "description": "Relax going down, squeeze coming up",
-      "type": "function"
+      "type": "function",
+      "illustration": "assets/images/standing.svg",
+      "cues": ["exCueLegsLift", "exCueKeepBreathing"],
+      "defaultReps": 10,
+      "holdSec": 0,
+      "positions": ["standing"],
+      "contraindications": ["catheter", "pain"]
+    },
+    {
+      "id": "sit_to_stand_squeeze",
+      "name": "Sit-to-stand with squeeze",
+      "description": "Squeeze just before standing, hold while rising, sit and let go",
+      "type": "function",
+      "illustration": "assets/images/standing.svg",
+      "cues": ["exCueButtocksRelaxed", "exCueKeepBreathing"],
+      "defaultReps": 8,
+      "holdSec": 3,
+      "positions": ["sitting", "standing"],
+      "contraindications": ["catheter", "pain"]
     },
     {
       "id": "the_knack",
       "name": "The Knack",
       "description": "Squeeze just before a cough, lift or sneeze",
-      "type": "function"
+      "type": "function",
+      "illustration": "assets/images/standing.svg",
+      "cues": ["exCueButtocksRelaxed", "exCueKeepBreathing"],
+      "defaultReps": 10,
+      "holdSec": 2,
+      "positions": ["sitting", "standing"],
+      "contraindications": ["catheter", "pain"]
+    },
+    {
+      "id": "pillow_squeeze_lift",
+      "name": "Pillow squeeze with lift",
+      "description": "Knees press a pillow gently while you lift the pelvic floor",
+      "type": "function",
+      "illustration": "assets/images/lying.svg",
+      "cues": ["exCueKeepBreathing"],
+      "defaultReps": 8,
+      "holdSec": 5,
+      "positions": ["lying"],
+      "contraindications": ["catheter", "pain"]
     },
     {
       "id": "diaphragmatic_breathing",
       "name": "Diaphragmatic breathing",
       "description": "Belly breath in as the pelvic floor lets go",
-      "type": "relaxation"
+      "type": "relaxation",
+      "illustration": "assets/images/child.svg",
+      "cues": ["exCueKeepBreathing"],
+      "defaultReps": 1,
+      "holdSec": 120,
+      "positions": ["lying", "sitting"],
+      "contraindications": []
     },
     {
       "id": "reverse_kegel",
       "name": "Reverse Kegel",
-      "description": "Gently release and lengthen instead of squeezing",
-      "type": "relaxation"
+      "description": "Gently let the pelvic floor drop and lengthen; do not push down",
+      "type": "relaxation",
+      "illustration": "assets/images/child.svg",
+      "cues": ["exCueReverseLetGo", "exCueKeepBreathing"],
+      "defaultReps": 5,
+      "holdSec": 8,
+      "positions": ["lying", "sitting"],
+      "contraindications": ["catheter"]
     },
     {
-      "id": "childs_pose_happy_baby",
-      "name": "Child's pose and happy baby",
-      "description": "Held stretches, 1 to 3 minutes",
-      "type": "relaxation"
+      "id": "childs_pose",
+      "name": "Child's pose",
+      "description": "Kneel, sit back on heels, rest forward, breathe into the belly",
+      "type": "relaxation",
+      "illustration": "assets/images/child.svg",
+      "cues": ["exCueKeepBreathing"],
+      "defaultReps": 1,
+      "holdSec": 120,
+      "positions": ["kneeling"],
+      "contraindications": []
+    },
+    {
+      "id": "happy_baby",
+      "name": "Happy baby",
+      "description": "On your back, hold the feet, knees wide, rock gently",
+      "type": "relaxation",
+      "illustration": "assets/images/lying.svg",
+      "cues": ["exCueKeepBreathing"],
+      "defaultReps": 1,
+      "holdSec": 90,
+      "positions": ["lying"],
+      "contraindications": []
+    },
+    {
+      "id": "supported_back_release",
+      "name": "Supported back-lying release",
+      "description": "On your back, legs wide on pillows or up on a sofa, belly breathing",
+      "type": "relaxation",
+      "illustration": "assets/images/lying.svg",
+      "cues": ["exCueKeepBreathing"],
+      "defaultReps": 1,
+      "holdSec": 120,
+      "positions": ["lying"],
+      "contraindications": []
+    },
+    {
+      "id": "after_dribble_squeeze",
+      "name": "After-dribble squeeze",
+      "description": "After urinating, squeeze the pelvic floor firmly once before leaving the toilet",
+      "type": "habit",
+      "illustration": "assets/images/standing.svg",
+      "cues": ["exHabitAfterDribbleSteps"],
+      "defaultReps": 1,
+      "holdSec": 0,
+      "positions": ["standing"],
+      "contraindications": ["catheter"]
+    },
+    {
+      "id": "urge_control_squeeze",
+      "name": "Urge-control squeeze",
+      "description": "When urgency comes: stay still, gentle squeezes if needed, wait, then walk calmly",
+      "type": "habit",
+      "illustration": "assets/images/standing.svg",
+      "cues": ["exHabitUrgeControlSteps"],
+      "defaultReps": 1,
+      "holdSec": 0,
+      "positions": ["any"],
+      "contraindications": ["catheter"]
+    },
+    {
+      "id": "brisk_walking",
+      "name": "Brisk walking",
+      "description": "Moderate to brisk walking for general cardiovascular health",
+      "type": "activity",
+      "illustration": "assets/images/standing.svg",
+      "cues": ["exWalkingCardioNote", "exWalkingDoctorNote"],
+      "defaultReps": 1,
+      "holdSec": 0,
+      "positions": ["standing"],
+      "contraindications": []
     }
   ]
 }

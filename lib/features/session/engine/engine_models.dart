@@ -1,3 +1,16 @@
+/// Stable phase-word keys for the engine (localized in the UI layer).
+abstract final class SessionPhaseKey {
+  static const String getReady = 'getReady';
+  static const String squeeze = 'squeeze';
+  static const String hold = 'hold';
+  static const String relax = 'relax';
+  static const String rest = 'rest';
+  static const String breatheIn = 'breatheIn';
+  static const String breatheOut = 'breatheOut';
+  static const String done = 'done';
+  static const String lift = 'lift';
+}
+
 /// Machine states for the session player (pure Dart).
 enum EngineMachineState {
   idle,
@@ -40,7 +53,7 @@ class EngineState {
 
   final EngineMachineState machine;
 
-  /// User-facing label: Squeeze, Hold, Relax, Rest, Breathe in, Breathe out, Get ready.
+  /// Stable [SessionPhaseKey] value; UI maps it to localized copy.
   final String phaseWord;
 
   /// 0..1 progress through the current timed segment.
@@ -153,7 +166,7 @@ class TimelineSegment {
   final String blockTitleKey;
   final String phaseWordAtStart;
 
-  /// When true, after the first second of this segment the word becomes "Hold".
+  /// When true, after the first second of this segment the word becomes [SessionPhaseKey.hold].
   final bool holdAfterFirstSecond;
 
   final int? rep;
@@ -167,7 +180,7 @@ class TimelineSegment {
 
   String phaseWordAt(Duration elapsedInSegment) {
     if (holdAfterFirstSecond && elapsedInSegment >= const Duration(seconds: 1)) {
-      return 'Hold';
+      return SessionPhaseKey.hold;
     }
     return phaseWordAtStart;
   }

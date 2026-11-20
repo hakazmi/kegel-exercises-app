@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches AppColors.sessionBackground so the native launch screen
+         hands over to the Flutter splash without a colour flash. -->
+    <color name="splash_background">#0E1412</color>
+</resources>

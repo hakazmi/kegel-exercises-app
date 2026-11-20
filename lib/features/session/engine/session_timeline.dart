@@ -21,7 +21,7 @@ abstract final class SessionTimeline {
           duration: Duration(seconds: countdownSeconds),
           blockIndex: -1,
           blockTitleKey: '',
-          phaseWordAtStart: 'Get ready',
+          phaseWordAtStart: SessionPhaseKey.getReady,
           isCountdown: true,
         ),
       );
@@ -50,6 +50,13 @@ abstract final class SessionTimeline {
           index: index,
           squeezeIsHold: false,
         );
+      case 'movement':
+        return _repCycles(
+          block: block,
+          index: index,
+          squeezeIsHold: true,
+          phaseCue: block.phaseCue,
+        );
       case 'rest':
         return <TimelineSegment>[
           TimelineSegment(
@@ -57,7 +64,7 @@ abstract final class SessionTimeline {
             duration: Duration(seconds: block.sec ?? 0),
             blockIndex: index,
             blockTitleKey: block.titleKey,
-            phaseWordAtStart: 'Rest',
+            phaseWordAtStart: SessionPhaseKey.rest,
             startEvent: EngineEvent.restStarted,
           ),
         ];
@@ -71,7 +78,7 @@ abstract final class SessionTimeline {
             duration: Duration(seconds: block.sec ?? block.durationSeconds),
             blockIndex: index,
             blockTitleKey: block.titleKey,
-            phaseWordAtStart: 'Relax',
+            phaseWordAtStart: SessionPhaseKey.relax,
             startEvent: EngineEvent.relaxStarted,
           ),
         ];
@@ -84,10 +91,12 @@ abstract final class SessionTimeline {
     required SessionBlockDef block,
     required int index,
     required bool squeezeIsHold,
+    String? phaseCue,
   }) {
     final int reps = block.reps ?? 0;
     final int squeezeSec = block.squeezeSec ?? 0;
     final int relaxSec = block.relaxSec ?? 0;
+    final String startWord = phaseCue ?? SessionPhaseKey.squeeze;
     final List<TimelineSegment> out = <TimelineSegment>[];
     for (int r = 1; r <= reps; r++) {
       out.add(
@@ -96,7 +105,7 @@ abstract final class SessionTimeline {
           duration: Duration(seconds: squeezeSec),
           blockIndex: index,
           blockTitleKey: block.titleKey,
-          phaseWordAtStart: 'Squeeze',
+          phaseWordAtStart: startWord,
           holdAfterFirstSecond: squeezeIsHold && squeezeSec > 1,
           rep: r,
           totalReps: reps,
@@ -111,7 +120,7 @@ abstract final class SessionTimeline {
             duration: Duration(seconds: relaxSec),
             blockIndex: index,
             blockTitleKey: block.titleKey,
-            phaseWordAtStart: 'Relax',
+            phaseWordAtStart: SessionPhaseKey.relax,
             rep: r,
             totalReps: reps,
             startEvent: EngineEvent.relaxStarted,
@@ -126,7 +135,13 @@ abstract final class SessionTimeline {
     final int total = block.sec ?? 0;
     final List<TimelineSegment> out = <TimelineSegment>[];
     int remaining = total;
+    // One cycle = one in-breath + one out-breath; the breathing screen shows
+    // "cycle n of m".
+    final int cycleSec = inhale.inSeconds + exhale.inSeconds;
+    final int totalCycles = total <= 0 ? 0 : (total + cycleSec - 1) ~/ cycleSec;
+    int cycle = 0;
     while (remaining > 0) {
+      cycle++;
       final int inSec =
           remaining >= inhale.inSeconds ? inhale.inSeconds : remaining;
       out.add(
@@ -135,7 +150,9 @@ abstract final class SessionTimeline {
           duration: Duration(seconds: inSec),
           blockIndex: index,
           blockTitleKey: block.titleKey,
-          phaseWordAtStart: 'Breathe in',
+          phaseWordAtStart: SessionPhaseKey.breatheIn,
+          rep: cycle,
+          totalReps: totalCycles,
           startEvent: EngineEvent.squeezeStarted,
         ),
       );
@@ -151,7 +168,9 @@ abstract final class SessionTimeline {
           duration: Duration(seconds: outSec),
           blockIndex: index,
           blockTitleKey: block.titleKey,
-          phaseWordAtStart: 'Breathe out',
+          phaseWordAtStart: SessionPhaseKey.breatheOut,
+          rep: cycle,
+          totalReps: totalCycles,
           startEvent: EngineEvent.relaxStarted,
         ),
       );
@@ -163,27 +182,30 @@ abstract final class SessionTimeline {
 
 /// Builds a [SessionDefinition] from levels.json + track, or from JSON maps.
 abstract final class SessionDefinitionFactory {
-  /// Level strengthening session from [levels.json] content.
+  /// Level strengthening session from [levels.json] content + track.
   static SessionDefinition fromLevel({
     required LevelContent level,
     required TrackId track,
     String? id,
     int sessionNumber = 1,
     int sessionsToday = 1,
+    TrackContent? trackContent,
+    Map<String, ExerciseContent>? exercisesById,
   }) {
-    // Track-specific block extras land with later content prompts.
     final SessionDefinition base = SessionDefinitionBuilder.fromLevelAndItem(
       level: level,
       item: TodayItem(
         id: 'strength_$sessionNumber',
         kind: SessionKind.strengthening,
-        label: 'Session $sessionNumber',
+        label: '',
         durationSeconds:
             SessionDefinitionBuilder.strengtheningDurationForLevel(level),
         done: false,
         sessionNumber: sessionNumber,
       ),
       sessionsToday: sessionsToday,
+      track: trackContent,
+      exercisesById: exercisesById,
     );
     return base.copyWith(id: id ?? 'L${level.id}_standard');
   }
@@ -247,13 +269,30 @@ abstract final class SessionDefinitionFactory {
             ),
           );
         case 'stretch':
+          final String? stretchId = m['exerciseId'] as String?;
           blocks.add(
             SessionBlockDef(
               type: 'stretch',
-              titleKey: 'stretch',
+              titleKey: stretchId ?? m['titleKey'] as String? ?? 'stretch',
               sec: (m['sec'] as num?)?.toInt() ??
                   (m['seconds'] as num?)?.toInt(),
               thumbnailAsset: 'assets/images/child.svg',
+              exerciseId: stretchId,
+            ),
+          );
+        case 'movement':
+          blocks.add(
+            SessionBlockDef(
+              type: 'movement',
+              titleKey: m['titleKey'] as String? ?? 'movement',
+              reps: (m['reps'] as num?)?.toInt(),
+              squeezeSec: (m['squeezeSec'] as num?)?.toInt() ??
+                  (m['holdSec'] as num?)?.toInt(),
+              relaxSec: (m['relaxSec'] as num?)?.toInt(),
+              thumbnailAsset: m['thumbnailAsset'] as String? ??
+                  'assets/images/standing.svg',
+              exerciseId: m['exerciseId'] as String?,
+              phaseCue: m['phaseCue'] as String?,
             ),
           );
         default:

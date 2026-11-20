@@ -69,13 +69,19 @@ abstract final class HomeCopy {
   }
 
   static String itemTitle(AppLocalizations l10n, TodayItem item) {
+    // Titles come from ARB — PlanService leaves [TodayItem.label] empty.
     switch (item.kind) {
       case SessionKind.strengthening:
         return l10n.h1SessionLabel(item.sessionNumber ?? 1);
+      case SessionKind.body:
+        return l10n.h1BodyCardTitle;
       case SessionKind.breathing:
         return l10n.h1BreathingLabel;
       case SessionKind.relaxation:
-        return l10n.h1ReverseLabel;
+        if (item.id == 'reverse_kegel') {
+          return l10n.h1ReverseLabel;
+        }
+        return l10n.h1BreathingLabel;
     }
   }
 

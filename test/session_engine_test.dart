@@ -52,7 +52,7 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     // t=0: first squeeze
-    expect(engine.current.phaseWord, 'Squeeze');
+    expect(engine.current.phaseWord, SessionPhaseKey.squeeze);
     expect(engine.current.machine, EngineMachineState.squeeze);
     expect(engine.current.rep, 1);
     expect(events, contains(EngineEvent.squeezeStarted));
@@ -65,24 +65,24 @@ void main() {
       phases.add(engine.current.phaseWord);
     }
 
-    // Rep 1 slow: Squeeze, Hold, Hold, Relax, Relax, Relax
+    // Rep 1 slow: squeeze, hold, hold, relax, relax, relax
     expect(phases.sublist(0, 6), <String>[
-      'Squeeze',
-      'Hold',
-      'Hold',
-      'Relax',
-      'Relax',
-      'Relax',
+      SessionPhaseKey.squeeze,
+      SessionPhaseKey.hold,
+      SessionPhaseKey.hold,
+      SessionPhaseKey.relax,
+      SessionPhaseKey.relax,
+      SessionPhaseKey.relax,
     ]);
 
     // After 5 slow holds (30s) → rest
-    expect(phases[30], 'Rest');
-    expect(phases[39], 'Rest');
+    expect(phases[30], SessionPhaseKey.rest);
+    expect(phases[39], SessionPhaseKey.rest);
 
     // Quick squeezes start at t=40
-    expect(phases[40], 'Squeeze');
-    expect(phases[41], 'Relax');
-    expect(phases[42], 'Relax');
+    expect(phases[40], SessionPhaseKey.squeeze);
+    expect(phases[41], SessionPhaseKey.relax);
+    expect(phases[42], SessionPhaseKey.relax);
 
     clock.add(const Duration(seconds: 1));
     engine.tick();
@@ -104,11 +104,11 @@ void main() {
     );
     engine.start(autoTick: false);
     engine.tick();
-    expect(engine.current.phaseWord, 'Squeeze');
+    expect(engine.current.phaseWord, SessionPhaseKey.squeeze);
 
     clock.add(const Duration(seconds: 1));
     engine.tick();
-    expect(engine.current.phaseWord, 'Hold');
+    expect(engine.current.phaseWord, SessionPhaseKey.hold);
 
     engine.pause();
     expect(engine.current.machine, EngineMachineState.paused);
@@ -118,13 +118,13 @@ void main() {
 
     engine.resume();
     engine.tick();
-    expect(engine.current.phaseWord, 'Hold');
+    expect(engine.current.phaseWord, SessionPhaseKey.hold);
     clock.add(const Duration(seconds: 1));
     engine.tick();
-    expect(engine.current.phaseWord, 'Hold');
+    expect(engine.current.phaseWord, SessionPhaseKey.hold);
     clock.add(const Duration(seconds: 1));
     engine.tick();
-    expect(engine.current.phaseWord, 'Relax');
+    expect(engine.current.phaseWord, SessionPhaseKey.relax);
     engine.dispose();
   });
 
@@ -162,7 +162,7 @@ void main() {
     expect(engine.current.machine, EngineMachineState.countdown);
     engine.skipCountdown();
     expect(engine.current.machine, EngineMachineState.squeeze);
-    expect(engine.current.phaseWord, 'Squeeze');
+    expect(engine.current.phaseWord, SessionPhaseKey.squeeze);
     engine.dispose();
   });
 
@@ -184,11 +184,78 @@ void main() {
           'relaxSec': 2,
         },
         position: 'lying_or_sitting',
-        extras: <String>[],
+        bodyCard: <String, List<String>>{},
+  kegelExtras: <String, List<String>>{},
         dailyBreathingSec: 120,
       ),
       track: TrackId.generalBladder,
     );
     expect(fromLevel.durationSeconds, 55);
+  });
+
+  group('forward button', () {
+    SessionEngine started(FakeClock clock) {
+      final SessionEngine engine = SessionEngine(
+        definition: _level1Ref(),
+        clock: clock,
+        countdownSeconds: 0,
+      )..start(autoTick: false);
+      engine.tick();
+      return engine;
+    }
+
+    test('skipPhase moves squeeze → relax → next rep', () {
+      final FakeClock clock = FakeClock(DateTime(2026, 1, 1, 12));
+      final SessionEngine engine = started(clock);
+      expect(engine.current.machine, EngineMachineState.squeeze);
+      expect(engine.current.rep, 1);
+
+      engine.skipPhase();
+      expect(engine.current.machine, EngineMachineState.relax);
+      expect(engine.current.rep, 1);
+
+      engine.skipPhase();
+      expect(engine.current.machine, EngineMachineState.squeeze);
+      expect(engine.current.rep, 2);
+      engine.dispose();
+    });
+
+    test('skipBlock jumps to the next exercise', () {
+      final FakeClock clock = FakeClock(DateTime(2026, 1, 1, 12));
+      final SessionEngine engine = started(clock);
+      expect(engine.current.blockIndex, 0);
+      engine.skipBlock();
+      expect(engine.current.blockIndex, 1);
+      expect(engine.current.machine, EngineMachineState.rest);
+      engine.skipBlock();
+      expect(engine.current.blockIndex, 2);
+      expect(engine.current.blockTitleKey, 'quickSqueezes');
+      engine.dispose();
+    });
+
+    test('a skipped hold never counts toward the longest hold', () {
+      final FakeClock clock = FakeClock(DateTime(2026, 1, 1, 12));
+      final SessionEngine engine = started(clock);
+      engine.skipBlock(); // skip all five 3 s holds
+      engine.skipBlock(); // skip rest
+      clock.add(const Duration(seconds: 30));
+      engine.tick();
+      expect(engine.current.completed, isTrue);
+      expect(engine.current.longestHoldSeconds, 0);
+      engine.dispose();
+    });
+
+    test('skipping while paused resumes, and the last skip finishes', () {
+      final FakeClock clock = FakeClock(DateTime(2026, 1, 1, 12));
+      final SessionEngine engine = started(clock);
+      engine.pause();
+      engine.skipPhase();
+      expect(engine.current.machine, EngineMachineState.relax);
+      engine.skipBlock();
+      engine.skipBlock();
+      engine.skipBlock();
+      expect(engine.current.completed, isTrue);
+      engine.dispose();
+    });
   });
 }

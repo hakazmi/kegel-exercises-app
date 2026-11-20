@@ -196,6 +196,24 @@ abstract class AppLocalizations {
   /// **'Train your pelvic floor in a few minutes a day'**
   String get o1Title;
 
+  /// No description provided for @o1TitleBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Train your pelvic floor in a '**
+  String get o1TitleBefore;
+
+  /// No description provided for @o1TitleAccent.
+  ///
+  /// In en, this message translates to:
+  /// **'few minutes'**
+  String get o1TitleAccent;
+
+  /// No description provided for @o1TitleAfter.
+  ///
+  /// In en, this message translates to:
+  /// **' a day'**
+  String get o1TitleAfter;
+
   /// No description provided for @o1Body.
   ///
   /// In en, this message translates to:
@@ -219,6 +237,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Private: your data stays on this phone'**
   String get o1BulletPrivate;
+
+  /// No description provided for @o1FeatureBladder.
+  ///
+  /// In en, this message translates to:
+  /// **'Better bladder control'**
+  String get o1FeatureBladder;
+
+  /// No description provided for @o1FeaturePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'A plan that grows with you'**
+  String get o1FeaturePlan;
+
+  /// No description provided for @o1FeaturePrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private on this phone'**
+  String get o1FeaturePrivate;
 
   /// No description provided for @o1AgeCheckbox.
   ///
@@ -253,7 +289,7 @@ abstract class AppLocalizations {
   /// No description provided for @o1HeroSemantic.
   ///
   /// In en, this message translates to:
-  /// **'Person standing, with calendar, shield, stopwatch and target icons'**
+  /// **'Athletic man squatting beside a pelvic bone graphic with pelvic floor muscles highlighted in red'**
   String get o1HeroSemantic;
 
   /// No description provided for @o1CalendarSemantic.
@@ -292,11 +328,23 @@ abstract class AppLocalizations {
   /// **'Pick one. You can change it later in Settings.'**
   String get o2Subtitle;
 
+  /// No description provided for @o2HeroSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Green shield with pelvic health graphic'**
+  String get o2HeroSemantic;
+
   /// No description provided for @o2GoalBladder.
   ///
   /// In en, this message translates to:
   /// **'Bladder control'**
   String get o2GoalBladder;
+
+  /// No description provided for @o2GoalBladderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holds, quick squeezes and urge habits'**
+  String get o2GoalBladderSubtitle;
 
   /// No description provided for @o2GoalErection.
   ///
@@ -304,11 +352,23 @@ abstract class AppLocalizations {
   /// **'Erection support'**
   String get o2GoalErection;
 
+  /// No description provided for @o2GoalErectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holds, bridges and walking goals'**
+  String get o2GoalErectionSubtitle;
+
   /// No description provided for @o2GoalEjaculation.
   ///
   /// In en, this message translates to:
   /// **'Ejaculation control'**
   String get o2GoalEjaculation;
+
+  /// No description provided for @o2GoalEjaculationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeezes plus reverse Kegels'**
+  String get o2GoalEjaculationSubtitle;
 
   /// No description provided for @o2GoalSurgery.
   ///
@@ -316,11 +376,23 @@ abstract class AppLocalizations {
   /// **'Recovery after prostate surgery'**
   String get o2GoalSurgery;
 
+  /// No description provided for @o2GoalSurgerySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentler holds after catheter removal'**
+  String get o2GoalSurgerySubtitle;
+
   /// No description provided for @o2GoalGeneral.
   ///
   /// In en, this message translates to:
   /// **'General pelvic health'**
   String get o2GoalGeneral;
+
+  /// No description provided for @o2GoalGeneralSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A balanced mix of strength and ease'**
+  String get o2GoalGeneralSubtitle;
 
   /// No description provided for @o3Title.
   ///
@@ -400,6 +472,12 @@ abstract class AppLocalizations {
   /// **'Safety shield'**
   String get o3ShieldSemantic;
 
+  /// No description provided for @o3HeroSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Man holding lower abdomen beside a pelvic graphic with a green check'**
+  String get o3HeroSemantic;
+
   /// No description provided for @o3ContinueBlocked.
   ///
   /// In en, this message translates to:
@@ -417,6 +495,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This decides whether we show the muscle-finding tutorial first.'**
   String get o4Subtitle;
+
+  /// No description provided for @o4HeroSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Man thinking about his Kegel exercise experience'**
+  String get o4HeroSemantic;
 
   /// No description provided for @o4None.
   ///
@@ -531,6 +615,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Calendar'**
   String get o5CalendarSemantic;
+
+  /// No description provided for @o5HeroSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Man meditating beside a stopwatch showing daily training time'**
+  String get o5HeroSemantic;
 
   /// No description provided for @o5DayMon.
   ///
@@ -931,7 +1021,7 @@ abstract class AppLocalizations {
   /// No description provided for @t1AnatomySemantic.
   ///
   /// In en, this message translates to:
-  /// **'Side view: the pelvic floor runs from the pubic bone to the tailbone, under the bladder'**
+  /// **'Animated pelvic floor view: red muscles squeeze, hold, then relax around the central opening between the sitting bones'**
   String get t1AnatomySemantic;
 
   /// No description provided for @s1LevelDay.
@@ -1149,6 +1239,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stretch'**
   String get s3BlockStretch;
+
+  /// No description provided for @s3PhaseHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold'**
+  String get s3PhaseHold;
+
+  /// No description provided for @s3PhaseRest.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest'**
+  String get s3PhaseRest;
+
+  /// No description provided for @s3PhaseBreatheIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe in'**
+  String get s3PhaseBreatheIn;
+
+  /// No description provided for @s3PhaseBreatheOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe out'**
+  String get s3PhaseBreatheOut;
+
+  /// No description provided for @s3PhaseDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get s3PhaseDone;
+
+  /// No description provided for @s3PhaseLift.
+  ///
+  /// In en, this message translates to:
+  /// **'Lift'**
+  String get s3PhaseLift;
 
   /// No description provided for @s3Pause.
   ///
@@ -1701,6 +1827,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start Level {level}'**
   String h2StartLevel(int level);
+
+  /// No description provided for @h2TestCompleteLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete level (test)'**
+  String get h2TestCompleteLevel;
+
+  /// No description provided for @h2TestCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get h2TestCompleted;
+
+  /// No description provided for @h2TestCompleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'You are on Level {level}. Test jump only — remove before store release.'**
+  String h2TestCompleteConfirm(int level);
 
   /// No description provided for @h1LevelUnlockedTitle.
   ///
@@ -2380,6 +2524,24 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get x1Title;
 
+  /// No description provided for @x1SectionTesting.
+  ///
+  /// In en, this message translates to:
+  /// **'Testing'**
+  String get x1SectionTesting;
+
+  /// No description provided for @x1TestingPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Premium (Levels 2–5)'**
+  String get x1TestingPremium;
+
+  /// No description provided for @x1TestingReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset app — start onboarding again'**
+  String get x1TestingReset;
+
   /// No description provided for @x1SectionPlan.
   ///
   /// In en, this message translates to:
@@ -2619,6 +2781,1308 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version {version} · Not a medical device'**
   String x1VersionFooter(String version);
+
+  /// No description provided for @h1SectionPelvicFloor.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelvic floor'**
+  String get h1SectionPelvicFloor;
+
+  /// No description provided for @h1SectionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Body and function'**
+  String get h1SectionBody;
+
+  /// No description provided for @h1SectionBreathe.
+  ///
+  /// In en, this message translates to:
+  /// **'Relax and breathe'**
+  String get h1SectionBreathe;
+
+  /// No description provided for @h1SectionHabits.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily habits'**
+  String get h1SectionHabits;
+
+  /// No description provided for @h1BodyCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Body and function'**
+  String get h1BodyCardTitle;
+
+  /// No description provided for @h1BodyCardLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock with Premium'**
+  String get h1BodyCardLocked;
+
+  /// No description provided for @h1HabitDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done today'**
+  String get h1HabitDone;
+
+  /// No description provided for @h1HabitMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark done'**
+  String get h1HabitMarkDone;
+
+  /// No description provided for @h1HabitClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get h1HabitClear;
+
+  /// No description provided for @exCueButtocksRelaxed.
+  ///
+  /// In en, this message translates to:
+  /// **'Buttocks, thighs and stomach stay relaxed. Keep breathing.'**
+  String get exCueButtocksRelaxed;
+
+  /// No description provided for @exCueKeepBreathing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep breathing. Do not hold your breath.'**
+  String get exCueKeepBreathing;
+
+  /// No description provided for @exCueLegsLift.
+  ///
+  /// In en, this message translates to:
+  /// **'Let the legs do the lifting; the squeeze stays gentle. Keep breathing.'**
+  String get exCueLegsLift;
+
+  /// No description provided for @exCueReverseLetGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Let go and lengthen. Do not push down.'**
+  String get exCueReverseLetGo;
+
+  /// No description provided for @exHabitAfterDribbleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'After-dribble squeeze'**
+  String get exHabitAfterDribbleTitle;
+
+  /// No description provided for @exHabitAfterDribbleSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'After you finish urinating, squeeze the pelvic floor firmly once, then relax, before you leave the toilet. This is not the same as stopping the urine stream mid-flow — that test is only for finding the muscles once, never as a regular exercise.'**
+  String get exHabitAfterDribbleSteps;
+
+  /// No description provided for @exHabitUrgeControlTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Urge-control steps'**
+  String get exHabitUrgeControlTitle;
+
+  /// No description provided for @exHabitUrgeControlSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'When a sudden urge comes: stay still. Soften the belly and breathe. If it helps, use a few gentle pelvic floor squeezes or one easy hold — not repeated hard maximum squeezes. Wait until the urgency settles, then walk calmly to the toilet.'**
+  String get exHabitUrgeControlSteps;
+
+  /// No description provided for @exWalkingCardioNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Brisk walking is general cardiovascular activity. It is not a pelvic floor (Kegel) exercise. Regular activity may support erectile function; results vary and it is not a treatment or cure.'**
+  String get exWalkingCardioNote;
+
+  /// No description provided for @exWalkingDoctorNote.
+  ///
+  /// In en, this message translates to:
+  /// **'If you have a heart condition or have not exercised in a while, check with your doctor first.'**
+  String get exWalkingDoctorNote;
+
+  /// No description provided for @exWalkingSurgeryNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk only as your care team allows.'**
+  String get exWalkingSurgeryNote;
+
+  /// No description provided for @g1WalkingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Brisk walking this week'**
+  String get g1WalkingTitle;
+
+  /// No description provided for @g1WalkingGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Aim for about 40 minutes on 4 days this week'**
+  String get g1WalkingGoal;
+
+  /// No description provided for @g1WalkingProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min · {days} of 4 days'**
+  String g1WalkingProgress(int minutes, int days);
+
+  /// No description provided for @g1WalkingAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add walking minutes'**
+  String get g1WalkingAdd;
+
+  /// No description provided for @g1WalkingAddConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get g1WalkingAddConfirm;
+
+  /// No description provided for @g1WalkingMinutesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Minutes'**
+  String get g1WalkingMinutesLabel;
+
+  /// No description provided for @g1WalkingQuickAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'+{minutes} min'**
+  String g1WalkingQuickAdd(int minutes);
+
+  /// No description provided for @g1WalkingCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get g1WalkingCustom;
+
+  /// No description provided for @g1HeroDaysThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'days this week'**
+  String get g1HeroDaysThisWeek;
+
+  /// No description provided for @g1CalTrainedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No training days yet} =1{1 training day} other{{count} training days}}'**
+  String g1CalTrainedCount(int count);
+
+  /// No description provided for @g1CalRest.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest day'**
+  String get g1CalRest;
+
+  /// No description provided for @h1GreetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get h1GreetingMorning;
+
+  /// No description provided for @h1GreetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get h1GreetingAfternoon;
+
+  /// No description provided for @h1GreetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get h1GreetingEvening;
+
+  /// No description provided for @h1JourneyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s plan'**
+  String get h1JourneyTitle;
+
+  /// No description provided for @h1JourneySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done'**
+  String h1JourneySubtitle(int done, int total);
+
+  /// No description provided for @h1UpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Up next'**
+  String get h1UpNext;
+
+  /// No description provided for @h1ItemStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get h1ItemStart;
+
+  /// No description provided for @h1ItemAlreadyDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Already done today.'**
+  String get h1ItemAlreadyDone;
+
+  /// No description provided for @h1HabitsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tick each one once you have done it today. Tap again to clear.'**
+  String get h1HabitsHint;
+
+  /// No description provided for @s1InsideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s inside'**
+  String get s1InsideTitle;
+
+  /// No description provided for @s1RemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember'**
+  String get s1RemindersTitle;
+
+  /// No description provided for @s4SubtitleSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Session {number} · Day {day}'**
+  String s4SubtitleSession(int number, int day);
+
+  /// No description provided for @s4SubtitleGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'One more part of today done.'**
+  String get s4SubtitleGeneric;
+
+  /// No description provided for @o6RestDayNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your weekly rest day is {weekday}.'**
+  String o6RestDayNote(String weekday);
+
+  /// No description provided for @weekdayMonday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get weekdayMonday;
+
+  /// No description provided for @weekdayTuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get weekdayTuesday;
+
+  /// No description provided for @weekdayWednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get weekdayWednesday;
+
+  /// No description provided for @weekdayThursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get weekdayThursday;
+
+  /// No description provided for @weekdayFriday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get weekdayFriday;
+
+  /// No description provided for @weekdaySaturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get weekdaySaturday;
+
+  /// No description provided for @weekdaySunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get weekdaySunday;
+
+  /// No description provided for @h1PlanWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan week {week}'**
+  String h1PlanWeek(int week);
+
+  /// No description provided for @h1ThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get h1ThisWeek;
+
+  /// No description provided for @o4GuideHint.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll show you a short guide before your first session'**
+  String get o4GuideHint;
+
+  /// No description provided for @o4ConfidentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Go straight to your first session'**
+  String get o4ConfidentHint;
+
+  /// No description provided for @infoButtonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'About {topic}'**
+  String infoButtonLabel(String topic);
+
+  /// No description provided for @infoGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get infoGotIt;
+
+  /// No description provided for @infoWhySlowHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: builds endurance, so you can keep the squeeze for longer.'**
+  String get infoWhySlowHold;
+
+  /// No description provided for @infoWhyQuickSqueeze.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: builds the fast reaction you need for a sudden cough or sneeze.'**
+  String get infoWhyQuickSqueeze;
+
+  /// No description provided for @infoWhyStrongHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: a firmer squeeze used in the erection support plan from Level 3.'**
+  String get infoWhyStrongHold;
+
+  /// No description provided for @infoWhyStandingHolds.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: leaks often happen upright, so holds move to standing and walking as you progress.'**
+  String get infoWhyStandingHolds;
+
+  /// No description provided for @infoWhyBridge.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: pairs the pelvic floor squeeze with the hip muscles that support it.'**
+  String get infoWhyBridge;
+
+  /// No description provided for @infoWhySquat.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: practises relaxing on the way down and squeezing on the way up, the pattern of everyday movement.'**
+  String get infoWhySquat;
+
+  /// No description provided for @infoWhySitToStand.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: standing up is a common moment for leaks, so you practise the squeeze at exactly that moment.'**
+  String get infoWhySitToStand;
+
+  /// No description provided for @infoWhyKnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: squeezing just before a cough, sneeze or lift trains control in the moments that cause leaks.'**
+  String get infoWhyKnack;
+
+  /// No description provided for @infoWhyPillowSqueeze.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: the inner thigh muscles work together with the pelvic floor.'**
+  String get infoWhyPillowSqueeze;
+
+  /// No description provided for @infoWhyBreathing.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: teaches the pelvic floor to let go fully between squeezes.'**
+  String get infoWhyBreathing;
+
+  /// No description provided for @infoWhyReverseKegel.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: lengthens and relaxes the muscles, useful when they feel tight or squeezing is uncomfortable.'**
+  String get infoWhyReverseKegel;
+
+  /// No description provided for @infoWhyStretch.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: a gentle stretch that helps the pelvic floor relax.'**
+  String get infoWhyStretch;
+
+  /// No description provided for @infoWhyAfterDribble.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: prostate charities recommend it to clear the last drops that stay in the urethra after you finish.'**
+  String get infoWhyAfterDribble;
+
+  /// No description provided for @infoWhyUrgeControl.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: bladder guidelines include these steps; staying calm and still gives a sudden urge time to fade.'**
+  String get infoWhyUrgeControl;
+
+  /// No description provided for @infoWhyWalking.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it\'s here: regular aerobic activity supports heart and blood vessel health.'**
+  String get infoWhyWalking;
+
+  /// No description provided for @infoPelvicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelvic floor session'**
+  String get infoPelvicTitle;
+
+  /// No description provided for @infoPelvicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Guided slow holds and quick squeezes. Squeeze and lift as if stopping yourself passing wind, then let go fully before the next one.'**
+  String get infoPelvicBody;
+
+  /// No description provided for @infoBodyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Short movements that add a pelvic floor squeeze to everyday actions. Today\'s moves:'**
+  String get infoBodyBody;
+
+  /// No description provided for @infoBreatheBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow belly breathing and gentle relaxation. Letting the muscles go is part of the training. Today\'s parts:'**
+  String get infoBreatheBody;
+
+  /// No description provided for @infoHabitsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Small habits for during the day, not timed sessions. Tick each one when you have done it today; tap again to untick. Habits never affect your streak or level.'**
+  String get infoHabitsBody;
+
+  /// No description provided for @infoRestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan week'**
+  String get infoRestTitle;
+
+  /// No description provided for @infoRestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan runs in 7-day weeks starting on the day you joined. Days 1 to 6 are training days and day 7 is a rest day, when only breathing is planned. Muscles recover on rest days, and a rest day never breaks your streak.'**
+  String get infoRestBody;
+
+  /// No description provided for @infoStreakBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Days in a row with at least one completed session. Your weekly rest day never breaks it, and missed days start a new streak with no penalty.'**
+  String get infoStreakBody;
+
+  /// No description provided for @infoWeekRingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions completed since Monday. The ring on the streak card shows training days this week out of 6; the 7th day is for rest.'**
+  String get infoWeekRingBody;
+
+  /// No description provided for @infoHoldBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The longest hold the app has guided you through. A phone cannot measure your muscles, so this is the programmed hold you completed, not a measurement.'**
+  String get infoHoldBody;
+
+  /// No description provided for @infoLevelsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How levels work'**
+  String get infoLevelsTitle;
+
+  /// No description provided for @infoLevelsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Each level adds longer holds or more reps. The next level unlocks when you finish this level\'s days and trained on at least 5 of the last 7 days. You can repeat or step down a level any time.'**
+  String get infoLevelsBody;
+
+  /// No description provided for @infoCheckInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About check-ins'**
+  String get infoCheckInTitle;
+
+  /// No description provided for @infoCheckInBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One question about your goal, answered now and again every 4 weeks, so you can compare your own answers side by side. There are no predictions or scores from other people.'**
+  String get infoCheckInBody;
+
+  /// No description provided for @infoGoalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What this plan includes'**
+  String get infoGoalTitle;
+
+  /// No description provided for @infoGoalBladder.
+  ///
+  /// In en, this message translates to:
+  /// **'Slow holds and quick squeezes, plus squeezing before coughs, lifts and standing up. Daily habits for after-dribble and sudden urges.'**
+  String get infoGoalBladder;
+
+  /// No description provided for @infoGoalErection.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard levels with stronger holds from Level 3, bridges and squats, and a weekly brisk walking goal.'**
+  String get infoGoalErection;
+
+  /// No description provided for @infoGoalEjaculation.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard levels with more relaxation: reverse Kegels and extra breathing every day, so you learn to let go as well as squeeze.'**
+  String get infoGoalEjaculation;
+
+  /// No description provided for @infoGoalSurgery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gentler holds of up to 10 seconds with 4 seconds of rest. Starts only after the catheter is removed and your care team agrees.'**
+  String get infoGoalSurgery;
+
+  /// No description provided for @infoGoalGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'A balanced plan of slow holds, quick squeezes, everyday squeezes and relaxation.'**
+  String get infoGoalGeneral;
+
+  /// No description provided for @infoGoalNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change your goal any time in Settings.'**
+  String get infoGoalNote;
+
+  /// No description provided for @infoSafetyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why we ask'**
+  String get infoSafetyTitle;
+
+  /// No description provided for @infoSafetyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pain can mean the muscles are too tight, so squeezing may make it worse; you start with relaxation instead. Recent surgery and a catheter need your care team\'s go-ahead before you start.'**
+  String get infoSafetyBody;
+
+  /// No description provided for @infoKegelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is a Kegel exercise?'**
+  String get infoKegelTitle;
+
+  /// No description provided for @infoKegelBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeezing and lifting your pelvic floor muscles, the ones you use to stop passing wind, then letting them go fully. It needs no equipment and nobody can see you doing it.'**
+  String get infoKegelBody;
+
+  /// No description provided for @infoRemindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About reminders'**
+  String get infoRemindersTitle;
+
+  /// No description provided for @infoRemindersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders are discreet by default: the lock screen never mentions what the app is for. At most 2 a day, never for marketing, and you can change them any time in Settings.'**
+  String get infoRemindersBody;
+
+  /// No description provided for @infoVoiceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A spoken \"Squeeze\" and \"Relax\" during sessions. Off by default so your phone stays quiet around other people.'**
+  String get infoVoiceBody;
+
+  /// No description provided for @infoSessionsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'How many short sessions you plan each day. One is a fine start; more than 3 strengthening sessions a day is never planned, because tired muscles recover slower.'**
+  String get infoSessionsBody;
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelvic floor trainer'**
+  String get splashTagline;
+
+  /// No description provided for @h2DayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String h2DayLabel(int day);
+
+  /// No description provided for @h2LevelShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {level}'**
+  String h2LevelShort(int level);
+
+  /// No description provided for @h2DayPlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day plan'**
+  String get h2DayPlanTitle;
+
+  /// No description provided for @s3ForwardPhase.
+  ///
+  /// In en, this message translates to:
+  /// **'Next phase'**
+  String get s3ForwardPhase;
+
+  /// No description provided for @s3ForwardExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Next exercise'**
+  String get s3ForwardExercise;
+
+  /// No description provided for @brCycles.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycles'**
+  String get brCycles;
+
+  /// No description provided for @brCycle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cycle'**
+  String get brCycle;
+
+  /// No description provided for @brInhale.
+  ///
+  /// In en, this message translates to:
+  /// **'Inhale'**
+  String get brInhale;
+
+  /// No description provided for @brExhale.
+  ///
+  /// In en, this message translates to:
+  /// **'Exhale'**
+  String get brExhale;
+
+  /// No description provided for @poseStanding.
+  ///
+  /// In en, this message translates to:
+  /// **'Standing'**
+  String get poseStanding;
+
+  /// No description provided for @poseSitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Sitting'**
+  String get poseSitting;
+
+  /// No description provided for @poseLyingOnBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Lying on your back'**
+  String get poseLyingOnBack;
+
+  /// No description provided for @poseGluteBridge.
+  ///
+  /// In en, this message translates to:
+  /// **'Glute bridge'**
+  String get poseGluteBridge;
+
+  /// No description provided for @poseSquatting.
+  ///
+  /// In en, this message translates to:
+  /// **'Squatting'**
+  String get poseSquatting;
+
+  /// No description provided for @poseKneeling.
+  ///
+  /// In en, this message translates to:
+  /// **'Kneeling'**
+  String get poseKneeling;
+
+  /// No description provided for @poseRestBreathing.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm breathing'**
+  String get poseRestBreathing;
+
+  /// No description provided for @h2LevelCompleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Level {level} complete'**
+  String h2LevelCompleteTitle(int level);
+
+  /// No description provided for @h2ReviewDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Review days'**
+  String get h2ReviewDays;
+
+  /// No description provided for @h2DoneTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get h2DoneTab;
+
+  /// No description provided for @h2TagCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get h2TagCurrent;
+
+  /// No description provided for @h2TagCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get h2TagCompleted;
+
+  /// No description provided for @h2StartDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Start day {day}'**
+  String h2StartDay(int day);
+
+  /// No description provided for @h2StepDownUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re on Level 1, the first level, so there is no level to step down to.'**
+  String get h2StepDownUnavailable;
+
+  /// No description provided for @h2OpenDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Open day'**
+  String get h2OpenDay;
+
+  /// No description provided for @h2FocusL1.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the right muscles. Squeeze for 3 seconds, then let go fully.'**
+  String get h2FocusL1;
+
+  /// No description provided for @h2FocusL2.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze for 5 seconds while sitting, plus a few quick squeezes.'**
+  String get h2FocusL2;
+
+  /// No description provided for @h2FocusL3.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze for 7 seconds, sitting and standing.'**
+  String get h2FocusL3;
+
+  /// No description provided for @h2FocusL4.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze for 8 to 10 seconds, plus bridges and squats.'**
+  String get h2FocusL4;
+
+  /// No description provided for @h2FocusL5.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze for 10 seconds during everyday moves.'**
+  String get h2FocusL5;
+
+  /// No description provided for @h2AchievedL1.
+  ///
+  /// In en, this message translates to:
+  /// **'You can find, squeeze and fully relax the right muscles.'**
+  String get h2AchievedL1;
+
+  /// No description provided for @h2AchievedL2.
+  ///
+  /// In en, this message translates to:
+  /// **'You can hold a squeeze for 5 seconds while sitting.'**
+  String get h2AchievedL2;
+
+  /// No description provided for @h2AchievedL3.
+  ///
+  /// In en, this message translates to:
+  /// **'You can hold for 7 seconds, sitting and standing.'**
+  String get h2AchievedL3;
+
+  /// No description provided for @h2AchievedL4.
+  ///
+  /// In en, this message translates to:
+  /// **'You can hold for 8 to 10 seconds in bridges and squats.'**
+  String get h2AchievedL4;
+
+  /// No description provided for @h2AchievedL5.
+  ///
+  /// In en, this message translates to:
+  /// **'You keep the routine going in everyday moves.'**
+  String get h2AchievedL5;
+
+  /// No description provided for @h2StatTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Total time'**
+  String get h2StatTime;
+
+  /// No description provided for @h2StatExercises.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercises'**
+  String get h2StatExercises;
+
+  /// No description provided for @h2StatParts.
+  ///
+  /// In en, this message translates to:
+  /// **'Parts'**
+  String get h2StatParts;
+
+  /// No description provided for @h2TimeSplitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where your time goes'**
+  String get h2TimeSplitTitle;
+
+  /// No description provided for @h2RhythmSqueeze.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze'**
+  String get h2RhythmSqueeze;
+
+  /// No description provided for @h2RhythmRelax.
+  ///
+  /// In en, this message translates to:
+  /// **'Relax'**
+  String get h2RhythmRelax;
+
+  /// No description provided for @h2RhythmReps.
+  ///
+  /// In en, this message translates to:
+  /// **'{reps} rounds'**
+  String h2RhythmReps(int reps);
+
+  /// No description provided for @h2PartsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 part} other{{count} parts}}'**
+  String h2PartsCount(int count);
+
+  /// No description provided for @t1TipTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick tip'**
+  String get t1TipTitle;
+
+  /// No description provided for @pfDemoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch the muscles'**
+  String get pfDemoTitle;
+
+  /// No description provided for @pfDemoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelvic floor muscles squeeze and lift, hold, then relax and lower again'**
+  String get pfDemoSemantic;
+
+  /// No description provided for @pfDemoSqueezeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Lift in and up'**
+  String get pfDemoSqueezeHint;
+
+  /// No description provided for @pfDemoHoldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay still, breathe'**
+  String get pfDemoHoldHint;
+
+  /// No description provided for @pfDemoRelaxHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Let go fully'**
+  String get pfDemoRelaxHint;
+
+  /// No description provided for @htTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelvic floor test'**
+  String get htTitle;
+
+  /// No description provided for @htPressPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Press and hold the button, then squeeze'**
+  String get htPressPrompt;
+
+  /// No description provided for @htHoldPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze and hold. Let go of the button when you relax.'**
+  String get htHoldPrompt;
+
+  /// No description provided for @htPress.
+  ///
+  /// In en, this message translates to:
+  /// **'Press'**
+  String get htPress;
+
+  /// No description provided for @htHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold'**
+  String get htHold;
+
+  /// No description provided for @htSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'seconds'**
+  String get htSeconds;
+
+  /// No description provided for @htBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best {seconds} s'**
+  String htBest(String seconds);
+
+  /// No description provided for @htTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'That was very short. Press and keep holding the button for as long as you squeeze.'**
+  String get htTooShort;
+
+  /// No description provided for @htResult.
+  ///
+  /// In en, this message translates to:
+  /// **'You held for {seconds} s'**
+  String htResult(String seconds);
+
+  /// No description provided for @htAccidentQ.
+  ///
+  /// In en, this message translates to:
+  /// **'Did you accidentally let go or partly relax the muscle at any point during the squeeze?'**
+  String get htAccidentQ;
+
+  /// No description provided for @htNo.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get htNo;
+
+  /// No description provided for @htYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get htYes;
+
+  /// No description provided for @htAccidentNote.
+  ///
+  /// In en, this message translates to:
+  /// **'No problem. Take a breath, relax fully, and try again. Only a steady, unbroken squeeze counts.'**
+  String get htAccidentNote;
+
+  /// No description provided for @htTestAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Test again'**
+  String get htTestAgain;
+
+  /// No description provided for @htReasonQ.
+  ///
+  /// In en, this message translates to:
+  /// **'Which one do you think you had trouble with?'**
+  String get htReasonQ;
+
+  /// No description provided for @htReasonStrength.
+  ///
+  /// In en, this message translates to:
+  /// **'I couldn\'t hold it with full strength.'**
+  String get htReasonStrength;
+
+  /// No description provided for @htReasonEndurance.
+  ///
+  /// In en, this message translates to:
+  /// **'It was hard to hold for long. I let go quickly.'**
+  String get htReasonEndurance;
+
+  /// No description provided for @htReasonNone.
+  ///
+  /// In en, this message translates to:
+  /// **'I didn\'t have any problems!'**
+  String get htReasonNone;
+
+  /// No description provided for @htStrengthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength vs. endurance'**
+  String get htStrengthTitle;
+
+  /// No description provided for @htStrengthBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength is how hard you can squeeze: the most effort you can put into one squeeze. Endurance is how long you can keep a squeeze going without letting go.'**
+  String get htStrengthBody;
+
+  /// No description provided for @htStrengthPoint1.
+  ///
+  /// In en, this message translates to:
+  /// **'If you can squeeze strongly but only for a short time, your strength is ahead of your endurance.'**
+  String get htStrengthPoint1;
+
+  /// No description provided for @htStrengthPoint2.
+  ///
+  /// In en, this message translates to:
+  /// **'If you can hold a light squeeze for a long time, your endurance is ahead of your strength.'**
+  String get htStrengthPoint2;
+
+  /// No description provided for @htStrengthFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan trains both: slow holds build endurance and quick squeezes build strength.'**
+  String get htStrengthFooter;
+
+  /// No description provided for @htEnduranceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Holding gets easier step by step'**
+  String get htEnduranceTitle;
+
+  /// No description provided for @htEnduranceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Letting go early is very common at the start. Holding is a skill: the muscles learn to keep working while you breathe normally.'**
+  String get htEnduranceBody;
+
+  /// No description provided for @htEndurancePoint1.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze at a level you can keep, not as hard as possible.'**
+  String get htEndurancePoint1;
+
+  /// No description provided for @htEndurancePoint2.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep breathing. Holding your breath makes the hold shorter.'**
+  String get htEndurancePoint2;
+
+  /// No description provided for @htEnduranceFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Your plan starts with 3-second holds and adds a little time level by level.'**
+  String get htEnduranceFooter;
+
+  /// No description provided for @htNoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice, steady control'**
+  String get htNoneTitle;
+
+  /// No description provided for @htNoneBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A steady squeeze with no breaks is exactly what you want. Keep your belly, buttocks and thighs relaxed so only the pelvic floor works.'**
+  String get htNoneBody;
+
+  /// No description provided for @htNonePoint1.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat the test about once a week to see your hold time change.'**
+  String get htNonePoint1;
+
+  /// No description provided for @htNonePoint2.
+  ///
+  /// In en, this message translates to:
+  /// **'Always relax fully after each hold, for at least as long as you held.'**
+  String get htNonePoint2;
+
+  /// No description provided for @htNoneFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Your results are saved on this phone and shown in Progress.'**
+  String get htNoneFooter;
+
+  /// No description provided for @htGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get htGotIt;
+
+  /// No description provided for @htSaveQ.
+  ///
+  /// In en, this message translates to:
+  /// **'What would you like to do?'**
+  String get htSaveQ;
+
+  /// No description provided for @htSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save my result'**
+  String get htSave;
+
+  /// No description provided for @htTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get htTryAgain;
+
+  /// No description provided for @htSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. You can see it in Progress.'**
+  String get htSaved;
+
+  /// No description provided for @htDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get htDone;
+
+  /// No description provided for @htTodayLearnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to do a Kegel'**
+  String get htTodayLearnTitle;
+
+  /// No description provided for @htTodayLearnSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the muscles and learn the movement'**
+  String get htTodayLearnSub;
+
+  /// No description provided for @htTodayTestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pelvic floor test'**
+  String get htTodayTestTitle;
+
+  /// No description provided for @htTodayTestSub.
+  ///
+  /// In en, this message translates to:
+  /// **'See how long you can hold a squeeze'**
+  String get htTodayTestSub;
+
+  /// No description provided for @htTodayToolsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Technique and test'**
+  String get htTodayToolsTitle;
+
+  /// No description provided for @htProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold test'**
+  String get htProgressTitle;
+
+  /// No description provided for @htProgressEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Do the pelvic floor test to see your hold time here.'**
+  String get htProgressEmpty;
+
+  /// No description provided for @htProgressLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get htProgressLatest;
+
+  /// No description provided for @htProgressBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Best'**
+  String get htProgressBest;
+
+  /// No description provided for @htProgressTests.
+  ///
+  /// In en, this message translates to:
+  /// **'Tests'**
+  String get htProgressTests;
+
+  /// No description provided for @htProgressStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the test'**
+  String get htProgressStart;
+
+  /// No description provided for @htValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s'**
+  String htValue(String seconds);
+
+  /// No description provided for @h2Motivation1.
+  ///
+  /// In en, this message translates to:
+  /// **'Day one. Every routine starts here.'**
+  String get h2Motivation1;
+
+  /// No description provided for @h2Motivation2.
+  ///
+  /// In en, this message translates to:
+  /// **'Small squeezes, done well, add up.'**
+  String get h2Motivation2;
+
+  /// No description provided for @h2Motivation3.
+  ///
+  /// In en, this message translates to:
+  /// **'Steady breathing, steady squeeze.'**
+  String get h2Motivation3;
+
+  /// No description provided for @h2Motivation4.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re building a habit, one day at a time.'**
+  String get h2Motivation4;
+
+  /// No description provided for @h2Motivation5.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality over quantity. Make each one count.'**
+  String get h2Motivation5;
+
+  /// No description provided for @h2Motivation6.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost a full week. Keep it going.'**
+  String get h2Motivation6;
+
+  /// No description provided for @h2Motivation7.
+  ///
+  /// In en, this message translates to:
+  /// **'A week of practice behind you. Nice work.'**
+  String get h2Motivation7;
+
+  /// No description provided for @h2Motivation8.
+  ///
+  /// In en, this message translates to:
+  /// **'New week, same focus.'**
+  String get h2Motivation8;
+
+  /// No description provided for @h2Motivation9.
+  ///
+  /// In en, this message translates to:
+  /// **'Let go fully after every squeeze.'**
+  String get h2Motivation9;
+
+  /// No description provided for @h2Motivation10.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing up beats pushing hard.'**
+  String get h2Motivation10;
+
+  /// No description provided for @h2Motivation11.
+  ///
+  /// In en, this message translates to:
+  /// **'Find the lift, hold it, let it go.'**
+  String get h2Motivation11;
+
+  /// No description provided for @h2Motivation12.
+  ///
+  /// In en, this message translates to:
+  /// **'You know the moves now. Own them.'**
+  String get h2Motivation12;
+
+  /// No description provided for @h2Motivation13.
+  ///
+  /// In en, this message translates to:
+  /// **'A short session still counts. Show up today.'**
+  String get h2Motivation13;
+
+  /// No description provided for @h2Motivation14.
+  ///
+  /// In en, this message translates to:
+  /// **'Two weeks of practice. Be proud of that.'**
+  String get h2Motivation14;
+
+  /// No description provided for @h2MotivationLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last day of this level. Finish strong.'**
+  String get h2MotivationLast;
 }
 
 class _AppLocalizationsDelegate

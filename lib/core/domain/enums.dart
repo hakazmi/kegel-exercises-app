@@ -30,9 +30,10 @@ enum SessionFeel {
   pain,
 }
 
-/// Strengthening vs relaxation session kinds.
+/// Timed session kinds on Today (habits are tick-only, not [SessionKind]).
 enum SessionKind {
   strengthening,
+  body,
   breathing,
   relaxation,
 }
@@ -74,6 +75,23 @@ extension ExperienceX on Experience {
 
 extension TrackIdX on TrackId {
   String get storageValue => name;
+
+  /// Id used in `tracks.json` / `levels.json` bodyCard maps.
+  String get contentId {
+    switch (this) {
+      case TrackId.generalBladder:
+        return 'general_bladder';
+      case TrackId.erectionSupport:
+        return 'erection_support';
+      case TrackId.ejaculationControl:
+        return 'ejaculation_control';
+      case TrackId.afterProstateSurgery:
+        return 'after_prostate_surgery';
+      case TrackId.relaxationFirst:
+        return 'relaxation_first';
+    }
+  }
+
   static TrackId parse(String value) => TrackId.values.byName(value);
 }
 

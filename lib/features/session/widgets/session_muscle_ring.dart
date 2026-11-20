@@ -11,10 +11,14 @@ class SessionMuscleRing extends StatefulWidget {
   const SessionMuscleRing({
     super.key,
     required this.engineState,
+    this.phaseLabel,
     this.size = 280,
   });
 
   final EngineState engineState;
+
+  /// Localized phase word for semantics; ring colors use [SessionPhaseKey].
+  final String? phaseLabel;
   final double size;
 
   @override
@@ -63,14 +67,14 @@ class _SessionMuscleRingState extends State<SessionMuscleRing>
 
   Color get _phaseColor {
     final String word = widget.engineState.phaseWord;
-    if (word == 'Rest' ||
+    if (word == SessionPhaseKey.rest ||
         widget.engineState.machine == EngineMachineState.rest ||
         (widget.engineState.machine == EngineMachineState.paused &&
             widget.engineState.pausedFrom == EngineMachineState.rest)) {
       return AppColors.phaseRest;
     }
-    if (word == 'Relax' ||
-        word == 'Breathe out' ||
+    if (word == SessionPhaseKey.relax ||
+        word == SessionPhaseKey.breatheOut ||
         widget.engineState.machine == EngineMachineState.relax ||
         (widget.engineState.machine == EngineMachineState.paused &&
             widget.engineState.pausedFrom == EngineMachineState.relax)) {
@@ -108,7 +112,7 @@ class _SessionMuscleRingState extends State<SessionMuscleRing>
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: widget.engineState.phaseWord,
+      label: widget.phaseLabel ?? widget.engineState.phaseWord,
       child: SizedBox(
         width: widget.size,
         height: widget.size,

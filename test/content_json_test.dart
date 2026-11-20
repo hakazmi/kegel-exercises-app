@@ -19,7 +19,7 @@ void main() {
     expect(levels['reviewedByPhysio'], isFalse);
     expect(tracks['reviewedByPhysio'], isFalse);
 
-    expect((exercises['exercises'] as List<dynamic>).length, 10);
+    expect((exercises['exercises'] as List<dynamic>).length, 17);
     expect((levels['levels'] as List<dynamic>).length, 5);
     expect((tracks['tracks'] as List<dynamic>).length, 5);
 

@@ -15,7 +15,7 @@ class Sessions extends Table {
   IntColumn get level => integer()();
   IntColumn get dayInLevel => integer()();
   TextColumn get track => text()();
-  /// strengthening | breathing | relaxation — needed for daily cap rules.
+  /// strengthening | body | breathing | relaxation
   TextColumn get kind => text().withDefault(const Constant('strengthening'))();
   IntColumn get durationSeconds => integer().withDefault(const Constant(0))();
   IntColumn get longestHoldSeconds => integer().withDefault(const Constant(0))();
@@ -31,8 +31,22 @@ class Checkins extends Table {
   IntColumn get score => integer()();
 }
 
+/// Tick-only daily habits (never affect streak or unlock).
+class HabitTicks extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get date => dateTime()();
+  TextColumn get habitId => text()();
+}
+
+/// Self-reported walking minutes by calendar day.
+class WalkingLogs extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get date => dateTime()();
+  IntColumn get minutes => integer()();
+}
+
 /// Local SQLite database.
-@DriftDatabase(tables: <Type>[Sessions, Checkins])
+@DriftDatabase(tables: <Type>[Sessions, Checkins, HabitTicks, WalkingLogs])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -42,12 +56,27 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            await m.createTable(habitTicks);
+            await m.createTable(walkingLogs);
+          }
+        },
+      );
 
   Future<void> clearAllData() async {
     await transaction(() async {
       await delete(sessions).go();
       await delete(checkins).go();
+      await delete(habitTicks).go();
+      await delete(walkingLogs).go();
     });
   }
 }

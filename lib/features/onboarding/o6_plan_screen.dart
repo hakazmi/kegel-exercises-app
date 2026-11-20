@@ -6,7 +6,9 @@ import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/content/content_models.dart';
+import '../../core/content/info_copy.dart';
 import '../../core/data/providers.dart';
+import '../../core/motion/app_motion.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
@@ -82,7 +84,9 @@ class O6PlanScreen extends ConsumerWidget {
         ref.read(onboardingControllerProvider.notifier);
     final TrackId track = draft.resolveTrack();
     final bool relaxation = track == TrackId.relaxationFirst;
-    final int restWeekday = UserProfile.initial().restWeekday;
+    // Rest day is day 7 of the first week, counted from today.
+    final DateTime startDay = ref.watch(appClockProvider).now();
+    final int restWeekday = restWeekdayForStart(startDay);
     final PlanService planService = ref.watch(planServiceProvider);
     final List<LevelContent>? levels = ref.watch(levelsProvider).asData?.value;
     final int minutes = _typicalDayMinutes(
@@ -98,7 +102,10 @@ class O6PlanScreen extends ConsumerWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.o6Title, style: AppTypography.display),
+          Reveal(
+            from: RevealFrom.left,
+            child: Text(l10n.o6Title, style: AppTypography.display),
+          ),
           const SizedBox(height: AppSpacing.lg),
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -121,8 +128,8 @@ class O6PlanScreen extends ConsumerWidget {
                                 .o6TrackBadge(_trackName(l10n, track))
                                 .toUpperCase(),
                             style: AppTypography.caption.copyWith(
-                              color: AppColors.accent,
-                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
@@ -152,20 +159,51 @@ class O6PlanScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    Illustration(
-                      assetPath: relaxation
-                          ? 'assets/images/child.svg'
-                          : 'assets/images/bridge.svg',
-                      semanticLabel: relaxation
-                          ? l10n.o6ChildSemantic
-                          : l10n.o6BridgeSemantic,
-                      width: 72,
-                      height: 72,
+                    // Day 1's 3D figure (calm breathing for relaxation).
+                    FloatBob(
+                      lift: 3,
+                      period: const Duration(milliseconds: 3000),
+                      child: PoseFigure(
+                        pose: relaxation
+                            ? DayPose.restBreathing
+                            : DayPose.standing,
+                        width: relaxation ? 110 : 78,
+                        height: relaxation ? 90 : 118,
+                        glowColor: AppColors.lavender,
+                        semanticLabel: relaxation
+                            ? l10n.o6ChildSemantic
+                            : l10n.o6BridgeSemantic,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                _WeekPreview(restWeekday: restWeekday, l10n: l10n),
+                _WeekPreview(startWeekday: startDay.weekday, l10n: l10n),
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.nightlight_round,
+                      size: 14,
+                      color: AppColors.sessionTextSecondary,
+                    ),
+                    const SizedBox(width: AppSpacing.xxs),
+                    Expanded(
+                      child: Text(
+                        l10n.o6RestDayNote(_weekdayName(l10n, restWeekday)),
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.sessionTextSecondary,
+                        ),
+                      ),
+                    ),
+                    InfoButton(
+                      content: InfoCopy.restDay(l10n),
+                      dark: true,
+                      size: 22,
+                      compact: true,
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -209,6 +247,8 @@ class O6PlanScreen extends ConsumerWidget {
       ),
       footer: PrimaryButton(
         label: l10n.o6Start,
+        icon: Icons.play_arrow_rounded,
+        shimmer: true,
         onPressed: () async {
           await controller.completeStep('O6');
           final UserProfile profile = await controller.finish(
@@ -230,25 +270,41 @@ class O6PlanScreen extends ConsumerWidget {
   }
 }
 
-class _WeekPreview extends StatelessWidget {
-  const _WeekPreview({required this.restWeekday, required this.l10n});
+String _weekdayName(AppLocalizations l10n, int weekday) {
+  return switch (weekday) {
+    DateTime.monday => l10n.weekdayMonday,
+    DateTime.tuesday => l10n.weekdayTuesday,
+    DateTime.wednesday => l10n.weekdayWednesday,
+    DateTime.thursday => l10n.weekdayThursday,
+    DateTime.friday => l10n.weekdayFriday,
+    DateTime.saturday => l10n.weekdaySaturday,
+    _ => l10n.weekdaySunday,
+  };
+}
 
-  final int restWeekday;
+/// First week from today: six training days, then the rest day.
+class _WeekPreview extends StatelessWidget {
+  const _WeekPreview({required this.startWeekday, required this.l10n});
+
+  final int startWeekday;
   final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
-    int trainingDay = 0;
     return Row(
       children: [
-        for (int weekday = 1; weekday <= 7; weekday++) ...[
-          if (weekday > 1) const SizedBox(width: 6),
+        for (int i = 0; i < 7; i++) ...[
+          if (i > 0) const SizedBox(width: 6),
           Expanded(
-            child: _DayBubble(
-              isRest: weekday == restWeekday,
-              index: weekday == restWeekday ? 0 : ++trainingDay,
-              isFirst: weekday != restWeekday && trainingDay == 1,
-              l10n: l10n,
+            child: Reveal(
+              from: RevealFrom.drop,
+              delay: AppMotion.stagger(i, base: const Duration(milliseconds: 200)),
+              child: _DayBubble(
+                isRest: i == 6,
+                index: i + 1,
+                isFirst: i == 0,
+                l10n: l10n,
+              ),
             ),
           ),
         ],
@@ -328,16 +384,24 @@ class _TimelineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Reveal(
+      from: RevealFrom.right,
+      delay: const Duration(milliseconds: 320),
+      child: Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 10,
-            height: 10,
-            margin: const EdgeInsets.only(top: 6),
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            width: 12,
+            height: 12,
+            margin: const EdgeInsets.only(top: 5),
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.surface, width: 2),
+              boxShadow: AppElevation.level1,
+            ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -356,6 +420,7 @@ class _TimelineItem extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }

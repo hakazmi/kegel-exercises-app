@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kegelexercisesapp/core/services/notification_gateway.dart';
+import 'package:kegelexercisesapp/core/services/reminder_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kegelexercisesapp/app/app.dart';
 import 'package:kegelexercisesapp/app/router.dart';
@@ -13,6 +15,8 @@ import 'package:kegelexercisesapp/features/onboarding/onboarding_state.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'helpers/preload.dart';
+
 Future<ProviderContainer> _container() async {
   SharedPreferences.setMockInitialValues(<String, Object>{});
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -22,11 +26,13 @@ Future<ProviderContainer> _container() async {
     overrides: [
       sharedPreferencesProvider.overrideWithValue(prefs),
       appDatabaseProvider.overrideWithValue(db),
+      notificationGatewayProvider.overrideWithValue(FakeNotificationGateway()),
     ],
   );
 }
 
 Future<void> _pumpApp(WidgetTester tester, ProviderContainer container) async {
+  await preloadContent(tester, container);
   await tester.pumpWidget(
     UncontrolledProviderScope(
       container: container,
@@ -202,8 +208,13 @@ void main() {
     );
     await tester.tap(find.text('Continue to Today'));
     await tester.pump();
-    for (int i = 0; i < 20; i++) {
-      await tester.pump(const Duration(milliseconds: 20));
+    // The in-memory database answers on real async, so let it run between
+    // frames until Today has loaded.
+    for (int i = 0; i < 40; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
       if (find.text('Update my answer').evaluate().isNotEmpty) {
         break;
       }
@@ -218,8 +229,13 @@ void main() {
     final GoRouter router = container.read(routerProvider);
     router.go(AppRoutes.welcome);
     await tester.pump();
-    for (int i = 0; i < 20; i++) {
-      await tester.pump(const Duration(milliseconds: 20));
+    // The in-memory database answers on real async, so let it run between
+    // frames until Today has loaded.
+    for (int i = 0; i < 40; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
       if (find.text('Update my answer').evaluate().isNotEmpty) {
         break;
       }
@@ -294,8 +310,13 @@ void main() {
 
     await tester.tap(find.text('Continue to Today'));
     await tester.pump();
-    for (int i = 0; i < 20; i++) {
-      await tester.pump(const Duration(milliseconds: 20));
+    // The in-memory database answers on real async, so let it run between
+    // frames until Today has loaded.
+    for (int i = 0; i < 40; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 10)),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
       if (find.text('Update my answer').evaluate().isNotEmpty) {
         break;
       }

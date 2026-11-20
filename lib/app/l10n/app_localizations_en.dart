@@ -63,6 +63,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get o1Title => 'Train your pelvic floor in a few minutes a day';
 
   @override
+  String get o1TitleBefore => 'Train your pelvic floor in a ';
+
+  @override
+  String get o1TitleAccent => 'few minutes';
+
+  @override
+  String get o1TitleAfter => ' a day';
+
+  @override
   String get o1Body =>
       'Guided exercises for bladder control and pelvic health. No equipment.';
 
@@ -74,6 +83,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get o1BulletPrivate => 'Private: your data stays on this phone';
+
+  @override
+  String get o1FeatureBladder => 'Better bladder control';
+
+  @override
+  String get o1FeaturePlan => 'A plan that grows with you';
+
+  @override
+  String get o1FeaturePrivate => 'Private on this phone';
 
   @override
   String get o1AgeCheckbox => 'I am 18 or older';
@@ -93,7 +111,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get o1HeroSemantic =>
-      'Person standing, with calendar, shield, stopwatch and target icons';
+      'Athletic man squatting beside a pelvic bone graphic with pelvic floor muscles highlighted in red';
 
   @override
   String get o1CalendarSemantic => 'Calendar';
@@ -114,19 +132,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get o2Subtitle => 'Pick one. You can change it later in Settings.';
 
   @override
+  String get o2HeroSemantic => 'Green shield with pelvic health graphic';
+
+  @override
   String get o2GoalBladder => 'Bladder control';
+
+  @override
+  String get o2GoalBladderSubtitle => 'Holds, quick squeezes and urge habits';
 
   @override
   String get o2GoalErection => 'Erection support';
 
   @override
+  String get o2GoalErectionSubtitle => 'Holds, bridges and walking goals';
+
+  @override
   String get o2GoalEjaculation => 'Ejaculation control';
+
+  @override
+  String get o2GoalEjaculationSubtitle => 'Squeezes plus reverse Kegels';
 
   @override
   String get o2GoalSurgery => 'Recovery after prostate surgery';
 
   @override
+  String get o2GoalSurgerySubtitle => 'Gentler holds after catheter removal';
+
+  @override
   String get o2GoalGeneral => 'General pelvic health';
+
+  @override
+  String get o2GoalGeneralSubtitle => 'A balanced mix of strength and ease';
 
   @override
   String get o3Title => 'Do any of these apply to you?';
@@ -171,6 +207,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get o3ShieldSemantic => 'Safety shield';
 
   @override
+  String get o3HeroSemantic =>
+      'Man holding lower abdomen beside a pelvic graphic with a green check';
+
+  @override
   String get o3ContinueBlocked => 'Continue to Today';
 
   @override
@@ -179,6 +219,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get o4Subtitle =>
       'This decides whether we show the muscle-finding tutorial first.';
+
+  @override
+  String get o4HeroSemantic =>
+      'Man thinking about his Kegel exercise experience';
 
   @override
   String get o4None => 'No';
@@ -238,6 +282,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get o5CalendarSemantic => 'Calendar';
+
+  @override
+  String get o5HeroSemantic =>
+      'Man meditating beside a stopwatch showing daily training time';
 
   @override
   String get o5DayMon => 'M';
@@ -460,7 +508,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get t1AnatomySemantic =>
-      'Side view: the pelvic floor runs from the pubic bone to the tailbone, under the bladder';
+      'Animated pelvic floor view: red muscles squeeze, hold, then relax around the central opening between the sitting bones';
 
   @override
   String s1LevelDay(int level, int day) {
@@ -606,6 +654,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get s3BlockStretch => 'Stretch';
+
+  @override
+  String get s3PhaseHold => 'Hold';
+
+  @override
+  String get s3PhaseRest => 'Rest';
+
+  @override
+  String get s3PhaseBreatheIn => 'Breathe in';
+
+  @override
+  String get s3PhaseBreatheOut => 'Breathe out';
+
+  @override
+  String get s3PhaseDone => 'Done';
+
+  @override
+  String get s3PhaseLift => 'Lift';
 
   @override
   String get s3Pause => 'Pause';
@@ -972,6 +1038,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String h2StartLevel(int level) {
     return 'Start Level $level';
+  }
+
+  @override
+  String get h2TestCompleteLevel => 'Complete level (test)';
+
+  @override
+  String get h2TestCompleted => 'Completed';
+
+  @override
+  String h2TestCompleteConfirm(int level) {
+    return 'You are on Level $level. Test jump only — remove before store release.';
   }
 
   @override
@@ -1369,6 +1446,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get x1Title => 'Settings';
 
   @override
+  String get x1SectionTesting => 'Testing';
+
+  @override
+  String get x1TestingPremium => 'Unlock Premium (Levels 2–5)';
+
+  @override
+  String get x1TestingReset => 'Reset app — start onboarding again';
+
+  @override
   String get x1SectionPlan => 'Plan';
 
   @override
@@ -1515,4 +1601,772 @@ class AppLocalizationsEn extends AppLocalizations {
   String x1VersionFooter(String version) {
     return 'Version $version · Not a medical device';
   }
+
+  @override
+  String get h1SectionPelvicFloor => 'Pelvic floor';
+
+  @override
+  String get h1SectionBody => 'Body and function';
+
+  @override
+  String get h1SectionBreathe => 'Relax and breathe';
+
+  @override
+  String get h1SectionHabits => 'Daily habits';
+
+  @override
+  String get h1BodyCardTitle => 'Body and function';
+
+  @override
+  String get h1BodyCardLocked => 'Unlock with Premium';
+
+  @override
+  String get h1HabitDone => 'Done today';
+
+  @override
+  String get h1HabitMarkDone => 'Mark done';
+
+  @override
+  String get h1HabitClear => 'Clear';
+
+  @override
+  String get exCueButtocksRelaxed =>
+      'Buttocks, thighs and stomach stay relaxed. Keep breathing.';
+
+  @override
+  String get exCueKeepBreathing => 'Keep breathing. Do not hold your breath.';
+
+  @override
+  String get exCueLegsLift =>
+      'Let the legs do the lifting; the squeeze stays gentle. Keep breathing.';
+
+  @override
+  String get exCueReverseLetGo => 'Let go and lengthen. Do not push down.';
+
+  @override
+  String get exHabitAfterDribbleTitle => 'After-dribble squeeze';
+
+  @override
+  String get exHabitAfterDribbleSteps =>
+      'After you finish urinating, squeeze the pelvic floor firmly once, then relax, before you leave the toilet. This is not the same as stopping the urine stream mid-flow — that test is only for finding the muscles once, never as a regular exercise.';
+
+  @override
+  String get exHabitUrgeControlTitle => 'Urge-control steps';
+
+  @override
+  String get exHabitUrgeControlSteps =>
+      'When a sudden urge comes: stay still. Soften the belly and breathe. If it helps, use a few gentle pelvic floor squeezes or one easy hold — not repeated hard maximum squeezes. Wait until the urgency settles, then walk calmly to the toilet.';
+
+  @override
+  String get exWalkingCardioNote =>
+      'Brisk walking is general cardiovascular activity. It is not a pelvic floor (Kegel) exercise. Regular activity may support erectile function; results vary and it is not a treatment or cure.';
+
+  @override
+  String get exWalkingDoctorNote =>
+      'If you have a heart condition or have not exercised in a while, check with your doctor first.';
+
+  @override
+  String get exWalkingSurgeryNote => 'Walk only as your care team allows.';
+
+  @override
+  String get g1WalkingTitle => 'Brisk walking this week';
+
+  @override
+  String get g1WalkingGoal => 'Aim for about 40 minutes on 4 days this week';
+
+  @override
+  String g1WalkingProgress(int minutes, int days) {
+    return '$minutes min · $days of 4 days';
+  }
+
+  @override
+  String get g1WalkingAdd => 'Add walking minutes';
+
+  @override
+  String get g1WalkingAddConfirm => 'Save';
+
+  @override
+  String get g1WalkingMinutesLabel => 'Minutes';
+
+  @override
+  String g1WalkingQuickAdd(int minutes) {
+    return '+$minutes min';
+  }
+
+  @override
+  String get g1WalkingCustom => 'Other';
+
+  @override
+  String get g1HeroDaysThisWeek => 'days this week';
+
+  @override
+  String g1CalTrainedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count training days',
+      one: '1 training day',
+      zero: 'No training days yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get g1CalRest => 'Rest day';
+
+  @override
+  String get h1GreetingMorning => 'Good morning';
+
+  @override
+  String get h1GreetingAfternoon => 'Good afternoon';
+
+  @override
+  String get h1GreetingEvening => 'Good evening';
+
+  @override
+  String get h1JourneyTitle => 'Today\'s plan';
+
+  @override
+  String h1JourneySubtitle(int done, int total) {
+    return '$done of $total done';
+  }
+
+  @override
+  String get h1UpNext => 'Up next';
+
+  @override
+  String get h1ItemStart => 'Start';
+
+  @override
+  String get h1ItemAlreadyDone => 'Already done today.';
+
+  @override
+  String get h1HabitsHint =>
+      'Tick each one once you have done it today. Tap again to clear.';
+
+  @override
+  String get s1InsideTitle => 'What\'s inside';
+
+  @override
+  String get s1RemindersTitle => 'Remember';
+
+  @override
+  String s4SubtitleSession(int number, int day) {
+    return 'Session $number · Day $day';
+  }
+
+  @override
+  String get s4SubtitleGeneric => 'One more part of today done.';
+
+  @override
+  String o6RestDayNote(String weekday) {
+    return 'Your weekly rest day is $weekday.';
+  }
+
+  @override
+  String get weekdayMonday => 'Monday';
+
+  @override
+  String get weekdayTuesday => 'Tuesday';
+
+  @override
+  String get weekdayWednesday => 'Wednesday';
+
+  @override
+  String get weekdayThursday => 'Thursday';
+
+  @override
+  String get weekdayFriday => 'Friday';
+
+  @override
+  String get weekdaySaturday => 'Saturday';
+
+  @override
+  String get weekdaySunday => 'Sunday';
+
+  @override
+  String h1PlanWeek(int week) {
+    return 'Plan week $week';
+  }
+
+  @override
+  String get h1ThisWeek => 'This week';
+
+  @override
+  String get o4GuideHint =>
+      'We\'ll show you a short guide before your first session';
+
+  @override
+  String get o4ConfidentHint => 'Go straight to your first session';
+
+  @override
+  String infoButtonLabel(String topic) {
+    return 'About $topic';
+  }
+
+  @override
+  String get infoGotIt => 'Got it';
+
+  @override
+  String get infoWhySlowHold =>
+      'Why it\'s here: builds endurance, so you can keep the squeeze for longer.';
+
+  @override
+  String get infoWhyQuickSqueeze =>
+      'Why it\'s here: builds the fast reaction you need for a sudden cough or sneeze.';
+
+  @override
+  String get infoWhyStrongHold =>
+      'Why it\'s here: a firmer squeeze used in the erection support plan from Level 3.';
+
+  @override
+  String get infoWhyStandingHolds =>
+      'Why it\'s here: leaks often happen upright, so holds move to standing and walking as you progress.';
+
+  @override
+  String get infoWhyBridge =>
+      'Why it\'s here: pairs the pelvic floor squeeze with the hip muscles that support it.';
+
+  @override
+  String get infoWhySquat =>
+      'Why it\'s here: practises relaxing on the way down and squeezing on the way up, the pattern of everyday movement.';
+
+  @override
+  String get infoWhySitToStand =>
+      'Why it\'s here: standing up is a common moment for leaks, so you practise the squeeze at exactly that moment.';
+
+  @override
+  String get infoWhyKnack =>
+      'Why it\'s here: squeezing just before a cough, sneeze or lift trains control in the moments that cause leaks.';
+
+  @override
+  String get infoWhyPillowSqueeze =>
+      'Why it\'s here: the inner thigh muscles work together with the pelvic floor.';
+
+  @override
+  String get infoWhyBreathing =>
+      'Why it\'s here: teaches the pelvic floor to let go fully between squeezes.';
+
+  @override
+  String get infoWhyReverseKegel =>
+      'Why it\'s here: lengthens and relaxes the muscles, useful when they feel tight or squeezing is uncomfortable.';
+
+  @override
+  String get infoWhyStretch =>
+      'Why it\'s here: a gentle stretch that helps the pelvic floor relax.';
+
+  @override
+  String get infoWhyAfterDribble =>
+      'Why it\'s here: prostate charities recommend it to clear the last drops that stay in the urethra after you finish.';
+
+  @override
+  String get infoWhyUrgeControl =>
+      'Why it\'s here: bladder guidelines include these steps; staying calm and still gives a sudden urge time to fade.';
+
+  @override
+  String get infoWhyWalking =>
+      'Why it\'s here: regular aerobic activity supports heart and blood vessel health.';
+
+  @override
+  String get infoPelvicTitle => 'Pelvic floor session';
+
+  @override
+  String get infoPelvicBody =>
+      'Guided slow holds and quick squeezes. Squeeze and lift as if stopping yourself passing wind, then let go fully before the next one.';
+
+  @override
+  String get infoBodyBody =>
+      'Short movements that add a pelvic floor squeeze to everyday actions. Today\'s moves:';
+
+  @override
+  String get infoBreatheBody =>
+      'Slow belly breathing and gentle relaxation. Letting the muscles go is part of the training. Today\'s parts:';
+
+  @override
+  String get infoHabitsBody =>
+      'Small habits for during the day, not timed sessions. Tick each one when you have done it today; tap again to untick. Habits never affect your streak or level.';
+
+  @override
+  String get infoRestTitle => 'Your plan week';
+
+  @override
+  String get infoRestBody =>
+      'Your plan runs in 7-day weeks starting on the day you joined. Days 1 to 6 are training days and day 7 is a rest day, when only breathing is planned. Muscles recover on rest days, and a rest day never breaks your streak.';
+
+  @override
+  String get infoStreakBody =>
+      'Days in a row with at least one completed session. Your weekly rest day never breaks it, and missed days start a new streak with no penalty.';
+
+  @override
+  String get infoWeekRingBody =>
+      'Sessions completed since Monday. The ring on the streak card shows training days this week out of 6; the 7th day is for rest.';
+
+  @override
+  String get infoHoldBody =>
+      'The longest hold the app has guided you through. A phone cannot measure your muscles, so this is the programmed hold you completed, not a measurement.';
+
+  @override
+  String get infoLevelsTitle => 'How levels work';
+
+  @override
+  String get infoLevelsBody =>
+      'Each level adds longer holds or more reps. The next level unlocks when you finish this level\'s days and trained on at least 5 of the last 7 days. You can repeat or step down a level any time.';
+
+  @override
+  String get infoCheckInTitle => 'About check-ins';
+
+  @override
+  String get infoCheckInBody =>
+      'One question about your goal, answered now and again every 4 weeks, so you can compare your own answers side by side. There are no predictions or scores from other people.';
+
+  @override
+  String get infoGoalTitle => 'What this plan includes';
+
+  @override
+  String get infoGoalBladder =>
+      'Slow holds and quick squeezes, plus squeezing before coughs, lifts and standing up. Daily habits for after-dribble and sudden urges.';
+
+  @override
+  String get infoGoalErection =>
+      'Standard levels with stronger holds from Level 3, bridges and squats, and a weekly brisk walking goal.';
+
+  @override
+  String get infoGoalEjaculation =>
+      'Standard levels with more relaxation: reverse Kegels and extra breathing every day, so you learn to let go as well as squeeze.';
+
+  @override
+  String get infoGoalSurgery =>
+      'Gentler holds of up to 10 seconds with 4 seconds of rest. Starts only after the catheter is removed and your care team agrees.';
+
+  @override
+  String get infoGoalGeneral =>
+      'A balanced plan of slow holds, quick squeezes, everyday squeezes and relaxation.';
+
+  @override
+  String get infoGoalNote => 'You can change your goal any time in Settings.';
+
+  @override
+  String get infoSafetyTitle => 'Why we ask';
+
+  @override
+  String get infoSafetyBody =>
+      'Pain can mean the muscles are too tight, so squeezing may make it worse; you start with relaxation instead. Recent surgery and a catheter need your care team\'s go-ahead before you start.';
+
+  @override
+  String get infoKegelTitle => 'What is a Kegel exercise?';
+
+  @override
+  String get infoKegelBody =>
+      'Squeezing and lifting your pelvic floor muscles, the ones you use to stop passing wind, then letting them go fully. It needs no equipment and nobody can see you doing it.';
+
+  @override
+  String get infoRemindersTitle => 'About reminders';
+
+  @override
+  String get infoRemindersBody =>
+      'Reminders are discreet by default: the lock screen never mentions what the app is for. At most 2 a day, never for marketing, and you can change them any time in Settings.';
+
+  @override
+  String get infoVoiceBody =>
+      'A spoken \"Squeeze\" and \"Relax\" during sessions. Off by default so your phone stays quiet around other people.';
+
+  @override
+  String get infoSessionsBody =>
+      'How many short sessions you plan each day. One is a fine start; more than 3 strengthening sessions a day is never planned, because tired muscles recover slower.';
+
+  @override
+  String get splashTagline => 'Pelvic floor trainer';
+
+  @override
+  String h2DayLabel(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String h2LevelShort(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String get h2DayPlanTitle => 'Day plan';
+
+  @override
+  String get s3ForwardPhase => 'Next phase';
+
+  @override
+  String get s3ForwardExercise => 'Next exercise';
+
+  @override
+  String get brCycles => 'Cycles';
+
+  @override
+  String get brCycle => 'Cycle';
+
+  @override
+  String get brInhale => 'Inhale';
+
+  @override
+  String get brExhale => 'Exhale';
+
+  @override
+  String get poseStanding => 'Standing';
+
+  @override
+  String get poseSitting => 'Sitting';
+
+  @override
+  String get poseLyingOnBack => 'Lying on your back';
+
+  @override
+  String get poseGluteBridge => 'Glute bridge';
+
+  @override
+  String get poseSquatting => 'Squatting';
+
+  @override
+  String get poseKneeling => 'Kneeling';
+
+  @override
+  String get poseRestBreathing => 'Calm breathing';
+
+  @override
+  String h2LevelCompleteTitle(int level) {
+    return 'Level $level complete';
+  }
+
+  @override
+  String get h2ReviewDays => 'Review days';
+
+  @override
+  String get h2DoneTab => 'Done';
+
+  @override
+  String get h2TagCurrent => 'Current';
+
+  @override
+  String get h2TagCompleted => 'Completed';
+
+  @override
+  String h2StartDay(int day) {
+    return 'Start day $day';
+  }
+
+  @override
+  String get h2StepDownUnavailable =>
+      'You\'re on Level 1, the first level, so there is no level to step down to.';
+
+  @override
+  String get h2OpenDay => 'Open day';
+
+  @override
+  String get h2FocusL1 =>
+      'Find the right muscles. Squeeze for 3 seconds, then let go fully.';
+
+  @override
+  String get h2FocusL2 =>
+      'Squeeze for 5 seconds while sitting, plus a few quick squeezes.';
+
+  @override
+  String get h2FocusL3 => 'Squeeze for 7 seconds, sitting and standing.';
+
+  @override
+  String get h2FocusL4 =>
+      'Squeeze for 8 to 10 seconds, plus bridges and squats.';
+
+  @override
+  String get h2FocusL5 => 'Squeeze for 10 seconds during everyday moves.';
+
+  @override
+  String get h2AchievedL1 =>
+      'You can find, squeeze and fully relax the right muscles.';
+
+  @override
+  String get h2AchievedL2 =>
+      'You can hold a squeeze for 5 seconds while sitting.';
+
+  @override
+  String get h2AchievedL3 =>
+      'You can hold for 7 seconds, sitting and standing.';
+
+  @override
+  String get h2AchievedL4 =>
+      'You can hold for 8 to 10 seconds in bridges and squats.';
+
+  @override
+  String get h2AchievedL5 => 'You keep the routine going in everyday moves.';
+
+  @override
+  String get h2StatTime => 'Total time';
+
+  @override
+  String get h2StatExercises => 'Exercises';
+
+  @override
+  String get h2StatParts => 'Parts';
+
+  @override
+  String get h2TimeSplitTitle => 'Where your time goes';
+
+  @override
+  String get h2RhythmSqueeze => 'Squeeze';
+
+  @override
+  String get h2RhythmRelax => 'Relax';
+
+  @override
+  String h2RhythmReps(int reps) {
+    return '$reps rounds';
+  }
+
+  @override
+  String h2PartsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count parts',
+      one: '1 part',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get t1TipTitle => 'Quick tip';
+
+  @override
+  String get pfDemoTitle => 'Watch the muscles';
+
+  @override
+  String get pfDemoSemantic =>
+      'Pelvic floor muscles squeeze and lift, hold, then relax and lower again';
+
+  @override
+  String get pfDemoSqueezeHint => 'Lift in and up';
+
+  @override
+  String get pfDemoHoldHint => 'Stay still, breathe';
+
+  @override
+  String get pfDemoRelaxHint => 'Let go fully';
+
+  @override
+  String get htTitle => 'Pelvic floor test';
+
+  @override
+  String get htPressPrompt => 'Press and hold the button, then squeeze';
+
+  @override
+  String get htHoldPrompt =>
+      'Squeeze and hold. Let go of the button when you relax.';
+
+  @override
+  String get htPress => 'Press';
+
+  @override
+  String get htHold => 'Hold';
+
+  @override
+  String get htSeconds => 'seconds';
+
+  @override
+  String htBest(String seconds) {
+    return 'Best $seconds s';
+  }
+
+  @override
+  String get htTooShort =>
+      'That was very short. Press and keep holding the button for as long as you squeeze.';
+
+  @override
+  String htResult(String seconds) {
+    return 'You held for $seconds s';
+  }
+
+  @override
+  String get htAccidentQ =>
+      'Did you accidentally let go or partly relax the muscle at any point during the squeeze?';
+
+  @override
+  String get htNo => 'No';
+
+  @override
+  String get htYes => 'Yes';
+
+  @override
+  String get htAccidentNote =>
+      'No problem. Take a breath, relax fully, and try again. Only a steady, unbroken squeeze counts.';
+
+  @override
+  String get htTestAgain => 'Test again';
+
+  @override
+  String get htReasonQ => 'Which one do you think you had trouble with?';
+
+  @override
+  String get htReasonStrength => 'I couldn\'t hold it with full strength.';
+
+  @override
+  String get htReasonEndurance =>
+      'It was hard to hold for long. I let go quickly.';
+
+  @override
+  String get htReasonNone => 'I didn\'t have any problems!';
+
+  @override
+  String get htStrengthTitle => 'Strength vs. endurance';
+
+  @override
+  String get htStrengthBody =>
+      'Strength is how hard you can squeeze: the most effort you can put into one squeeze. Endurance is how long you can keep a squeeze going without letting go.';
+
+  @override
+  String get htStrengthPoint1 =>
+      'If you can squeeze strongly but only for a short time, your strength is ahead of your endurance.';
+
+  @override
+  String get htStrengthPoint2 =>
+      'If you can hold a light squeeze for a long time, your endurance is ahead of your strength.';
+
+  @override
+  String get htStrengthFooter =>
+      'Your plan trains both: slow holds build endurance and quick squeezes build strength.';
+
+  @override
+  String get htEnduranceTitle => 'Holding gets easier step by step';
+
+  @override
+  String get htEnduranceBody =>
+      'Letting go early is very common at the start. Holding is a skill: the muscles learn to keep working while you breathe normally.';
+
+  @override
+  String get htEndurancePoint1 =>
+      'Squeeze at a level you can keep, not as hard as possible.';
+
+  @override
+  String get htEndurancePoint2 =>
+      'Keep breathing. Holding your breath makes the hold shorter.';
+
+  @override
+  String get htEnduranceFooter =>
+      'Your plan starts with 3-second holds and adds a little time level by level.';
+
+  @override
+  String get htNoneTitle => 'Nice, steady control';
+
+  @override
+  String get htNoneBody =>
+      'A steady squeeze with no breaks is exactly what you want. Keep your belly, buttocks and thighs relaxed so only the pelvic floor works.';
+
+  @override
+  String get htNonePoint1 =>
+      'Repeat the test about once a week to see your hold time change.';
+
+  @override
+  String get htNonePoint2 =>
+      'Always relax fully after each hold, for at least as long as you held.';
+
+  @override
+  String get htNoneFooter =>
+      'Your results are saved on this phone and shown in Progress.';
+
+  @override
+  String get htGotIt => 'Got it';
+
+  @override
+  String get htSaveQ => 'What would you like to do?';
+
+  @override
+  String get htSave => 'Save my result';
+
+  @override
+  String get htTryAgain => 'Try again';
+
+  @override
+  String get htSaved => 'Saved. You can see it in Progress.';
+
+  @override
+  String get htDone => 'Done';
+
+  @override
+  String get htTodayLearnTitle => 'How to do a Kegel';
+
+  @override
+  String get htTodayLearnSub => 'Find the muscles and learn the movement';
+
+  @override
+  String get htTodayTestTitle => 'Pelvic floor test';
+
+  @override
+  String get htTodayTestSub => 'See how long you can hold a squeeze';
+
+  @override
+  String get htTodayToolsTitle => 'Technique and test';
+
+  @override
+  String get htProgressTitle => 'Hold test';
+
+  @override
+  String get htProgressEmpty =>
+      'Do the pelvic floor test to see your hold time here.';
+
+  @override
+  String get htProgressLatest => 'Latest';
+
+  @override
+  String get htProgressBest => 'Best';
+
+  @override
+  String get htProgressTests => 'Tests';
+
+  @override
+  String get htProgressStart => 'Take the test';
+
+  @override
+  String htValue(String seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String get h2Motivation1 => 'Day one. Every routine starts here.';
+
+  @override
+  String get h2Motivation2 => 'Small squeezes, done well, add up.';
+
+  @override
+  String get h2Motivation3 => 'Steady breathing, steady squeeze.';
+
+  @override
+  String get h2Motivation4 => 'You\'re building a habit, one day at a time.';
+
+  @override
+  String get h2Motivation5 => 'Quality over quantity. Make each one count.';
+
+  @override
+  String get h2Motivation6 => 'Almost a full week. Keep it going.';
+
+  @override
+  String get h2Motivation7 => 'A week of practice behind you. Nice work.';
+
+  @override
+  String get h2Motivation8 => 'New week, same focus.';
+
+  @override
+  String get h2Motivation9 => 'Let go fully after every squeeze.';
+
+  @override
+  String get h2Motivation10 => 'Showing up beats pushing hard.';
+
+  @override
+  String get h2Motivation11 => 'Find the lift, hold it, let it go.';
+
+  @override
+  String get h2Motivation12 => 'You know the moves now. Own them.';
+
+  @override
+  String get h2Motivation13 => 'A short session still counts. Show up today.';
+
+  @override
+  String get h2Motivation14 => 'Two weeks of practice. Be proud of that.';
+
+  @override
+  String get h2MotivationLast => 'Last day of this level. Finish strong.';
 }

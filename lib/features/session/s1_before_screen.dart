@@ -8,21 +8,28 @@ import '../../app/router.dart';
 import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/content/content_models.dart';
+import '../../core/content/info_copy.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/user_profile.dart';
+import '../../core/motion/app_motion.dart';
 import '../../core/plan/plan_models.dart';
 import '../../core/plan/session_definition.dart';
 import '../../core/widgets/widgets.dart';
+import '../home/home_copy.dart';
 
-/// S1 Before you start — session overview for a plan item.
+/// S1 Before you start — what this session contains, how to position, cues.
+///
+/// Dark hero with the session title, a numbered "what's inside" timeline
+/// (icon per exercise type, real names from content), reminders, cue
+/// toggles and the Start CTA. Panels slide in from alternating sides.
 class S1BeforeScreen extends ConsumerWidget {
   const S1BeforeScreen({
     super.key,
     this.itemId,
   });
 
-  /// Today-plan item id (e.g. strength_1, breathing, reverse_kegel).
+  /// Today-plan item id (e.g. strength_1, body_1, breathe_1).
   final String? itemId;
 
   @override
@@ -38,7 +45,10 @@ class S1BeforeScreen extends ConsumerWidget {
         levelsAsync.isLoading ||
         exercisesAsync.isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: AppColors.sessionBackground,
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.accent),
+        ),
       );
     }
     if (planAsync.hasError ||
@@ -65,14 +75,25 @@ class S1BeforeScreen extends ConsumerWidget {
         .where((TodayItem i) => i.kind == SessionKind.strengthening)
         .length
         .clamp(1, 3);
+    final List<TrackContent> tracks =
+        ref.watch(tracksProvider).asData?.value ?? const <TrackContent>[];
+    TrackContent? trackContent;
+    for (final TrackContent t in tracks) {
+      if (t.id == profile.track.contentId) {
+        trackContent = t;
+        break;
+      }
+    }
+    final Map<String, ExerciseContent> byId = <String, ExerciseContent>{
+      for (final ExerciseContent e in exercises) e.id: e,
+    };
     final SessionDefinition session = SessionDefinitionBuilder.fromLevelAndItem(
       level: level,
       item: item,
       sessionsToday: profile.sessionsPerDay.clamp(1, 3),
+      track: trackContent,
+      exercisesById: byId,
     );
-    final Map<String, String> descriptions = <String, String>{
-      for (final ExerciseContent e in exercises) e.id: e.description,
-    };
 
     return _S1Body(
       l10n: l10n,
@@ -81,7 +102,7 @@ class S1BeforeScreen extends ConsumerWidget {
       session: session,
       item: item,
       strengtheningTotal: strengtheningTotal,
-      descriptions: descriptions,
+      exercisesById: byId,
       onToggleVibration: (bool value) {
         ref.read(userProfileProvider.notifier).save(
               profile.copyWith(vibrationOn: value),
@@ -114,7 +135,7 @@ class S1BeforeScreen extends ConsumerWidget {
     return const TodayItem(
       id: 'strength_1',
       kind: SessionKind.strengthening,
-      label: 'Session 1',
+      label: '',
       durationSeconds: 55,
       done: false,
       sessionNumber: 1,
@@ -130,7 +151,7 @@ class _S1Body extends StatelessWidget {
     required this.session,
     required this.item,
     required this.strengtheningTotal,
-    required this.descriptions,
+    required this.exercisesById,
     required this.onToggleVibration,
     required this.onToggleVoice,
   });
@@ -141,7 +162,7 @@ class _S1Body extends StatelessWidget {
   final SessionDefinition session;
   final TodayItem item;
   final int strengtheningTotal;
-  final Map<String, String> descriptions;
+  final Map<String, ExerciseContent> exercisesById;
   final ValueChanged<bool> onToggleVibration;
   final ValueChanged<bool> onToggleVoice;
 
@@ -150,7 +171,7 @@ class _S1Body extends StatelessWidget {
     final int number = item.sessionNumber ?? 1;
     final String title = item.kind == SessionKind.strengthening
         ? l10n.s1SessionOf(number, strengtheningTotal)
-        : item.label;
+        : _kindTitle();
     final String meta = session.durationSeconds >= 90
         ? l10n.s1MetaMinutes(
             (session.durationSeconds / 60).ceil(),
@@ -164,13 +185,15 @@ class _S1Body extends StatelessWidget {
         backgroundColor: AppColors.background,
         body: Column(
           children: [
-            _DarkHeader(
+            _HeroHeader(
               l10n: l10n,
               track: plan.track,
               level: plan.level,
               day: plan.dayInLevel,
               title: title,
               meta: meta,
+              illustration: _illustrationFor(item.kind),
+              position: _positionCopy(l10n, session.position),
               onBack: () {
                 if (context.canPop()) {
                   context.pop();
@@ -182,78 +205,123 @@ class _S1Body extends StatelessWidget {
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
                   AppSpacing.lg,
-                  AppSpacing.xl,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
                   AppSpacing.md,
                 ),
                 children: [
-                  for (int i = 0; i < session.blocks.length; i++) ...[
-                    if (i > 0) const Divider(height: 1, color: AppColors.border),
-                    _BlockRow(
+                  Reveal(
+                    from: RevealFrom.left,
+                    delay: const Duration(milliseconds: 120),
+                    child: Text(l10n.s1InsideTitle, style: AppTypography.title),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  for (int i = 0; i < session.blocks.length; i++)
+                    Reveal(
+                      from: RevealFrom.right,
+                      delay: AppMotion.stagger(
+                        i,
+                        base: const Duration(milliseconds: 180),
+                      ),
+                      child: _BlockStep(
+                        index: i,
+                        isLast: i == session.blocks.length - 1,
+                        block: session.blocks[i],
+                        title: _blockTitle(session.blocks[i]),
+                        subtitle: _blockSubtitle(session.blocks[i]),
+                        info: _blockInfo(session.blocks[i]),
+                      ),
+                    ),
+                  const SizedBox(height: AppSpacing.md),
+                  Reveal(
+                    from: RevealFrom.left,
+                    delay: AppMotion.stagger(
+                      session.blocks.length,
+                      base: const Duration(milliseconds: 220),
+                    ),
+                    child: _RemindersCard(l10n: l10n),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Reveal(
+                    from: RevealFrom.right,
+                    delay: AppMotion.stagger(
+                      session.blocks.length + 1,
+                      base: const Duration(milliseconds: 220),
+                    ),
+                    child: _CuesCard(
                       l10n: l10n,
-                      block: session.blocks[i],
-                      description: _descriptionFor(session.blocks[i]),
+                      vibrationOn: profile.vibrationOn,
+                      voiceOn: profile.voiceOn,
+                      onToggleVibration: onToggleVibration,
+                      onToggleVoice: onToggleVoice,
                     ),
-                  ],
-                  const SizedBox(height: AppSpacing.lg),
-                  AppCard(
-                    backgroundColor: AppColors.surfaceMuted,
-                    borderColor: Colors.transparent,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.airline_seat_flat, size: 22),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Text(
-                            _positionCopy(l10n, session.position),
-                            style: AppTypography.body
-                                .copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  _ToggleRow(
-                    title: l10n.s1VibrationCues,
-                    value: profile.vibrationOn,
-                    onChanged: onToggleVibration,
-                  ),
-                  _ToggleRow(
-                    title: l10n.s1VoiceCues,
-                    subtitle: l10n.s1VoicePrivacy,
-                    value: profile.voiceOn,
-                    onChanged: onToggleVoice,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Center(
-                    child: TextLinkButton(
-                      label: l10n.s1ShowMeHow,
-                      underline: true,
-                      onPressed: () {
-                        context.push('${AppRoutes.tutorial}?replay=1');
-                      },
+                    child: PressScale(
+                      onTap: () =>
+                          context.push('${AppRoutes.tutorial}?replay=1'),
+                      semanticLabel: l10n.s1ShowMeHow,
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minHeight: AppSpacing.minTouchTarget,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: AppRadii.pillAll,
+                          border: Border.all(color: AppColors.borderStrong),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.play_circle_outline_rounded,
+                              size: 20,
+                              color: AppColors.textPrimary,
+                            ),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text(
+                              l10n.s1ShowMeHow,
+                              style: AppTypography.body.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                AppSpacing.md,
-                AppSpacing.xl,
-                AppSpacing.md,
+            DecoratedBox(
+              decoration: const BoxDecoration(
+                color: AppColors.background,
+                border: Border(top: BorderSide(color: AppColors.border)),
               ),
-              child: PrimaryButton(
-                label: l10n.s1Start,
-                onPressed: () {
-                  context.go(
-                    '${AppRoutes.countdown}?itemId=${Uri.encodeComponent(session.id)}',
-                  );
-                },
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                  ),
+                  child: PrimaryButton(
+                    label: l10n.s1Start,
+                    icon: Icons.play_arrow_rounded,
+                    shimmer: true,
+                    onPressed: () {
+                      context.go(
+                        '${AppRoutes.countdown}?itemId=${Uri.encodeComponent(session.id)}',
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ],
@@ -262,7 +330,54 @@ class _S1Body extends StatelessWidget {
     );
   }
 
-  String? _descriptionFor(SessionBlockDef block) {
+  String _kindTitle() => HomeCopy.itemTitle(l10n, item);
+
+  String _illustrationFor(SessionKind kind) {
+    return switch (kind) {
+      SessionKind.strengthening => 'assets/images/lying.svg',
+      SessionKind.body => 'assets/images/standing.svg',
+      SessionKind.breathing ||
+      SessionKind.relaxation =>
+        'assets/images/child.svg',
+    };
+  }
+
+  /// "i" explanation for a block: the exercise's own info when it maps to
+  /// one in content, nothing for rest blocks.
+  InfoContent? _blockInfo(SessionBlockDef block) {
+    final String? exerciseId = switch (block.titleKey) {
+      'slowHolds' => 'slow_hold',
+      'quickSqueezes' => 'quick_squeeze',
+      'breathing' => 'diaphragmatic_breathing',
+      'reverseKegel' => 'reverse_kegel',
+      'rest' => null,
+      _ => block.exerciseId ?? block.titleKey,
+    };
+    final ExerciseContent? ex =
+        exerciseId == null ? null : exercisesById[exerciseId];
+    return ex == null ? null : InfoCopy.exercise(l10n, ex);
+  }
+
+  String _blockTitle(SessionBlockDef block) {
+    switch (block.titleKey) {
+      case 'slowHolds':
+        return l10n.s1BlockSlowHolds;
+      case 'quickSqueezes':
+        return l10n.s1BlockQuickSqueezes;
+      case 'rest':
+        return l10n.s1BlockRest;
+      case 'breathing':
+        return l10n.s1BlockBreathing;
+      case 'reverseKegel':
+        return l10n.s1BlockReverseKegel;
+    }
+    // Stretch, strong hold and body moves: the exercise name from content.
+    final ExerciseContent? ex =
+        block.exerciseId == null ? null : exercisesById[block.exerciseId];
+    return ex?.name ?? exercisesById[block.titleKey]?.name ?? block.titleKey;
+  }
+
+  String _blockSubtitle(SessionBlockDef block) {
     if (block.titleKey == 'reverseKegel') {
       return l10n.s1ReverseKegelDescription;
     }
@@ -270,12 +385,23 @@ class _S1Body extends StatelessWidget {
       'slowHolds' => 'slow_hold',
       'quickSqueezes' => 'quick_squeeze',
       'breathing' => 'diaphragmatic_breathing',
-      _ => null,
+      _ => block.exerciseId,
     };
-    if (exerciseId == null) {
-      return null;
+    final String? description =
+        exerciseId == null ? null : exercisesById[exerciseId]?.description;
+    if (description != null && block.titleKey != 'rest') {
+      return description;
     }
-    return descriptions[exerciseId];
+    if (block.reps != null &&
+        block.squeezeSec != null &&
+        block.relaxSec != null) {
+      return l10n.s1BlockRepsDetail(
+        block.reps!,
+        block.squeezeSec!,
+        block.relaxSec!,
+      );
+    }
+    return l10n.s1BlockRestDetail(block.sec ?? block.durationSeconds);
   }
 
   String _positionCopy(AppLocalizations l10n, String position) {
@@ -295,14 +421,16 @@ class _S1Body extends StatelessWidget {
   }
 }
 
-class _DarkHeader extends StatelessWidget {
-  const _DarkHeader({
+class _HeroHeader extends StatelessWidget {
+  const _HeroHeader({
     required this.l10n,
     required this.track,
     required this.level,
     required this.day,
     required this.title,
     required this.meta,
+    required this.illustration,
+    required this.position,
     required this.onBack,
   });
 
@@ -312,6 +440,8 @@ class _DarkHeader extends StatelessWidget {
   final int day;
   final String title;
   final String meta;
+  final String illustration;
+  final String position;
   final VoidCallback onBack;
 
   @override
@@ -320,171 +450,468 @@ class _DarkHeader extends StatelessWidget {
         ? l10n.s1RelaxationDay(day)
         : l10n.s1LevelDay(level, day);
 
-    return ColoredBox(
-      color: AppColors.sessionBackground,
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.sm,
-            AppSpacing.xs,
-            AppSpacing.xl,
-            AppSpacing.lg,
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(
+        bottom: Radius.circular(AppRadii.xl),
+      ),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: <Color>[AppColors.sessionBackground, AppColors.sessionSurface],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  onPressed: onBack,
-                  icon: const Icon(Icons.arrow_back, color: AppColors.sessionText),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -60,
+              top: -40,
+              child: Container(
+                width: 220,
+                height: 220,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: <Color>[
+                      AppColors.accent.withValues(alpha: 0.3),
+                      AppColors.accent.withValues(alpha: 0),
+                    ],
+                  ),
                 ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Padding(
+            ),
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.xs,
+                  AppSpacing.xxs,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        tooltip: l10n.commonBack,
+                        onPressed: onBack,
+                        icon: const Icon(
+                          Icons.arrow_back_rounded,
+                          color: AppColors.sessionText,
+                        ),
+                      ),
+                    ),
+                    Padding(
                       padding: const EdgeInsets.only(left: AppSpacing.sm),
-                      child: Column(
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            eyebrow.toUpperCase(),
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.accent,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.4,
+                          Expanded(
+                            child: Reveal(
+                              from: RevealFrom.left,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    eyebrow.toUpperCase(),
+                                    style: AppTypography.caption.copyWith(
+                                      color: AppColors.accent,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.6,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    title,
+                                    style: AppTypography.display.copyWith(
+                                      color: AppColors.sessionText,
+                                      fontSize: 26,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xxs),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.schedule_rounded,
+                                        size: 16,
+                                        color: AppColors.sessionTextSecondary,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          meta,
+                                          style: AppTypography.body.copyWith(
+                                            color: AppColors.sessionTextSecondary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            title,
-                            style: AppTypography.display.copyWith(
-                              color: AppColors.sessionText,
-                              fontSize: 26,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            meta,
-                            style: AppTypography.body.copyWith(
-                              color: AppColors.sessionTextSecondary,
+                          Reveal(
+                            from: RevealFrom.drop,
+                            delay: const Duration(milliseconds: 120),
+                            child: FloatBob(
+                              lift: 5,
+                              child: Illustration(
+                                assetPath: illustration,
+                                semanticLabel: l10n.s1LyingSemantic,
+                                width: 104,
+                                height: 80,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  Illustration(
-                    assetPath: 'assets/images/lying.svg',
-                    semanticLabel: l10n.s1LyingSemantic,
-                    width: 96,
-                    height: 72,
-                  ),
-                ],
+                    const SizedBox(height: AppSpacing.md),
+                    Padding(
+                      padding: const EdgeInsets.only(left: AppSpacing.sm),
+                      child: Reveal(
+                        from: RevealFrom.rise,
+                        delay: const Duration(milliseconds: 160),
+                        child: Container(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          decoration: BoxDecoration(
+                            color: AppColors.sessionText.withValues(alpha: 0.06),
+                            borderRadius: AppRadii.lgAll,
+                            border: Border.all(
+                              color: AppColors.sessionText.withValues(alpha: 0.08),
+                            ),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.airline_seat_flat_rounded,
+                                size: 20,
+                                color: AppColors.accent,
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Expanded(
+                                child: Text(
+                                  position,
+                                  style: AppTypography.caption.copyWith(
+                                    color: AppColors.sessionText,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _BlockRow extends StatelessWidget {
-  const _BlockRow({
-    required this.l10n,
+/// Visual style for one block type.
+({IconData icon, Color bg, Color fg}) _blockStyle(SessionBlockDef block) {
+  return switch (block.type) {
+    'hold' when block.titleKey == 'strong_hold' ||
+            block.exerciseId == 'strong_hold' => (
+        icon: Icons.fitness_center_rounded,
+        bg: AppColors.goalEjaculationBg,
+        fg: AppColors.goalEjaculationFg,
+      ),
+    'hold' => (
+        icon: Icons.hourglass_bottom_rounded,
+        bg: AppColors.mint,
+        fg: AppColors.primary,
+      ),
+    'quick' => (
+        icon: Icons.bolt_rounded,
+        bg: AppColors.goalBladderBg,
+        fg: AppColors.goalBladderFg,
+      ),
+    'rest' => (
+        icon: Icons.pause_rounded,
+        bg: AppColors.surfaceMuted,
+        fg: AppColors.textSecondary,
+      ),
+    'breathing' => (
+        icon: Icons.air_rounded,
+        bg: AppColors.goalSurgeryBg,
+        fg: AppColors.goalSurgeryFg,
+      ),
+    'reverse_kegel' => (
+        icon: Icons.south_rounded,
+        bg: AppColors.goalSurgeryBg,
+        fg: AppColors.goalSurgeryFg,
+      ),
+    'stretch' => (
+        icon: Icons.self_improvement_rounded,
+        bg: AppColors.goalGeneralBg,
+        fg: AppColors.goalGeneralFg,
+      ),
+    _ => (
+        icon: Icons.accessibility_new_rounded,
+        bg: AppColors.goalBladderBg,
+        fg: AppColors.goalBladderFg,
+      ),
+  };
+}
+
+/// One numbered step in the session, joined to the next by a line.
+class _BlockStep extends StatelessWidget {
+  const _BlockStep({
+    required this.index,
+    required this.isLast,
     required this.block,
-    this.description,
+    required this.title,
+    required this.subtitle,
+    this.info,
   });
 
-  final AppLocalizations l10n;
+  final int index;
+  final bool isLast;
   final SessionBlockDef block;
-  final String? description;
+  final String title;
+  final String subtitle;
+  final InfoContent? info;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+    final ({IconData icon, Color bg, Color fg}) style = _blockStyle(block);
+    final bool hasReps = block.reps != null && block.reps! > 1;
+    return IntrinsicHeight(
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceMuted,
-              borderRadius: AppRadii.mdAll,
-            ),
-            alignment: Alignment.center,
-            child: Illustration(
-              assetPath: block.thumbnailAsset ?? 'assets/images/stopwatch.svg',
-              semanticLabel: _title(),
-              width: 28,
-              height: 28,
+          SizedBox(
+            width: 28,
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.md),
+                Container(
+                  width: 24,
+                  height: 24,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    color: AppColors.ink,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '${index + 1}',
+                    style: AppTypography.caption.copyWith(
+                      color: AppColors.textOnPrimary,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+                if (!isLast)
+                  Expanded(
+                    child: Container(
+                      width: 2,
+                      margin: const EdgeInsets.symmetric(vertical: 2),
+                      color: AppColors.border,
+                    ),
+                  ),
+              ],
             ),
           ),
-          const SizedBox(width: AppSpacing.md),
+          const SizedBox(width: AppSpacing.xs),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _title(),
-                  style: AppTypography.body.copyWith(fontWeight: FontWeight.w700),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: block.isRest ? AppColors.surfaceMuted : AppColors.surface,
+                  borderRadius: AppRadii.lgAll,
+                  border: Border.all(color: AppColors.border),
                 ),
-                Text(
-                  description ?? _detail(),
-                  style: AppTypography.caption,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: style.bg,
+                        borderRadius: AppRadii.mdAll,
+                      ),
+                      child: Icon(style.icon, color: style.fg, size: 22),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: AppTypography.body
+                                .copyWith(fontWeight: FontWeight.w800),
+                          ),
+                          Text(subtitle, style: AppTypography.caption),
+                        ],
+                      ),
+                    ),
+                    if (info != null) InfoButton(content: info!, size: 24),
+                    if (hasReps) ...[
+                      const SizedBox(width: AppSpacing.xs),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: style.bg,
+                          borderRadius: AppRadii.pillAll,
+                        ),
+                        child: Text(
+                          '×${block.reps}',
+                          style: AppTypography.caption.copyWith(
+                            color: style.fg,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
+}
 
-  String _title() {
-    switch (block.titleKey) {
-      case 'slowHolds':
-        return l10n.s1BlockSlowHolds;
-      case 'quickSqueezes':
-        return l10n.s1BlockQuickSqueezes;
-      case 'rest':
-        return l10n.s1BlockRest;
-      case 'breathing':
-        return l10n.s1BlockBreathing;
-      case 'reverseKegel':
-        return l10n.s1BlockReverseKegel;
-      default:
-        return block.titleKey;
-    }
+class _RemindersCard extends StatelessWidget {
+  const _RemindersCard({required this.l10n});
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> tips = <String>[
+      l10n.s3CueBreathing,
+      l10n.s3CueRelaxed,
+      l10n.s3CueGentle,
+    ];
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: const BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: AppRadii.lgAll,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.tips_and_updates_outlined,
+                color: AppColors.primary,
+                size: 20,
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                l10n.s1RemindersTitle,
+                style: AppTypography.body.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          for (final String tip in tips)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xxs),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: Icon(
+                      Icons.check_rounded,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(child: Text(tip, style: AppTypography.body)),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
   }
+}
 
-  String _detail() {
-    if (block.reps != null &&
-        block.squeezeSec != null &&
-        block.relaxSec != null) {
-      return l10n.s1BlockRepsDetail(
-        block.reps!,
-        block.squeezeSec!,
-        block.relaxSec!,
-      );
-    }
-    return l10n.s1BlockRestDetail(block.sec ?? block.durationSeconds);
+class _CuesCard extends StatelessWidget {
+  const _CuesCard({
+    required this.l10n,
+    required this.vibrationOn,
+    required this.voiceOn,
+    required this.onToggleVibration,
+    required this.onToggleVoice,
+  });
+
+  final AppLocalizations l10n;
+  final bool vibrationOn;
+  final bool voiceOn;
+  final ValueChanged<bool> onToggleVibration;
+  final ValueChanged<bool> onToggleVoice;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadii.lgAll,
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          _ToggleRow(
+            icon: Icons.vibration_rounded,
+            title: l10n.s1VibrationCues,
+            value: vibrationOn,
+            onChanged: onToggleVibration,
+          ),
+          const Divider(height: 1, color: AppColors.border, indent: 64),
+          _ToggleRow(
+            icon: Icons.record_voice_over_outlined,
+            title: l10n.s1VoiceCues,
+            subtitle: l10n.s1VoicePrivacy,
+            value: voiceOn,
+            onChanged: onToggleVoice,
+          ),
+        ],
+      ),
+    );
   }
 }
 
 class _ToggleRow extends StatelessWidget {
   const _ToggleRow({
+    required this.icon,
     required this.title,
     required this.value,
     required this.onChanged,
     this.subtitle,
   });
 
+  final IconData icon;
   final String title;
   final String? subtitle;
   final bool value;
@@ -493,9 +920,27 @@ class _ToggleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       child: Row(
         children: [
+          AnimatedContainer(
+            duration: AppMotion.quick,
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: value ? AppColors.mint : AppColors.surfaceMuted,
+              borderRadius: AppRadii.mdAll,
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: value ? AppColors.primary : AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

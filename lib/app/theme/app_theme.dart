@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'system_ui.dart';
 import 'tokens.dart';
 
-/// Builds the light app [ThemeData] and the dark [SessionTheme] for S2–S4.
+/// Builds the light app [ThemeData] and the light lavender session theme.
 abstract final class AppTheme {
   /// Light theme for onboarding, tabs, Learn, Settings and paywall.
   static ThemeData light() {
@@ -69,19 +69,20 @@ abstract final class AppTheme {
     );
   }
 
-  /// Dark theme used only inside session screens (countdown / player / done).
+  /// Light lavender theme used inside session screens (countdown / player /
+  /// done).
   static ThemeData session() {
-    const ColorScheme scheme = ColorScheme.dark(
-      primary: AppColors.accent,
-      onPrimary: AppColors.ink,
+    const ColorScheme scheme = ColorScheme.light(
+      primary: AppColors.primary,
+      onPrimary: AppColors.textOnPrimary,
       secondary: AppColors.success,
-      onSecondary: AppColors.sessionText,
+      onSecondary: AppColors.textOnPrimary,
       surface: AppColors.sessionSurface,
       onSurface: AppColors.sessionText,
       onSurfaceVariant: AppColors.sessionTextSecondary,
       outline: AppColors.sessionRingTrack,
       error: AppColors.goalGeneralFg,
-      onError: AppColors.sessionText,
+      onError: AppColors.textOnPrimary,
     );
 
     final TextTheme textTheme = TextTheme(
@@ -89,7 +90,7 @@ abstract final class AppTheme {
       titleLarge: AppTypography.title.copyWith(color: AppColors.sessionText),
       bodyLarge: AppTypography.body.copyWith(color: AppColors.sessionText),
       bodyMedium: AppTypography.body.copyWith(color: AppColors.sessionText),
-      labelLarge: AppTypography.button.copyWith(color: AppColors.ink),
+      labelLarge: AppTypography.button,
       bodySmall: AppTypography.caption.copyWith(
         color: AppColors.sessionTextSecondary,
       ),
@@ -100,7 +101,7 @@ abstract final class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       colorScheme: scheme,
       scaffoldBackgroundColor: AppColors.sessionBackground,
       fontFamily: AppTypography.fontFamily,

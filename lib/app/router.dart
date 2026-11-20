@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../core/data/providers.dart';
 import '../core/domain/user_profile.dart';
+import '../features/holdtest/hold_test_screen.dart';
 import '../features/dev/data_debug_screen.dart';
 import '../features/dev/widget_gallery_screen.dart';
 import '../features/onboarding/o1_welcome_screen.dart';
@@ -15,6 +16,7 @@ import '../features/onboarding/o5_time_screen.dart';
 import '../features/onboarding/o6_plan_screen.dart';
 import '../features/help/h3_pain_help_screen.dart';
 import '../features/home/h1_today_screen.dart';
+import '../features/home/h2_level_day_screen.dart';
 import '../features/home/h2_levels_screen.dart';
 import '../features/learn/l1_learn_screen.dart';
 import '../features/learn/l2_article_screen.dart';
@@ -40,6 +42,7 @@ abstract final class AppRoutes {
   static const String time = '/onboarding/time';
   static const String plan = '/onboarding/plan';
   static const String tutorial = '/tutorial';
+  static const String holdTest = '/hold-test';
   static const String before = '/session/before';
   static const String countdown = '/session/countdown';
   static const String player = '/session/player';
@@ -47,6 +50,7 @@ abstract final class AppRoutes {
   static const String paywall = '/paywall';
   static const String today = '/today';
   static const String levels = '/levels';
+  static const String levelDay = '/levels/day';
   static const String painHelp = '/pain-help';
   static const String progress = '/progress';
   static const String checkin = '/check-in';
@@ -140,6 +144,12 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
         },
       ),
       GoRoute(
+        path: AppRoutes.holdTest,
+        builder: (BuildContext context, GoRouterState state) {
+          return const HoldTestScreen();
+        },
+      ),
+      GoRoute(
         path: AppRoutes.before,
         builder: (BuildContext context, GoRouterState state) {
           return S1BeforeScreen(
@@ -189,6 +199,15 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
         path: AppRoutes.levels,
         builder: (BuildContext context, GoRouterState state) {
           return const H2LevelsScreen();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.levelDay,
+        builder: (BuildContext context, GoRouterState state) {
+          return H2LevelDayScreen(
+            level: int.tryParse(state.uri.queryParameters['level'] ?? '') ?? 1,
+            day: int.tryParse(state.uri.queryParameters['day'] ?? '') ?? 1,
+          );
         },
       ),
       GoRoute(

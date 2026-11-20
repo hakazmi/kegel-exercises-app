@@ -139,6 +139,61 @@ void main() {
         isFalse,
       );
     });
+
+    test('partial day does not count toward unlock when 2 sessions/day', () {
+      final DateTime today = DateTime(2026, 11, 12);
+      // One strengthening session per calendar day — incomplete for 2/day.
+      final List<SessionRecord> partial = _sevenDaySpanEnding(today);
+      expect(
+        PlanRules.canUnlockNextLevel(
+          level: 1,
+          sessions: partial,
+          today: today,
+          sessionsPerDay: 2,
+        ),
+        isFalse,
+      );
+      expect(
+        PlanRules.completedTrainingDaysAtLevel(
+          level: 1,
+          sessions: partial,
+          sessionsPerDay: 2,
+        ),
+        0,
+      );
+
+      final List<SessionRecord> full = <SessionRecord>[
+        for (int i = 6; i >= 0; i--) ...<SessionRecord>[
+          _session(
+            at: today.subtract(Duration(days: i)).add(const Duration(hours: 8)),
+            level: 1,
+          ),
+          _session(
+            at: today
+                .subtract(Duration(days: i))
+                .add(const Duration(hours: 18)),
+            level: 1,
+          ),
+        ],
+      ];
+      expect(
+        PlanRules.canUnlockNextLevel(
+          level: 1,
+          sessions: full,
+          today: today,
+          sessionsPerDay: 2,
+        ),
+        isTrue,
+      );
+      expect(
+        LevelProgression.shouldShowUnlockCard(
+          profile: _profile().copyWith(sessionsPerDay: 2),
+          sessions: full,
+          today: today,
+        ),
+        isTrue,
+      );
+    });
   });
 
   group('LevelProgression start / stay', () {

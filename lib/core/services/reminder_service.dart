@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,8 +49,21 @@ class LocalReminderService implements ReminderService {
   final SharedPreferences _prefs;
   final Future<ReminderPlanInput> Function() _loadInput;
 
+  /// Runs a notification step without letting a platform failure (plugin
+  /// missing, permission revoked, OEM quirks) break the screen that asked
+  /// for it. Reminders are best-effort; saving and navigation must go on.
+  Future<void> _safe(Future<void> Function() step) async {
+    try {
+      await step();
+    } on Object catch (error) {
+      debugPrint('Reminder step skipped: $error');
+    }
+  }
+
   @override
-  Future<void> initialize() async {
+  Future<void> initialize() => _safe(_initialize);
+
+  Future<void> _initialize() async {
     await _gateway.initialize();
     final String zone = await _gateway.currentTimeZoneId();
     await _gateway.setLocalTimeZone(zone);
@@ -57,13 +71,20 @@ class LocalReminderService implements ReminderService {
     if (previous != zone) {
       await _prefs.setString(_tzPrefKey, zone);
       if (previous != null) {
-        await reschedule();
+        await _reschedule();
       }
     }
   }
 
   @override
-  Future<bool> requestPermission() => _gateway.requestPermission();
+  Future<bool> requestPermission() async {
+    try {
+      return await _gateway.requestPermission();
+    } on Object catch (error) {
+      debugPrint('Reminder permission skipped: $error');
+      return false;
+    }
+  }
 
   @override
   Future<void> enableReminder({
@@ -75,12 +96,12 @@ class LocalReminderService implements ReminderService {
   }
 
   @override
-  Future<void> disableReminder() async {
-    await _gateway.cancelAll();
-  }
+  Future<void> disableReminder() => _safe(_gateway.cancelAll);
 
   @override
-  Future<void> reschedule() async {
+  Future<void> reschedule() => _safe(_reschedule);
+
+  Future<void> _reschedule() async {
     await _gateway.initialize();
     final String zone = await _gateway.currentTimeZoneId();
     await _gateway.setLocalTimeZone(zone);
@@ -97,6 +118,7 @@ class LocalReminderService implements ReminderService {
       sessions: base.sessions,
       today: base.now,
       track: base.profile.track,
+      sessionsPerDay: base.profile.sessionsPerDay,
     );
     final int? lastNotified = _prefs.getInt(_levelNoticeKey);
     final bool notifyLevelUnlock =

@@ -23,7 +23,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      find.text('Train your pelvic floor in a few minutes a day'),
+      find.text(
+        'Train your pelvic floor in a few minutes a day',
+        findRichText: true,
+      ),
       findsOneWidget,
     );
     expect(find.text('Get started'), findsOneWidget);

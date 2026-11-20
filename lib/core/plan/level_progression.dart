@@ -26,6 +26,7 @@ abstract final class LevelProgression {
       sessions: sessions,
       today: today,
       track: profile.track,
+      sessionsPerDay: profile.sessionsPerDay,
       daySpan: daySpan,
     );
   }
