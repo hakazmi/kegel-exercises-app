@@ -23,8 +23,12 @@ class LevelUnlockCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color titleColor = dark ? AppColors.sessionText : AppColors.textPrimary;
-    final Color muted = dark ? AppColors.sessionTextSecondary : AppColors.textSecondary;
+    final Color titleColor = dark
+        ? AppColors.sessionText
+        : AppColors.textPrimary;
+    final Color muted = dark
+        ? AppColors.sessionTextSecondary
+        : AppColors.textSecondary;
     return AppCard(
       backgroundColor: dark ? AppColors.sessionSurface : AppColors.mint,
       borderColor: dark ? AppColors.sessionSurface : AppColors.primary,

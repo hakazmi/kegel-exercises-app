@@ -115,7 +115,8 @@ class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final Curve curve = _isDrop ? AppMotion.dropCurve : AppMotion.slideCurve;
-    final double distance = widget.distance ??
+    final double distance =
+        widget.distance ??
         (_isDrop ? AppMotion.dropDistance : AppMotion.slideDistance);
     return AnimatedBuilder(
       animation: _controller,
@@ -177,11 +178,8 @@ class CountUpText extends StatelessWidget {
           delay: delay,
           end: value.toDouble(),
           duration: AppMotion.countUp,
-          builder: (BuildContext context, double v) => Text(
-            format(v.round()),
-            style: style,
-            textAlign: textAlign,
-          ),
+          builder: (BuildContext context, double v) =>
+              Text(format(v.round()), style: style, textAlign: textAlign),
         ),
       ),
     );
@@ -423,8 +421,7 @@ class _FloatBobState extends _LoopState<FloatBob> {
       animation: c,
       child: widget.child,
       builder: (BuildContext context, Widget? child) {
-        final double y =
-            -widget.lift * Curves.easeInOut.transform(c.value);
+        final double y = -widget.lift * Curves.easeInOut.transform(c.value);
         return Transform.translate(offset: Offset(0, y), child: child);
       },
     );
@@ -463,8 +460,11 @@ class _NudgeArrowState extends _LoopState<NudgeArrow> {
 
   @override
   Widget build(BuildContext context) {
-    final Widget icon =
-        Icon(widget.icon, size: widget.size, color: widget.color);
+    final Widget icon = Icon(
+      widget.icon,
+      size: widget.size,
+      color: widget.color,
+    );
     final AnimationController? c = controller;
     if (c == null) {
       return icon;
@@ -691,10 +691,16 @@ class _AnimatedCheckBadgeState extends State<AnimatedCheckBadge>
       animation: _controller,
       builder: (BuildContext context, Widget? _) {
         final double t = _controller.value;
-        final double pop = const Interval(0, 0.55, curve: AppMotion.dropCurve)
-            .transform(t);
-        final double draw =
-            const Interval(0.35, 1, curve: Curves.easeOutCubic).transform(t);
+        final double pop = const Interval(
+          0,
+          0.55,
+          curve: AppMotion.dropCurve,
+        ).transform(t);
+        final double draw = const Interval(
+          0.35,
+          1,
+          curve: Curves.easeOutCubic,
+        ).transform(t);
         return Transform.scale(
           scale: pop,
           child: SizedBox(

@@ -24,13 +24,21 @@ class PlanService {
     required List<SessionRecord> sessions,
     TrackContent? trackContent,
     LevelContent? levelContent,
-    Map<String, ExerciseContent> exercisesById = const <String, ExerciseContent>{},
+    Map<String, ExerciseContent> exercisesById =
+        const <String, ExerciseContent>{},
     Set<String> habitsDoneToday = const <String>{},
     bool isPremium = false,
     int strengtheningDurationSeconds = 55,
   }) {
     final DateTime today = dateOnly(now);
-    final int day = PlanRules.dayInLevel(profile: profile, sessions: sessions);
+    final List<SessionRecord> planSessions = PlanRules.sessionsForActivePlan(
+      profile: profile,
+      sessions: sessions,
+    );
+    final int day = PlanRules.dayInLevel(
+      profile: profile,
+      sessions: planSessions,
+    );
     final TrackId track = profile.track;
     final String trackKey = track.contentId;
     final int breathingSec = levelContent?.dailyBreathingSec ?? 120;
@@ -50,15 +58,19 @@ class PlanService {
     final bool rest = PlanRules.isRestDay(
       date: today,
       restWeekday: profile.restWeekday,
-      sessions: sessions,
+      sessions: planSessions,
     );
 
     final List<TodayItem> items = <TodayItem>[];
 
     if (!relaxationOnly && !rest) {
-      final int planned =
-          PlanRules.plannedStrengtheningSlots(profile.sessionsPerDay);
-      final int doneCount = PlanRules.strengtheningCountOnDay(sessions, today);
+      final int planned = PlanRules.plannedStrengtheningSlots(
+        profile.sessionsPerDay,
+      );
+      final int doneCount = PlanRules.strengtheningCountOnDay(
+        planSessions,
+        today,
+      );
       for (int i = 1; i <= planned; i++) {
         final bool optional = planned == 3 && i == 3;
         items.add(
@@ -78,7 +90,7 @@ class PlanService {
       final List<String> bodyIds =
           levelContent?.bodyExercisesForTrack(trackKey) ?? const <String>[];
       if (bodyIds.isNotEmpty && profile.level >= 2) {
-        final bool bodyDone = sessions.any(
+        final bool bodyDone = planSessions.any(
           (SessionRecord s) =>
               s.completed &&
               s.kind == SessionKind.body &&
@@ -105,9 +117,9 @@ class PlanService {
     // Relax and breathe card.
     final List<String> breatheIds = rest
         ? (trackContent?.restDayBreatheCard ??
-            const <String>['diaphragmatic_breathing'])
+              const <String>['diaphragmatic_breathing'])
         : (trackContent?.breatheCard ??
-            const <String>['diaphragmatic_breathing']);
+              const <String>['diaphragmatic_breathing']);
     if (relaxationOnly) {
       // Legacy single reverse-kegel item when no content loaded (tests).
       if (trackContent == null) {
@@ -117,7 +129,7 @@ class PlanService {
             kind: SessionKind.relaxation,
             label: '',
             durationSeconds: 120,
-            done: sessions.any(
+            done: planSessions.any(
               (SessionRecord s) =>
                   s.completed &&
                   s.kind == SessionKind.relaxation &&
@@ -131,7 +143,7 @@ class PlanService {
             kind: SessionKind.breathing,
             label: '',
             durationSeconds: PlanRules.breathingDurationSeconds,
-            done: sessions.any(
+            done: planSessions.any(
               (SessionRecord s) =>
                   s.completed &&
                   s.kind == SessionKind.breathing &&
@@ -150,7 +162,7 @@ class PlanService {
               exercisesById,
               breathingSec,
             ),
-            done: _breatheDoneToday(sessions, today),
+            done: _breatheDoneToday(planSessions, today),
             exerciseIds: breatheIds,
           ),
         );
@@ -163,7 +175,7 @@ class PlanService {
             kind: SessionKind.breathing,
             label: '',
             durationSeconds: PlanRules.breathingDurationSeconds,
-            done: sessions.any(
+            done: planSessions.any(
               (SessionRecord s) =>
                   s.completed &&
                   s.kind == SessionKind.breathing &&
@@ -182,7 +194,7 @@ class PlanService {
               exercisesById,
               breathingSec,
             ),
-            done: _breatheDoneToday(sessions, today),
+            done: _breatheDoneToday(planSessions, today),
             exerciseIds: breatheIds,
           ),
         );
@@ -204,7 +216,7 @@ class PlanService {
 
     final TodayPlanState state = _resolveState(
       profile: profile,
-      sessions: sessions,
+      sessions: planSessions,
       today: today,
       rest: rest,
       relaxationOnly: relaxationOnly,

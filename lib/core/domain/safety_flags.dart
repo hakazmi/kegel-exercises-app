@@ -37,11 +37,11 @@ class SafetyFlags {
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'pain': pain,
-        'painSexual': painSexual,
-        'recentSurgery': recentSurgery,
-        'catheter': catheter,
-      };
+    'pain': pain,
+    'painSexual': painSexual,
+    'recentSurgery': recentSurgery,
+    'catheter': catheter,
+  };
 
   factory SafetyFlags.fromJson(Map<String, dynamic> json) {
     return SafetyFlags(

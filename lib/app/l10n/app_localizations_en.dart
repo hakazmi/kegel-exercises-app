@@ -389,7 +389,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please see a doctor or pelvic floor physiotherapist if pain continues.';
 
   @override
-  String get o6Start => 'Start my first session';
+  String get o6Start => 'Start my plan';
 
   @override
   String get o6BridgeSemantic => 'Bridge exercise illustration';
@@ -1443,6 +1443,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String get l2NotFound => 'Article not found.';
 
   @override
+  String h1Motivation(String key) {
+    String _temp0 = intl.Intl.selectLogic(key, {
+      'l1a': 'Every session counts. Squeeze gently, then fully relax.',
+      'l1b': 'Find the muscles, then let them fully let go.',
+      'l1c': 'Small, steady reps build a habit you can keep.',
+      'l1d': 'Keep breathing. Soften buttocks, thighs and stomach.',
+      'l2a': 'A little longer each hold. Quality over quantity.',
+      'l2b': 'Steady holds, easy breathing, full release.',
+      'l2c': 'You are building a routine. Keep showing up.',
+      'l2d': 'Rest fully between reps. The release matters too.',
+      'l3a': 'Consistency matters more than intensity.',
+      'l3b': 'Bring the squeeze into everyday moments.',
+      'l3c': 'Control the lift, then control the release.',
+      'l3d': 'Short sessions, done often, add up.',
+      'l4a': 'Longer holds now. Rest if it feels like strain.',
+      'l4b': 'Strong squeeze, slow release, steady breath.',
+      'l4c': 'Every rep is practice in control.',
+      'l4d': 'Stay tall, stay relaxed, keep breathing.',
+      'l5a': 'A few minutes a day keeps the habit going.',
+      'l5b': 'Keep the routine that got you here.',
+      'l5c': 'Steady practice, week after week.',
+      'l5d': 'Pair your session with something you already do each day.',
+      'ra': 'Today is about letting go, not squeezing.',
+      'rb': 'Slow breaths. Let the pelvic floor soften.',
+      'rc': 'Relaxation is training too.',
+      'other': 'Go gently. Stop if anything hurts.',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get l1VideoBadge => 'Video';
+
+  @override
+  String get l1GuideBadge => 'Guide';
+
+  @override
+  String l1Clips(int count) {
+    return '$count clips';
+  }
+
+  @override
+  String l1Images(int count) {
+    return '$count images';
+  }
+
+  @override
+  String get l2WatchHeading => 'Watch and follow';
+
+  @override
+  String get l2LookHeading => 'See how it looks';
+
+  @override
+  String get l2OpenExercise => 'How to do it';
+
+  @override
   String get x1Title => 'Settings';
 
   @override
@@ -1978,6 +2034,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashTagline => 'Pelvic floor trainer';
 
   @override
+  String splashMotivation(String key) {
+    String _temp0 = intl.Intl.selectLogic(key, {
+      'd0': 'Breathe in, let go. A few calm minutes a day.',
+      'd1': 'Steady practice, one breath at a time.',
+      'd2': 'Relax first, then squeeze gently.',
+      'other': 'Small daily steps for your pelvic health.',
+    });
+    return '$_temp0';
+  }
+
+  @override
+  String get splashImageLabel =>
+      'Calm breathing, with the pelvic floor highlighted';
+
+  @override
   String h2DayLabel(int day) {
     return 'Day $day';
   }
@@ -2369,4 +2440,184 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get h2MotivationLast => 'Last day of this level. Finish strong.';
+
+  @override
+  String get hgHowTitle => 'How to do it';
+
+  @override
+  String get hgWhenTitle => 'When';
+
+  @override
+  String get hgWhyTitle => 'Why it helps';
+
+  @override
+  String get hgMarkDone => 'Mark as done today';
+
+  @override
+  String get hgDoneToday => 'Done today';
+
+  @override
+  String get hgUndo => 'Not done yet';
+
+  @override
+  String get hgOpen => 'How to do it';
+
+  @override
+  String get hgAdIntro =>
+      'A quick squeeze after you urinate, before you get dressed.';
+
+  @override
+  String get hgAdStep1 => 'Finish urinating and wait a moment.';
+
+  @override
+  String get hgAdStep2 =>
+      'Squeeze your pelvic floor firmly, as if lifting the base of the penis.';
+
+  @override
+  String get hgAdStep3 => 'Hold for 2 to 3 seconds, then let go fully.';
+
+  @override
+  String get hgAdStep4 => 'Shake gently, then get dressed.';
+
+  @override
+  String get hgAdWhen1 => 'Every time you urinate';
+
+  @override
+  String get hgAdWhen2 => 'Before you leave the toilet';
+
+  @override
+  String get hgAdWhy =>
+      'After urinating, a little urine can stay in the tube inside the penis. A firm squeeze helps move it out before you get dressed.';
+
+  @override
+  String get hgAdCaution =>
+      'Do it after you finish, not while urine is flowing. Stopping the stream mid-flow is not an exercise.';
+
+  @override
+  String get hgUcIntro =>
+      'What to do when a sudden, strong urge to urinate comes.';
+
+  @override
+  String get hgUcStep1 =>
+      'Stop and stay still. Sit or stand; don\'t rush to the toilet.';
+
+  @override
+  String get hgUcStep2 => 'Breathe slowly and soften your belly.';
+
+  @override
+  String get hgUcStep3 => 'Do 3 to 5 quick, gentle squeezes, or one easy hold.';
+
+  @override
+  String get hgUcStep4 =>
+      'Wait until the urge settles, then walk calmly to the toilet.';
+
+  @override
+  String get hgUcWhen1 => 'A sudden strong urge';
+
+  @override
+  String get hgUcWhen2 => 'Arriving home';
+
+  @override
+  String get hgUcWhen3 => 'Hearing running water';
+
+  @override
+  String get hgUcWhy =>
+      'Rushing while the urge is strong makes it harder to hold on. Staying still and squeezing gently gives the urge time to settle, so you stay in control on the way.';
+
+  @override
+  String get hgUcCaution =>
+      'Keep the squeezes gentle. Repeated hard squeezes are not needed.';
+
+  @override
+  String get hgUrgeLabel => 'Urge';
+
+  @override
+  String get hgCalmLabel => 'Calm';
+
+  @override
+  String get s1ContentTitle => 'What you\'ll do';
+
+  @override
+  String s1ContentRounds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rounds',
+      one: '1 round',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String s1ContentTiming(int squeeze, int relax) {
+    return '$squeeze s squeeze · $relax s relax';
+  }
+
+  @override
+  String h1MaintenanceDay(int week, int day, int total) {
+    return 'Week $week · Day $day of $total';
+  }
+
+  @override
+  String get h1ProgramComplete => 'Core program complete';
+
+  @override
+  String get exdHowTo => 'How to do it';
+
+  @override
+  String get exdWhy => 'Why it helps';
+
+  @override
+  String get exdInsideTitle => 'What happens inside';
+
+  @override
+  String get exdInsideHint =>
+      'The pelvic floor lifts on the squeeze, stays up while you hold, and lets go on the relax.';
+
+  @override
+  String get exdBodyTag => 'Your body';
+
+  @override
+  String get exdInsideTag => 'Inside';
+
+  @override
+  String get exdAnyPosition => 'Any position';
+
+  @override
+  String get exdGotIt => 'Got it';
+
+  @override
+  String exdOpen(String name) {
+    return 'Open $name';
+  }
+
+  @override
+  String get s3DoneExercise => 'Done, next exercise';
+
+  @override
+  String get s3DoneLast => 'Done, finish session';
+
+  @override
+  String exdReps(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reps',
+      one: '1 time',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String exdHoldSec(int seconds) {
+    return '$seconds s hold';
+  }
+
+  @override
+  String exdMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get o6GoHome => 'Go to home';
 }

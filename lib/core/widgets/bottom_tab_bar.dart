@@ -52,11 +52,7 @@ class BottomTabBar extends StatelessWidget {
       MediaQuery.viewPaddingOf(context).bottom,
       MediaQuery.paddingOf(context).bottom,
     );
-    final List<String> labels = <String>[
-      todayLabel,
-      progressLabel,
-      learnLabel,
-    ];
+    final List<String> labels = <String>[todayLabel, progressLabel, learnLabel];
     final int index = AppTab.values.indexOf(current);
 
     return Padding(

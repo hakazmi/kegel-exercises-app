@@ -38,11 +38,15 @@ class ProgressStats {
     );
     final DateTime weekEnd = weekStart.add(const Duration(days: 6));
 
+    final List<SessionRecord> planSessions = PlanRules.sessionsForActivePlan(
+      profile: profile,
+      sessions: sessions,
+    );
     int sessionsThisWeek = 0;
     int longestHold = 0;
     final Set<DateTime> completed = <DateTime>{};
 
-    for (final SessionRecord session in sessions) {
+    for (final SessionRecord session in planSessions) {
       if (!session.completed) {
         continue;
       }
@@ -58,14 +62,17 @@ class ProgressStats {
 
     return ProgressStats(
       streakDays: PlanRules.streak(
-        sessions,
+        planSessions,
         todayDate,
         restWeekday: profile.restWeekday,
       ),
       sessionsThisWeek: sessionsThisWeek,
       longestHoldSeconds: longestHold,
       level: profile.level,
-      dayInLevel: PlanRules.dayInLevel(profile: profile, sessions: sessions),
+      dayInLevel: PlanRules.dayInLevel(
+        profile: profile,
+        sessions: planSessions,
+      ),
       track: profile.track,
       completedDays: completed,
     );

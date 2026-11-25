@@ -40,8 +40,7 @@ abstract final class InfoCopy {
       'reverse_kegel' => l10n.infoWhyReverseKegel,
       'childs_pose' ||
       'happy_baby' ||
-      'supported_back_release' =>
-        l10n.infoWhyStretch,
+      'supported_back_release' => l10n.infoWhyStretch,
       'after_dribble_squeeze' => l10n.infoWhyAfterDribble,
       'urge_control_squeeze' => l10n.infoWhyUrgeControl,
       'brisk_walking' => l10n.infoWhyWalking,
@@ -71,30 +70,30 @@ abstract final class InfoCopy {
   static ({IconData icon, Color bg, Color fg}) _styleForType(String type) {
     return switch (type) {
       'function' => (
-          icon: Icons.accessibility_new_rounded,
-          bg: AppColors.goalBladderBg,
-          fg: AppColors.goalBladderFg,
-        ),
+        icon: Icons.accessibility_new_rounded,
+        bg: AppColors.goalBladderBg,
+        fg: AppColors.goalBladderFg,
+      ),
       'relaxation' => (
-          icon: Icons.spa_outlined,
-          bg: AppColors.goalSurgeryBg,
-          fg: AppColors.goalSurgeryFg,
-        ),
+        icon: Icons.spa_outlined,
+        bg: AppColors.goalSurgeryBg,
+        fg: AppColors.goalSurgeryFg,
+      ),
       'habit' => (
-          icon: Icons.repeat_rounded,
-          bg: AppColors.mint,
-          fg: AppColors.primary,
-        ),
+        icon: Icons.repeat_rounded,
+        bg: AppColors.mint,
+        fg: AppColors.primary,
+      ),
       'activity' => (
-          icon: Icons.directions_walk_rounded,
-          bg: AppColors.goalBladderBg,
-          fg: AppColors.goalBladderFg,
-        ),
+        icon: Icons.directions_walk_rounded,
+        bg: AppColors.goalBladderBg,
+        fg: AppColors.goalBladderFg,
+      ),
       _ => (
-          icon: Icons.adjust_rounded,
-          bg: AppColors.mint,
-          fg: AppColors.primary,
-        ),
+        icon: Icons.adjust_rounded,
+        bg: AppColors.mint,
+        fg: AppColors.primary,
+      ),
     };
   }
 
@@ -139,65 +138,65 @@ abstract final class InfoCopy {
   }
 
   static InfoContent habits(AppLocalizations l10n) => InfoContent(
-        title: l10n.h1SectionHabits,
-        body: l10n.infoHabitsBody,
-        icon: Icons.repeat_rounded,
-      );
+    title: l10n.h1SectionHabits,
+    body: l10n.infoHabitsBody,
+    icon: Icons.repeat_rounded,
+  );
 
   static InfoContent restDay(AppLocalizations l10n) => InfoContent(
-        title: l10n.infoRestTitle,
-        body: l10n.infoRestBody,
-        icon: Icons.nightlight_round,
-        iconBackground: AppColors.goalSurgeryBg,
-        iconForeground: AppColors.goalSurgeryFg,
-      );
+    title: l10n.infoRestTitle,
+    body: l10n.infoRestBody,
+    icon: Icons.nightlight_round,
+    iconBackground: AppColors.goalSurgeryBg,
+    iconForeground: AppColors.goalSurgeryFg,
+  );
 
   static InfoContent streak(AppLocalizations l10n) => InfoContent(
-        title: l10n.g1StatStreakLabel,
-        body: l10n.infoStreakBody,
-        icon: Icons.local_fire_department_outlined,
-        iconBackground: AppColors.streakBg,
-        iconForeground: AppColors.streakFg,
-      );
+    title: l10n.g1StatStreakLabel,
+    body: l10n.infoStreakBody,
+    icon: Icons.local_fire_department_outlined,
+    iconBackground: AppColors.streakBg,
+    iconForeground: AppColors.streakFg,
+  );
 
   static InfoContent weekRing(AppLocalizations l10n) => InfoContent(
-        title: l10n.g1StatWeekLabel,
-        body: l10n.infoWeekRingBody,
-        icon: Icons.event_available_rounded,
-      );
+    title: l10n.g1StatWeekLabel,
+    body: l10n.infoWeekRingBody,
+    icon: Icons.event_available_rounded,
+  );
 
   static InfoContent longestHold(AppLocalizations l10n) => InfoContent(
-        title: l10n.g1StatHoldLabel,
-        body: l10n.infoHoldBody,
-        icon: Icons.timer_outlined,
-        iconBackground: AppColors.goalEjaculationBg,
-        iconForeground: AppColors.goalEjaculationFg,
-      );
+    title: l10n.g1StatHoldLabel,
+    body: l10n.infoHoldBody,
+    icon: Icons.timer_outlined,
+    iconBackground: AppColors.goalEjaculationBg,
+    iconForeground: AppColors.goalEjaculationFg,
+  );
 
   static InfoContent levels(AppLocalizations l10n) => InfoContent(
-        title: l10n.infoLevelsTitle,
-        body: l10n.infoLevelsBody,
-        icon: Icons.emoji_events_outlined,
-        iconBackground: AppColors.goalSurgeryBg,
-        iconForeground: AppColors.goalSurgeryFg,
-      );
+    title: l10n.infoLevelsTitle,
+    body: l10n.infoLevelsBody,
+    icon: Icons.emoji_events_outlined,
+    iconBackground: AppColors.goalSurgeryBg,
+    iconForeground: AppColors.goalSurgeryFg,
+  );
 
   static InfoContent checkIn(AppLocalizations l10n) => InfoContent(
-        title: l10n.infoCheckInTitle,
-        body: l10n.infoCheckInBody,
-        icon: Icons.insights_rounded,
-        note: l10n.g2PrivacyNote,
-      );
+    title: l10n.infoCheckInTitle,
+    body: l10n.infoCheckInBody,
+    icon: Icons.insights_rounded,
+    note: l10n.g2PrivacyNote,
+  );
 
   static InfoContent walking(AppLocalizations l10n) => InfoContent(
-        title: l10n.g1WalkingTitle,
-        body: l10n.exWalkingCardioNote,
-        points: <String>[l10n.g1WalkingGoal],
-        note: l10n.exWalkingDoctorNote,
-        icon: Icons.directions_walk_rounded,
-        iconBackground: AppColors.goalBladderBg,
-        iconForeground: AppColors.goalBladderFg,
-      );
+    title: l10n.g1WalkingTitle,
+    body: l10n.exWalkingCardioNote,
+    points: <String>[l10n.g1WalkingGoal],
+    note: l10n.exWalkingDoctorNote,
+    icon: Icons.directions_walk_rounded,
+    iconBackground: AppColors.goalBladderBg,
+    iconForeground: AppColors.goalBladderFg,
+  );
 
   static InfoContent goal(AppLocalizations l10n, Goal goal) {
     final String body = switch (goal) {
@@ -216,36 +215,36 @@ abstract final class InfoCopy {
   }
 
   static InfoContent safetyWhy(AppLocalizations l10n) => InfoContent(
-        title: l10n.infoSafetyTitle,
-        body: l10n.infoSafetyBody,
-        icon: Icons.health_and_safety_outlined,
-        iconBackground: AppColors.goalSurgeryBg,
-        iconForeground: AppColors.goalSurgeryFg,
-        note: l10n.g2PrivacyNote,
-      );
+    title: l10n.infoSafetyTitle,
+    body: l10n.infoSafetyBody,
+    icon: Icons.health_and_safety_outlined,
+    iconBackground: AppColors.goalSurgeryBg,
+    iconForeground: AppColors.goalSurgeryFg,
+    note: l10n.g2PrivacyNote,
+  );
 
   static InfoContent kegel(AppLocalizations l10n) => InfoContent(
-        title: l10n.infoKegelTitle,
-        body: l10n.infoKegelBody,
-        points: <String>[l10n.exCueButtocksRelaxed, l10n.exCueKeepBreathing],
-        icon: Icons.adjust_rounded,
-      );
+    title: l10n.infoKegelTitle,
+    body: l10n.infoKegelBody,
+    points: <String>[l10n.exCueButtocksRelaxed, l10n.exCueKeepBreathing],
+    icon: Icons.adjust_rounded,
+  );
 
   static InfoContent reminders(AppLocalizations l10n) => InfoContent(
-        title: l10n.infoRemindersTitle,
-        body: l10n.infoRemindersBody,
-        icon: Icons.notifications_none_rounded,
-      );
+    title: l10n.infoRemindersTitle,
+    body: l10n.infoRemindersBody,
+    icon: Icons.notifications_none_rounded,
+  );
 
   static InfoContent voiceCues(AppLocalizations l10n) => InfoContent(
-        title: l10n.x1Voice,
-        body: l10n.infoVoiceBody,
-        icon: Icons.record_voice_over_outlined,
-      );
+    title: l10n.x1Voice,
+    body: l10n.infoVoiceBody,
+    icon: Icons.record_voice_over_outlined,
+  );
 
   static InfoContent sessionsPerDay(AppLocalizations l10n) => InfoContent(
-        title: l10n.x1DailyTime,
-        body: l10n.infoSessionsBody,
-        icon: Icons.schedule_rounded,
-      );
+    title: l10n.x1DailyTime,
+    body: l10n.infoSessionsBody,
+    icon: Icons.schedule_rounded,
+  );
 }

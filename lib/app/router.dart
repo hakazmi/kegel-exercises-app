@@ -3,9 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../core/cloud/cloud_config.dart';
+import '../core/cloud/cloud_providers.dart';
 import '../core/data/providers.dart';
 import '../core/domain/user_profile.dart';
+import '../features/auth/auth_screen.dart';
+import '../features/exercise/exercise_detail_screen.dart';
 import '../features/holdtest/hold_test_screen.dart';
+import '../features/home/habit_guide_screen.dart';
 import '../features/dev/data_debug_screen.dart';
 import '../features/dev/widget_gallery_screen.dart';
 import '../features/onboarding/o1_welcome_screen.dart';
@@ -35,6 +40,7 @@ import 'l10n/app_localizations.dart';
 
 /// Named route paths for the whole app map.
 abstract final class AppRoutes {
+  static const String auth = '/auth';
   static const String welcome = '/onboarding/welcome';
   static const String goal = '/onboarding/goal';
   static const String safety = '/onboarding/safety';
@@ -43,6 +49,8 @@ abstract final class AppRoutes {
   static const String plan = '/onboarding/plan';
   static const String tutorial = '/tutorial';
   static const String holdTest = '/hold-test';
+  static const String habit = '/habit';
+  static const String exercise = '/exercise';
   static const String before = '/session/before';
   static const String countdown = '/session/countdown';
   static const String player = '/session/player';
@@ -71,33 +79,97 @@ abstract final class AppRoutes {
   };
 }
 
-/// Riverpod-backed router with onboarding redirects.
+/// Where to land right after onboarding finishes (null = Today). Set by
+/// the plan screen just before it saves the profile.
+final postOnboardingTargetProvider =
+    NotifierProvider<PostOnboardingTarget, String?>(PostOnboardingTarget.new);
+
+class PostOnboardingTarget extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? target) => state = target;
+}
+
+/// Riverpod-backed router with auth + onboarding redirects.
 final routerProvider = Provider<GoRouter>((Ref ref) {
   final ValueNotifier<int> refresh = ValueNotifier<int>(0);
-  ref.listen<UserProfile>(userProfileProvider, (UserProfile? previous, UserProfile next) {
+  ref.listen<UserProfile>(userProfileProvider, (
+    UserProfile? previous,
+    UserProfile next,
+  ) {
+    refresh.value++;
+  });
+  ref.listen(authSessionProvider, (_, next) {
     refresh.value++;
   });
   ref.onDispose(refresh.dispose);
 
+  final bool requireAuth = CloudConfig.isConfigured;
+
   return GoRouter(
-    initialLocation: AppRoutes.welcome,
+    initialLocation: requireAuth ? AppRoutes.auth : AppRoutes.welcome,
     debugLogDiagnostics: kDebugMode,
     refreshListenable: refresh,
     redirect: (BuildContext context, GoRouterState state) {
-      final bool done = ref.read(userProfileProvider).onboardingDone;
       final String loc = state.matchedLocation;
+      final bool isAuth = loc == AppRoutes.auth;
       final bool isOnboarding = AppRoutes.onboarding.contains(loc);
       final bool isDev = loc.startsWith('/dev');
+      final bool signedIn = ref.read(authRepositoryProvider).isSignedIn;
+      final bool done = ref.read(userProfileProvider).onboardingDone;
 
-      if (!done && !isOnboarding && !(kDebugMode && isDev)) {
-        return AppRoutes.welcome;
+      // Without keys, skip auth entirely so local/dev/tests keep working.
+      if (!requireAuth) {
+        if (isAuth) {
+          return done ? AppRoutes.today : AppRoutes.welcome;
+        }
+        if (!done && !isOnboarding && !(kDebugMode && isDev)) {
+          return AppRoutes.welcome;
+        }
+        if (done && isOnboarding) {
+          final String? target = ref.read(postOnboardingTargetProvider);
+          if (target != null) {
+            Future<void>.microtask(
+              () => ref.read(postOnboardingTargetProvider.notifier).set(null),
+            );
+            return target;
+          }
+          return AppRoutes.today;
+        }
+        return null;
       }
-      if (done && isOnboarding) {
-        return AppRoutes.today;
+
+      if (!signedIn && !isAuth && !(kDebugMode && isDev)) {
+        return AppRoutes.auth;
+      }
+      if (signedIn && isAuth) {
+        return done ? AppRoutes.today : AppRoutes.welcome;
+      }
+      if (signedIn) {
+        if (!done && !isOnboarding && !isAuth && !(kDebugMode && isDev)) {
+          return AppRoutes.welcome;
+        }
+        if (done && isOnboarding) {
+          final String? target = ref.read(postOnboardingTargetProvider);
+          if (target != null) {
+            Future<void>.microtask(
+              () => ref.read(postOnboardingTargetProvider.notifier).set(null),
+            );
+            return target;
+          }
+          return AppRoutes.today;
+        }
       }
       return null;
     },
     routes: <RouteBase>[
+      GoRoute(
+        path: AppRoutes.auth,
+        builder: (BuildContext context, GoRouterState state) {
+          return const AuthScreen();
+        },
+      ),
       GoRoute(
         path: AppRoutes.welcome,
         builder: (BuildContext context, GoRouterState state) {
@@ -137,10 +209,27 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.tutorial,
         builder: (BuildContext context, GoRouterState state) {
-          final bool replay = state.uri.queryParameters['replay'] == '1' ||
+          final bool replay =
+              state.uri.queryParameters['replay'] == '1' ||
               state.uri.queryParameters['replay'] == 'true';
           final String? next = state.uri.queryParameters['next'];
           return T1TutorialScreen(replay: replay, nextPath: next);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.exercise,
+        builder: (BuildContext context, GoRouterState state) {
+          return ExerciseDetailScreen(
+            exerciseId: state.uri.queryParameters['id'] ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.habit,
+        builder: (BuildContext context, GoRouterState state) {
+          return HabitGuideScreen(
+            habitId: state.uri.queryParameters['id'] ?? '',
+          );
         },
       ),
       GoRoute(
@@ -152,33 +241,25 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: AppRoutes.before,
         builder: (BuildContext context, GoRouterState state) {
-          return S1BeforeScreen(
-            itemId: state.uri.queryParameters['itemId'],
-          );
+          return S1BeforeScreen(itemId: state.uri.queryParameters['itemId']);
         },
       ),
       GoRoute(
         path: AppRoutes.countdown,
         builder: (BuildContext context, GoRouterState state) {
-          return S2CountdownScreen(
-            itemId: state.uri.queryParameters['itemId'],
-          );
+          return S2CountdownScreen(itemId: state.uri.queryParameters['itemId']);
         },
       ),
       GoRoute(
         path: AppRoutes.player,
         builder: (BuildContext context, GoRouterState state) {
-          return S3PlayerScreen(
-            itemId: state.uri.queryParameters['itemId'],
-          );
+          return S3PlayerScreen(itemId: state.uri.queryParameters['itemId']);
         },
       ),
       GoRoute(
         path: AppRoutes.done,
         builder: (BuildContext context, GoRouterState state) {
-          return S4DoneScreen(
-            itemId: state.uri.queryParameters['itemId'],
-          );
+          return S4DoneScreen(itemId: state.uri.queryParameters['itemId']);
         },
       ),
       GoRoute(
@@ -258,19 +339,20 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
         ),
       ],
       StatefulShellRoute.indexedStack(
-        builder: (
-          BuildContext context,
-          GoRouterState state,
-          StatefulNavigationShell navigationShell,
-        ) {
-          final AppLocalizations l10n = AppLocalizations.of(context);
-          return MainShell(
-            navigationShell: navigationShell,
-            todayLabel: l10n.tabToday,
-            progressLabel: l10n.tabProgress,
-            learnLabel: l10n.tabLearn,
-          );
-        },
+        builder:
+            (
+              BuildContext context,
+              GoRouterState state,
+              StatefulNavigationShell navigationShell,
+            ) {
+              final AppLocalizations l10n = AppLocalizations.of(context);
+              return MainShell(
+                navigationShell: navigationShell,
+                todayLabel: l10n.tabToday,
+                progressLabel: l10n.tabProgress,
+                learnLabel: l10n.tabLearn,
+              );
+            },
         branches: <StatefulShellBranch>[
           StatefulShellBranch(
             routes: <RouteBase>[

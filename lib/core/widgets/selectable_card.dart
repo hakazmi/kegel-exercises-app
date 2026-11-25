@@ -40,7 +40,9 @@ class SelectableCard extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 240),
           curve: Curves.easeOut,
-          constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
+          constraints: const BoxConstraints(
+            minHeight: AppSpacing.minTouchTarget,
+          ),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md,
             vertical: AppSpacing.sm + 2,
@@ -77,8 +79,9 @@ class SelectableCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTypography.body
-                          .copyWith(fontWeight: FontWeight.w700),
+                      style: AppTypography.body.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     if (subtitle != null) ...[
                       const SizedBox(height: AppSpacing.xxs),

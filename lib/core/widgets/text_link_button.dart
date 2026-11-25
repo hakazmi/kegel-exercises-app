@@ -25,7 +25,10 @@ class TextLinkButton extends StatelessWidget {
         onPressed: onPressed,
         style: TextButton.styleFrom(
           foregroundColor: color,
-          minimumSize: const Size(AppSpacing.minTouchTarget, AppSpacing.minTouchTarget),
+          minimumSize: const Size(
+            AppSpacing.minTouchTarget,
+            AppSpacing.minTouchTarget,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
         ),
         child: Text(
@@ -34,7 +37,9 @@ class TextLinkButton extends StatelessWidget {
           style: AppTypography.body.copyWith(
             color: color,
             fontWeight: FontWeight.w600,
-            decoration: underline ? TextDecoration.underline : TextDecoration.none,
+            decoration: underline
+                ? TextDecoration.underline
+                : TextDecoration.none,
           ),
         ),
       ),

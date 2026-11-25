@@ -8,11 +8,7 @@ enum Goal {
 }
 
 /// Kegel experience (O4).
-enum Experience {
-  none,
-  unsure,
-  confident,
-}
+enum Experience { none, unsure, confident }
 
 /// Assigned training track.
 enum TrackId {
@@ -24,19 +20,10 @@ enum TrackId {
 }
 
 /// How the user felt after a session (S4).
-enum SessionFeel {
-  fine,
-  mildDiscomfort,
-  pain,
-}
+enum SessionFeel { fine, mildDiscomfort, pain }
 
 /// Timed session kinds on Today (habits are tick-only, not [SessionKind]).
-enum SessionKind {
-  strengthening,
-  body,
-  breathing,
-  relaxation,
-}
+enum SessionKind { strengthening, body, breathing, relaxation }
 
 /// Today plan surface state for H1.
 enum TodayPlanState {

@@ -76,12 +76,46 @@ class O6PlanScreen extends ConsumerWidget {
     return SessionDefinitionBuilder.strengtheningDurationForLevel(level);
   }
 
+  /// Saves the plan and leaves onboarding.
+  ///
+  /// [startPlan]: beginners (no experience / not sure) first learn the
+  /// technique, then land on Today; experienced users go to Today.
+  /// "Go to home" always lands on Today.
+  ///
+  /// The destination is handed to the router *before* the profile is
+  /// saved: saving flips "onboarding done", and the router's redirect then
+  /// goes straight there (no flash of Today on the way to the guide).
+  Future<void> _finish(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool startPlan,
+  }) async {
+    final OnboardingController controller = ref.read(
+      onboardingControllerProvider.notifier,
+    );
+    final OnboardingDraft draft = ref.read(onboardingControllerProvider);
+    final GoRouter router = GoRouter.of(context);
+    final bool needsTutorial =
+        startPlan &&
+        (draft.experience == Experience.none ||
+            draft.experience == Experience.unsure);
+    final String target = needsTutorial
+        ? '${AppRoutes.tutorial}?next=${Uri.encodeComponent(AppRoutes.today)}'
+        : AppRoutes.today;
+    ref.read(postOnboardingTargetProvider.notifier).set(target);
+    await controller.completeStep('O6');
+    await controller.finish(reminderOn: draft.reminderEnabled);
+    // Fallback if the redirect did not run (already handled = no-op).
+    if (router.routerDelegate.currentConfiguration.uri.path !=
+        Uri.parse(target).path) {
+      router.go(target);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final OnboardingDraft draft = ref.watch(onboardingControllerProvider);
-    final OnboardingController controller =
-        ref.read(onboardingControllerProvider.notifier);
     final TrackId track = draft.resolveTrack();
     final bool relaxation = track == TrackId.relaxationFirst;
     // Rest day is day 7 of the first week, counted from today.
@@ -137,8 +171,9 @@ class O6PlanScreen extends ConsumerWidget {
                             relaxation
                                 ? l10n.o6RelaxationTitle
                                 : l10n.o6LevelStart,
-                            style: AppTypography.title
-                                .copyWith(color: AppColors.sessionText),
+                            style: AppTypography.title.copyWith(
+                              color: AppColors.sessionText,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
@@ -245,26 +280,22 @@ class O6PlanScreen extends ConsumerWidget {
           ],
         ],
       ),
-      footer: PrimaryButton(
-        label: l10n.o6Start,
-        icon: Icons.play_arrow_rounded,
-        shimmer: true,
-        onPressed: () async {
-          await controller.completeStep('O6');
-          final UserProfile profile = await controller.finish(
-            reminderOn: draft.reminderEnabled,
-          );
-          if (!context.mounted) {
-            return;
-          }
-          final bool needsTutorial = profile.experience == Experience.none ||
-              profile.experience == Experience.unsure;
-          context.go(
-            needsTutorial
-                ? AppRoutes.tutorial
-                : '${AppRoutes.before}?itemId=strength_1',
-          );
-        },
+      footer: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PrimaryButton(
+            label: l10n.o6Start,
+            icon: Icons.play_arrow_rounded,
+            shimmer: true,
+            onPressed: () => _finish(context, ref, startPlan: true),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SecondaryButton(
+            label: l10n.o6GoHome,
+            icon: Icons.home_rounded,
+            onPressed: () => _finish(context, ref, startPlan: false),
+          ),
+        ],
       ),
     );
   }
@@ -298,7 +329,10 @@ class _WeekPreview extends StatelessWidget {
           Expanded(
             child: Reveal(
               from: RevealFrom.drop,
-              delay: AppMotion.stagger(i, base: const Duration(milliseconds: 200)),
+              delay: AppMotion.stagger(
+                i,
+                base: const Duration(milliseconds: 200),
+              ),
               child: _DayBubble(
                 isRest: i == 6,
                 index: i + 1,
@@ -388,39 +422,38 @@ class _TimelineItem extends StatelessWidget {
       from: RevealFrom.right,
       delay: const Duration(milliseconds: 320),
       child: Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            margin: const EdgeInsets.only(top: 5),
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.surface, width: 2),
-              boxShadow: AppElevation.level1,
+        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              margin: const EdgeInsets.only(top: 5),
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.surface, width: 2),
+                boxShadow: AppElevation.level1,
+              ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.body.copyWith(fontWeight: FontWeight.w700),
-                ),
-                Text(
-                  body,
-                  style: AppTypography.caption,
-                ),
-              ],
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTypography.body.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(body, style: AppTypography.caption),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

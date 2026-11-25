@@ -25,6 +25,12 @@ abstract final class PfDemoAssets {
 
   /// Natural length of each clip.
   static const Duration clipLength = Duration(milliseconds: 3000);
+
+  /// Width / height of the clips (840 × 402): the whole pelvis in view.
+  static const double aspect = 840 / 402;
+
+  /// Studio grey behind the model, used to fill any letterbox.
+  static const Color backdrop = Color(0xFFE6E7E3);
 }
 
 /// The 3D pelvic floor following a phase:
@@ -79,10 +85,12 @@ class _PelvicFloorVideoState extends State<PelvicFloorVideo> {
   }
 
   Future<void> _init() async {
-    final VideoPlayerController a =
-        VideoPlayerController.asset(PfDemoAssets.squeeze);
-    final VideoPlayerController b =
-        VideoPlayerController.asset(PfDemoAssets.relax);
+    final VideoPlayerController a = VideoPlayerController.asset(
+      PfDemoAssets.squeeze,
+    );
+    final VideoPlayerController b = VideoPlayerController.asset(
+      PfDemoAssets.relax,
+    );
     _squeeze = a;
     _relax = b;
     try {
@@ -127,6 +135,7 @@ class _PelvicFloorVideoState extends State<PelvicFloorVideo> {
     }
     switch (widget.phase) {
       case PfPhase.squeeze:
+        if (!mounted) return;
         setState(() => _showSqueeze = true);
         await b.pause();
         if (restart) {
@@ -137,6 +146,7 @@ class _PelvicFloorVideoState extends State<PelvicFloorVideo> {
       case PfPhase.hold:
         // Freeze on the squeezed frame: let the squeeze clip finish (it
         // stops on its last frame) or jump there if we arrived directly.
+        if (!mounted) return;
         setState(() => _showSqueeze = true);
         await b.pause();
         if (restart && !a.value.isPlaying) {
@@ -146,6 +156,7 @@ class _PelvicFloorVideoState extends State<PelvicFloorVideo> {
           await a.pause();
         }
       case PfPhase.relax:
+        if (!mounted) return;
         setState(() => _showSqueeze = false);
         await a.pause();
         if (restart) {
@@ -235,6 +246,9 @@ class PelvicFloorDemoLoop extends StatefulWidget {
     this.height = 230,
   });
 
+  /// Largest height for the video area; it keeps the clip's own shape so
+  /// the whole pelvis stays in view (no zoom-in crop).
+
   final Duration squeeze;
   final Duration hold;
   final Duration relax;
@@ -261,18 +275,18 @@ class _PelvicFloorDemoLoopState extends State<PelvicFloorDemoLoop> {
   }
 
   Duration _lengthOf(PfPhase p) => switch (p) {
-        PfPhase.squeeze => widget.squeeze,
-        PfPhase.hold => widget.hold,
-        PfPhase.relax => widget.relax,
-        PfPhase.rest => widget.rest,
-      };
+    PfPhase.squeeze => widget.squeeze,
+    PfPhase.hold => widget.hold,
+    PfPhase.relax => widget.relax,
+    PfPhase.rest => widget.rest,
+  };
 
   PfPhase _after(PfPhase p) => switch (p) {
-        PfPhase.squeeze => PfPhase.hold,
-        PfPhase.hold => PfPhase.relax,
-        PfPhase.relax => PfPhase.rest,
-        PfPhase.rest => PfPhase.squeeze,
-      };
+    PfPhase.squeeze => PfPhase.hold,
+    PfPhase.hold => PfPhase.relax,
+    PfPhase.relax => PfPhase.rest,
+    PfPhase.rest => PfPhase.squeeze,
+  };
 
   void _go(PfPhase p) {
     if (!mounted) {
@@ -299,7 +313,7 @@ class _PelvicFloorDemoLoopState extends State<PelvicFloorDemoLoop> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final bool still = !_running;
     final List<({PfPhase phase, String label, String hint, IconData icon})>
-        steps = <({PfPhase phase, String label, String hint, IconData icon})>[
+    steps = <({PfPhase phase, String label, String hint, IconData icon})>[
       (
         phase: PfPhase.squeeze,
         label: l10n.t1PhaseSqueeze,
@@ -333,25 +347,34 @@ class _PelvicFloorDemoLoopState extends State<PelvicFloorDemoLoop> {
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            SizedBox(
-              height: widget.height,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  PelvicFloorVideo(
-                    phase: _phase,
-                    cycle: _cycle,
-                    motion: _lengthOf(_phase),
+            ColoredBox(
+              color: PfDemoAssets.backdrop,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: widget.height),
+                child: AspectRatio(
+                  aspectRatio: PfDemoAssets.aspect,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      PelvicFloorVideo(
+                        phase: _phase,
+                        cycle: _cycle,
+                        motion: _lengthOf(_phase),
+                        fit: BoxFit.contain,
+                      ),
+                      Positioned(
+                        left: AppSpacing.sm,
+                        top: AppSpacing.sm,
+                        child: _PhasePill(
+                          text: still
+                              ? l10n.pfDemoTitle
+                              : _labelOf(l10n, _phase),
+                          active: !still && _phase != PfPhase.rest,
+                        ),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    left: AppSpacing.sm,
-                    top: AppSpacing.sm,
-                    child: _PhasePill(
-                      text: still ? l10n.pfDemoTitle : _labelOf(l10n, _phase),
-                      active: !still && _phase != PfPhase.rest,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
             Padding(
@@ -380,11 +403,11 @@ class _PelvicFloorDemoLoopState extends State<PelvicFloorDemoLoop> {
   }
 
   String _labelOf(AppLocalizations l10n, PfPhase p) => switch (p) {
-        PfPhase.squeeze => l10n.t1PhaseSqueeze,
-        PfPhase.hold => l10n.s3PhaseHold,
-        PfPhase.relax => l10n.t1PhaseRelax,
-        PfPhase.rest => l10n.s3PhaseRest,
-      };
+    PfPhase.squeeze => l10n.t1PhaseSqueeze,
+    PfPhase.hold => l10n.s3PhaseHold,
+    PfPhase.relax => l10n.t1PhaseRelax,
+    PfPhase.rest => l10n.s3PhaseRest,
+  };
 }
 
 class _PhasePill extends StatelessWidget {
@@ -402,7 +425,9 @@ class _PhasePill extends StatelessWidget {
         vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: active ? AppColors.ink : AppColors.surface.withValues(alpha: 0.9),
+        color: active
+            ? AppColors.ink
+            : AppColors.surface.withValues(alpha: 0.9),
         borderRadius: AppRadii.pillAll,
         boxShadow: AppElevation.level1,
       ),

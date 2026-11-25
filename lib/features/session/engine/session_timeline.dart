@@ -34,22 +34,17 @@ abstract final class SessionTimeline {
     return out;
   }
 
-  static List<TimelineSegment> _blockSegments(SessionBlockDef block, int index) {
+  static List<TimelineSegment> _blockSegments(
+    SessionBlockDef block,
+    int index,
+  ) {
     switch (block.type) {
       case 'hold':
       case 'slow_hold':
-        return _repCycles(
-          block: block,
-          index: index,
-          squeezeIsHold: true,
-        );
+        return _repCycles(block: block, index: index, squeezeIsHold: true);
       case 'quick':
       case 'quick_squeeze':
-        return _repCycles(
-          block: block,
-          index: index,
-          squeezeIsHold: false,
-        );
+        return _repCycles(block: block, index: index, squeezeIsHold: false);
       case 'movement':
         return _repCycles(
           block: block,
@@ -142,8 +137,9 @@ abstract final class SessionTimeline {
     int cycle = 0;
     while (remaining > 0) {
       cycle++;
-      final int inSec =
-          remaining >= inhale.inSeconds ? inhale.inSeconds : remaining;
+      final int inSec = remaining >= inhale.inSeconds
+          ? inhale.inSeconds
+          : remaining;
       out.add(
         TimelineSegment(
           machine: EngineMachineState.squeeze,
@@ -160,8 +156,9 @@ abstract final class SessionTimeline {
       if (remaining <= 0) {
         break;
       }
-      final int outSec =
-          remaining >= exhale.inSeconds ? exhale.inSeconds : remaining;
+      final int outSec = remaining >= exhale.inSeconds
+          ? exhale.inSeconds
+          : remaining;
       out.add(
         TimelineSegment(
           machine: EngineMachineState.relax,
@@ -198,8 +195,9 @@ abstract final class SessionDefinitionFactory {
         id: 'strength_$sessionNumber',
         kind: SessionKind.strengthening,
         label: '',
-        durationSeconds:
-            SessionDefinitionBuilder.strengtheningDurationForLevel(level),
+        durationSeconds: SessionDefinitionBuilder.strengtheningDurationForLevel(
+          level,
+        ),
         done: false,
         sessionNumber: sessionNumber,
       ),
@@ -226,10 +224,12 @@ abstract final class SessionDefinitionFactory {
               type: 'hold',
               titleKey: 'slowHolds',
               reps: (m['reps'] as num?)?.toInt(),
-              squeezeSec: (m['squeezeSec'] as num?)?.toInt() ??
+              squeezeSec:
+                  (m['squeezeSec'] as num?)?.toInt() ??
                   (m['holdSeconds'] as num?)?.toInt() ??
                   (m['holdSec'] as num?)?.toInt(),
-              relaxSec: (m['relaxSec'] as num?)?.toInt() ??
+              relaxSec:
+                  (m['relaxSec'] as num?)?.toInt() ??
                   (m['relaxSeconds'] as num?)?.toInt(),
               thumbnailAsset: 'assets/images/lying.svg',
             ),
@@ -241,9 +241,11 @@ abstract final class SessionDefinitionFactory {
               type: 'quick',
               titleKey: 'quickSqueezes',
               reps: (m['reps'] as num?)?.toInt(),
-              squeezeSec: (m['squeezeSec'] as num?)?.toInt() ??
+              squeezeSec:
+                  (m['squeezeSec'] as num?)?.toInt() ??
                   (m['squeezeSeconds'] as num?)?.toInt(),
-              relaxSec: (m['relaxSec'] as num?)?.toInt() ??
+              relaxSec:
+                  (m['relaxSec'] as num?)?.toInt() ??
                   (m['relaxSeconds'] as num?)?.toInt(),
               thumbnailAsset: 'assets/images/bridge.svg',
             ),
@@ -253,7 +255,8 @@ abstract final class SessionDefinitionFactory {
             SessionBlockDef(
               type: 'rest',
               titleKey: 'rest',
-              sec: (m['sec'] as num?)?.toInt() ??
+              sec:
+                  (m['sec'] as num?)?.toInt() ??
                   (m['seconds'] as num?)?.toInt(),
               thumbnailAsset: 'assets/images/stopwatch.svg',
             ),
@@ -263,7 +266,8 @@ abstract final class SessionDefinitionFactory {
             SessionBlockDef(
               type: 'breathing',
               titleKey: 'breathing',
-              sec: (m['sec'] as num?)?.toInt() ??
+              sec:
+                  (m['sec'] as num?)?.toInt() ??
                   (m['seconds'] as num?)?.toInt(),
               thumbnailAsset: 'assets/images/child.svg',
             ),
@@ -274,7 +278,8 @@ abstract final class SessionDefinitionFactory {
             SessionBlockDef(
               type: 'stretch',
               titleKey: stretchId ?? m['titleKey'] as String? ?? 'stretch',
-              sec: (m['sec'] as num?)?.toInt() ??
+              sec:
+                  (m['sec'] as num?)?.toInt() ??
                   (m['seconds'] as num?)?.toInt(),
               thumbnailAsset: 'assets/images/child.svg',
               exerciseId: stretchId,
@@ -286,10 +291,12 @@ abstract final class SessionDefinitionFactory {
               type: 'movement',
               titleKey: m['titleKey'] as String? ?? 'movement',
               reps: (m['reps'] as num?)?.toInt(),
-              squeezeSec: (m['squeezeSec'] as num?)?.toInt() ??
+              squeezeSec:
+                  (m['squeezeSec'] as num?)?.toInt() ??
                   (m['holdSec'] as num?)?.toInt(),
               relaxSec: (m['relaxSec'] as num?)?.toInt(),
-              thumbnailAsset: m['thumbnailAsset'] as String? ??
+              thumbnailAsset:
+                  m['thumbnailAsset'] as String? ??
                   'assets/images/standing.svg',
               exerciseId: m['exerciseId'] as String?,
               phaseCue: m['phaseCue'] as String?,

@@ -43,7 +43,9 @@ class MultiSelectCard extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 240),
           curve: Curves.easeOut,
-          constraints: const BoxConstraints(minHeight: AppSpacing.minTouchTarget),
+          constraints: const BoxConstraints(
+            minHeight: AppSpacing.minTouchTarget,
+          ),
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.md,
             vertical: AppSpacing.sm + 2,
@@ -65,14 +67,16 @@ class MultiSelectCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: iconBackground ??
+                    color:
+                        iconBackground ??
                         (selected ? AppColors.surface : AppColors.surfaceMuted),
                     borderRadius: AppRadii.mdAll,
                   ),
                   child: Icon(
                     leading,
                     size: 20,
-                    color: iconForeground ??
+                    color:
+                        iconForeground ??
                         (selected ? accent : AppColors.textSecondary),
                   ),
                 ),
@@ -84,8 +88,9 @@ class MultiSelectCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTypography.body
-                          .copyWith(fontWeight: FontWeight.w700),
+                      style: AppTypography.body.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     if (subtitle != null) ...[
                       const SizedBox(height: AppSpacing.xxs),

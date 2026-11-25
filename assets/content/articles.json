@@ -5,14 +5,32 @@
       "title": "Finding the right muscles",
       "minutes": 1,
       "image": "assets/images/target.svg",
+      "cover": "assets/images/learn/learn_finding_cover.jpg",
+      "media": [
+        {
+          "poster": "assets/images/learn/learn_finding_cover.jpg",
+          "caption": "A hammock of muscle"
+        },
+        {
+          "poster": "assets/images/learn/learn_finding_lift.jpg",
+          "caption": "Feel an inner lift, not a clamp"
+        },
+        {
+          "poster": "assets/images/learn/learn_finding_release.jpg",
+          "caption": "Fully soften after every hold"
+        }
+      ],
       "featured": true,
       "opensTutorial": true,
       "bodyAsset": "assets/content/articles/finding_muscles.md",
       "sources": [
         {
-          "title": "NHS: Pelvic floor exercises",
-          "url": "https://www.nhs.uk/conditions/pelvic-floor-exercises/",
-          "placeholder": "replace before release"
+          "title": "Advanced Urology: pelvic floor therapy for men",
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
+        },
+        {
+          "title": "NHS Fife / Prostate Scotland: pelvic floor exercises before and after prostate surgery",
+          "url": "https://www.nhsfife.org/media/na0bpxi5/pelvic-floor-exercises-befor-and-after-surgery-to-remove-the-prostate.pdf"
         }
       ]
     },
@@ -21,14 +39,31 @@
       "title": "How the pelvic floor works",
       "minutes": 2,
       "image": "assets/images/anatomy_side.svg",
+      "cover": "assets/videos/where_muscles.jpg",
+      "media": [
+        {
+          "video": "assets/videos/where_muscles.mp4",
+          "poster": "assets/videos/where_muscles.jpg",
+          "caption": "Where the muscles are"
+        },
+        {
+          "video": "assets/videos/pf_squeeze.mp4",
+          "poster": "assets/videos/pf_squeezed.jpg",
+          "caption": "Squeeze and lift"
+        },
+        {
+          "video": "assets/videos/pf_relax.mp4",
+          "poster": "assets/videos/pf_relaxed.jpg",
+          "caption": "Let go and relax"
+        }
+      ],
       "featured": false,
       "opensTutorial": false,
       "bodyAsset": "assets/content/articles/pelvic_floor_works.md",
       "sources": [
         {
           "title": "Advanced Urology: pelvic floor therapy for men",
-          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men",
-          "placeholder": "replace before release"
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
         }
       ]
     },
@@ -37,14 +72,44 @@
       "title": "Five common mistakes",
       "minutes": 2,
       "image": "assets/images/shield.svg",
+      "cover": "assets/images/learn/learn_common_mistakes_cover.jpg",
+      "media": [
+        {
+          "poster": "assets/images/learn/learn_common_mistakes_cover.jpg",
+          "caption": "Five habits that weaken a session"
+        },
+        {
+          "poster": "assets/images/learn/learn_mistake_clench.jpg",
+          "caption": "Do not clench buttocks, thighs or stomach"
+        },
+        {
+          "poster": "assets/images/learn/learn_mistake_breath.jpg",
+          "caption": "Keep breathing; many men squeeze on the out-breath"
+        },
+        {
+          "poster": "assets/images/learn/learn_mistake_urine.jpg",
+          "caption": "Stopping urine is a one-time check only"
+        },
+        {
+          "poster": "assets/images/learn/learn_mistake_no_release.jpg",
+          "caption": "Let go fully after every hold"
+        },
+        {
+          "poster": "assets/images/learn/learn_mistake_overdo.jpg",
+          "caption": "Extra sets can tire the muscles"
+        }
+      ],
       "featured": false,
       "opensTutorial": false,
       "bodyAsset": "assets/content/articles/common_mistakes.md",
       "sources": [
         {
-          "title": "NHS: Pelvic floor exercises",
-          "url": "https://www.nhs.uk/conditions/pelvic-floor-exercises/",
-          "placeholder": "replace before release"
+          "title": "Advanced Urology: pelvic floor therapy for men",
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
+        },
+        {
+          "title": "NHS Fife / Prostate Scotland: pelvic floor exercises before and after prostate surgery",
+          "url": "https://www.nhsfife.org/media/na0bpxi5/pelvic-floor-exercises-befor-and-after-surgery-to-remove-the-prostate.pdf"
         }
       ]
     },
@@ -53,19 +118,49 @@
       "title": "When to relax instead of squeeze",
       "minutes": 2,
       "image": "assets/images/child.svg",
+      "cover": "assets/videos/pf_relaxed.jpg",
+      "media": [
+        {
+          "video": "assets/videos/pf_relax.mp4",
+          "poster": "assets/videos/pf_relaxed.jpg",
+          "caption": "Relaxed pelvic floor"
+        },
+        {
+          "video": "assets/videos/exercises/diaphragmatic_breathing.mp4",
+          "poster": "assets/videos/exercises/diaphragmatic_breathing.jpg",
+          "caption": "Diaphragmatic breathing",
+          "exerciseId": "diaphragmatic_breathing"
+        },
+        {
+          "video": "assets/videos/exercises/reverse_kegel.mp4",
+          "poster": "assets/videos/exercises/reverse_kegel.jpg",
+          "caption": "Reverse Kegel",
+          "exerciseId": "reverse_kegel"
+        },
+        {
+          "video": "assets/videos/exercises/childs_pose.mp4",
+          "poster": "assets/videos/exercises/childs_pose.jpg",
+          "caption": "Child's pose",
+          "exerciseId": "childs_pose"
+        },
+        {
+          "video": "assets/videos/exercises/supported_back_release.mp4",
+          "poster": "assets/videos/exercises/supported_back_release.jpg",
+          "caption": "Supported back-lying release",
+          "exerciseId": "supported_back_release"
+        }
+      ],
       "featured": false,
       "opensTutorial": false,
       "bodyAsset": "assets/content/articles/relax_instead.md",
       "sources": [
         {
-          "title": "Advanced Urology: Pelvic floor therapy for men",
-          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men",
-          "placeholder": "replace before release"
+          "title": "Advanced Urology: pelvic floor therapy for men",
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
         },
         {
           "title": "Physiotutors: Reverse Kegels",
-          "url": "https://www.physiotutors.com/",
-          "placeholder": "replace before release"
+          "url": "https://www.physiotutors.com/reverse-kegels/"
         }
       ]
     },
@@ -74,14 +169,36 @@
       "title": "What to expect, week by week",
       "minutes": 1,
       "image": "assets/images/calendar.svg",
+      "cover": "assets/images/learn/learn_what_to_expect_cover.jpg",
+      "media": [
+        {
+          "poster": "assets/images/learn/learn_what_to_expect_cover.jpg",
+          "caption": "A few minutes a day"
+        },
+        {
+          "poster": "assets/images/learn/learn_expect_patience.jpg",
+          "caption": "Steady practice over weeks"
+        },
+        {
+          "poster": "assets/images/onboarding/cutouts/stopwatch.png",
+          "caption": "Short sessions add up"
+        },
+        {
+          "poster": "assets/images/onboarding/onboarding_goal_shield.jpg",
+          "caption": "Results vary"
+        }
+      ],
       "featured": false,
       "opensTutorial": false,
       "bodyAsset": "assets/content/articles/what_to_expect.md",
       "sources": [
         {
           "title": "Advanced Urology: pelvic floor therapy for men",
-          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men",
-          "placeholder": "replace before release"
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
+        },
+        {
+          "title": "NHS Fife / Prostate Scotland: pelvic floor exercises before and after prostate surgery",
+          "url": "https://www.nhsfife.org/media/na0bpxi5/pelvic-floor-exercises-befor-and-after-surgery-to-remove-the-prostate.pdf"
         }
       ]
     },
@@ -90,14 +207,50 @@
       "title": "Exercises after prostate surgery",
       "minutes": 2,
       "image": "assets/images/lying.svg",
+      "cover": "assets/videos/exercises/pillow_squeeze_lift.jpg",
+      "media": [
+        {
+          "video": "assets/videos/exercises/pillow_squeeze_lift.mp4",
+          "poster": "assets/videos/exercises/pillow_squeeze_lift.jpg",
+          "caption": "Pillow squeeze with lift",
+          "exerciseId": "pillow_squeeze_lift"
+        },
+        {
+          "video": "assets/videos/exercises/slow_hold.mp4",
+          "poster": "assets/videos/exercises/slow_hold.jpg",
+          "caption": "Slow hold",
+          "exerciseId": "slow_hold"
+        },
+        {
+          "video": "assets/videos/exercises/quick_squeeze.mp4",
+          "poster": "assets/videos/exercises/quick_squeeze.jpg",
+          "caption": "Quick squeeze",
+          "exerciseId": "quick_squeeze"
+        },
+        {
+          "video": "assets/videos/exercises/the_knack.mp4",
+          "poster": "assets/videos/exercises/the_knack.jpg",
+          "caption": "The Knack",
+          "exerciseId": "the_knack"
+        },
+        {
+          "video": "assets/videos/exercises/diaphragmatic_breathing.mp4",
+          "poster": "assets/videos/exercises/diaphragmatic_breathing.jpg",
+          "caption": "Diaphragmatic breathing",
+          "exerciseId": "diaphragmatic_breathing"
+        }
+      ],
       "featured": false,
       "opensTutorial": false,
       "bodyAsset": "assets/content/articles/after_surgery.md",
       "sources": [
         {
-          "title": "NHS: Prostatectomy",
-          "url": "https://www.nhs.uk/conditions/prostatectomy/",
-          "placeholder": "replace before release"
+          "title": "NHS Fife / Prostate Scotland: pelvic floor exercises before and after prostate surgery",
+          "url": "https://www.nhsfife.org/media/na0bpxi5/pelvic-floor-exercises-befor-and-after-surgery-to-remove-the-prostate.pdf"
+        },
+        {
+          "title": "Advanced Urology: pelvic floor therapy for men",
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
         }
       ]
     },
@@ -106,14 +259,32 @@
       "title": "When to see a doctor",
       "minutes": 1,
       "image": "assets/images/stopwatch.svg",
+      "cover": "assets/images/learn/learn_see_doctor_cover.jpg",
+      "media": [
+        {
+          "poster": "assets/images/learn/learn_see_doctor_cover.jpg",
+          "caption": "Talk with a clinician"
+        },
+        {
+          "poster": "assets/images/learn/learn_doctor_pain.jpg",
+          "caption": "Pain at rest or with squeezes needs care"
+        },
+        {
+          "poster": "assets/images/learn/learn_doctor_referral.jpg",
+          "caption": "Ask for pelvic floor physiotherapy when unsure"
+        }
+      ],
       "featured": false,
       "opensTutorial": false,
       "bodyAsset": "assets/content/articles/see_a_doctor.md",
       "sources": [
         {
-          "title": "NHS: Pelvic floor exercises",
-          "url": "https://www.nhs.uk/conditions/pelvic-floor-exercises/",
-          "placeholder": "replace before release"
+          "title": "Advanced Urology: pelvic floor therapy for men",
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
+        },
+        {
+          "title": "NHS Fife / Prostate Scotland: pelvic floor exercises before and after prostate surgery",
+          "url": "https://www.nhsfife.org/media/na0bpxi5/pelvic-floor-exercises-befor-and-after-surgery-to-remove-the-prostate.pdf"
         }
       ]
     },
@@ -122,19 +293,36 @@
       "title": "Where our guidance comes from",
       "minutes": 1,
       "image": "assets/images/trophy.svg",
+      "cover": "assets/images/learn/learn_guidance_cover.jpg",
+      "media": [
+        {
+          "poster": "assets/images/learn/learn_guidance_cover.jpg",
+          "caption": "Drawn from clinical pelvic floor guidance"
+        },
+        {
+          "poster": "assets/images/learn/learn_guidance_clinical.jpg",
+          "caption": "Finding muscles, slow and quick squeezes, the Knack"
+        },
+        {
+          "poster": "assets/images/learn/learn_guidance_safety.jpg",
+          "caption": "Results vary; pain routes you to relaxation first"
+        }
+      ],
       "featured": false,
       "opensTutorial": false,
       "bodyAsset": "assets/content/articles/guidance_sources.md",
       "sources": [
         {
-          "title": "NHS: Pelvic floor exercises",
-          "url": "https://www.nhs.uk/conditions/pelvic-floor-exercises/",
-          "placeholder": "replace before release"
+          "title": "Advanced Urology: pelvic floor therapy for men",
+          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men"
         },
         {
-          "title": "Advanced Urology: pelvic floor therapy for men",
-          "url": "https://learn.advancedurology.com/education/pelvic-floor-therapy-men",
-          "placeholder": "replace before release"
+          "title": "NHS Fife / Prostate Scotland: pelvic floor exercises before and after prostate surgery",
+          "url": "https://www.nhsfife.org/media/na0bpxi5/pelvic-floor-exercises-befor-and-after-surgery-to-remove-the-prostate.pdf"
+        },
+        {
+          "title": "Physiotutors: Reverse Kegels",
+          "url": "https://www.physiotutors.com/reverse-kegels/"
         }
       ]
     }

@@ -16,11 +16,11 @@ class SessionEngine {
     required this.clock,
     this.countdownSeconds = 5,
     this.tickInterval = const Duration(milliseconds: 50),
-  })  : _definition = definition,
-        _segments = SessionTimeline.fromDefinition(
-          definition,
-          countdownSeconds: countdownSeconds,
-        ) {
+  }) : _definition = definition,
+       _segments = SessionTimeline.fromDefinition(
+         definition,
+         countdownSeconds: countdownSeconds,
+       ) {
     _sessionDuration = _segments
         .where((TimelineSegment s) => !s.isCountdown)
         .fold<Duration>(
@@ -136,12 +136,7 @@ class SessionEngine {
     final EngineMachineState restore =
         _pausedFrom ?? EngineMachineState.squeeze;
     _pausedFrom = null;
-    _setState(
-      _state.copyWith(
-        machine: restore,
-        clearPausedFrom: true,
-      ),
-    );
+    _setState(_state.copyWith(machine: restore, clearPausedFrom: true));
     _emitFromElapsed(fireEvents: false);
   }
 
@@ -291,8 +286,9 @@ class SessionEngine {
         ? 1.0
         : (into.inMicroseconds / seg.duration.inMicroseconds).clamp(0.0, 1.0);
     final Duration left = seg.duration - into;
-    final int secondsRemaining =
-        left.inMilliseconds <= 0 ? 0 : ((left.inMilliseconds + 999) ~/ 1000);
+    final int secondsRemaining = left.inMilliseconds <= 0
+        ? 0
+        : ((left.inMilliseconds + 999) ~/ 1000);
 
     Duration sessionElapsed = Duration.zero;
     for (int i = 0; i < index; i++) {
@@ -306,7 +302,7 @@ class SessionEngine {
     final double totalProgress = _sessionDuration.inMicroseconds == 0
         ? 1.0
         : (sessionElapsed.inMicroseconds / _sessionDuration.inMicroseconds)
-            .clamp(0.0, 1.0);
+              .clamp(0.0, 1.0);
 
     String? nextKey;
     for (int i = index + 1; i < _segments.length; i++) {

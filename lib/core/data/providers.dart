@@ -11,6 +11,8 @@ import '../plan/plan_models.dart';
 import '../plan/plan_service.dart';
 import '../plan/session_definition.dart';
 import '../time/app_clock.dart';
+import '../cloud/sync_coordinator.dart';
+import '../cloud/sync_metadata_store.dart';
 import 'database/app_database.dart';
 import 'repositories/checkin_repository.dart';
 import 'repositories/data_reset_service.dart';
@@ -19,14 +21,31 @@ import 'repositories/hold_test_repository.dart';
 import 'repositories/session_repository.dart';
 import 'repositories/settings_repository.dart';
 
+// Sync coordinator is provided from cloud_providers to avoid a cycle;
+// repositories receive a lazy notify callback.
+SyncCoordinator? _syncCoordinatorRef;
+SyncMetadataStore? _syncMetaRef;
+
+/// Called once from [cloudProvidersReady] / app bootstrap.
+void bindSyncHooks({
+  required SyncCoordinator coordinator,
+  required SyncMetadataStore meta,
+}) {
+  _syncCoordinatorRef = coordinator;
+  _syncMetaRef = meta;
+}
+
+void _notifyDirty() => _syncCoordinatorRef?.notifyLocalChange();
+
 /// Shared preferences instance.
 final sharedPreferencesProvider = Provider<SharedPreferences>((Ref ref) {
   throw UnimplementedError('Override sharedPreferencesProvider in main()');
 });
 
 /// Debug-only day offset applied on top of the system clock (H1 tools).
-final debugDayOffsetProvider =
-    NotifierProvider<DebugDayOffsetNotifier, int>(DebugDayOffsetNotifier.new);
+final debugDayOffsetProvider = NotifierProvider<DebugDayOffsetNotifier, int>(
+  DebugDayOffsetNotifier.new,
+);
 
 /// Holds a debug day offset for [appClockProvider].
 class DebugDayOffsetNotifier extends Notifier<int> {
@@ -41,7 +60,9 @@ class DebugDayOffsetNotifier extends Notifier<int> {
 /// Premium entitlement stub until RevenueCat (Prompt 10).
 /// Debug builds default to unlocked so Levels 2–5 can be tested; toggle in Settings.
 final isPremiumOverrideProvider =
-    NotifierProvider<PremiumOverrideNotifier, bool>(PremiumOverrideNotifier.new);
+    NotifierProvider<PremiumOverrideNotifier, bool>(
+      PremiumOverrideNotifier.new,
+    );
 
 /// Holds the debug Premium override.
 class PremiumOverrideNotifier extends Notifier<bool> {
@@ -77,19 +98,31 @@ final settingsRepositoryProvider = Provider<SettingsRepository>((Ref ref) {
 });
 
 final sessionRepositoryProvider = Provider<SessionRepository>((Ref ref) {
-  return SessionRepository(ref.watch(appDatabaseProvider));
+  return SessionRepository(
+    ref.watch(appDatabaseProvider),
+    onDirty: _notifyDirty,
+  );
 });
 
 final checkInRepositoryProvider = Provider<CheckInRepository>((Ref ref) {
-  return CheckInRepository(ref.watch(appDatabaseProvider));
+  return CheckInRepository(
+    ref.watch(appDatabaseProvider),
+    onDirty: _notifyDirty,
+  );
 });
 
 final habitRepositoryProvider = Provider<HabitRepository>((Ref ref) {
-  return HabitRepository(ref.watch(appDatabaseProvider));
+  return HabitRepository(
+    ref.watch(appDatabaseProvider),
+    onDirty: _notifyDirty,
+  );
 });
 
 final walkingRepositoryProvider = Provider<WalkingRepository>((Ref ref) {
-  return WalkingRepository(ref.watch(appDatabaseProvider));
+  return WalkingRepository(
+    ref.watch(appDatabaseProvider),
+    onDirty: _notifyDirty,
+  );
 });
 
 final dataResetServiceProvider = Provider<DataResetService>((Ref ref) {
@@ -100,6 +133,7 @@ final dataResetServiceProvider = Provider<DataResetService>((Ref ref) {
     habits: ref.watch(habitRepositoryProvider),
     walking: ref.watch(walkingRepositoryProvider),
     holdTests: ref.watch(holdTestRepositoryProvider),
+    syncMeta: SyncMetadataStore(ref.watch(sharedPreferencesProvider)),
   );
 });
 
@@ -110,8 +144,8 @@ final holdTestRepositoryProvider = Provider<HoldTestRepository>((Ref ref) {
 /// Saved pelvic floor hold tests, oldest first. On-device only.
 final holdTestsProvider =
     NotifierProvider<HoldTestsNotifier, List<HoldTestResult>>(
-  HoldTestsNotifier.new,
-);
+      HoldTestsNotifier.new,
+    );
 
 class HoldTestsNotifier extends Notifier<List<HoldTestResult>> {
   @override
@@ -119,14 +153,19 @@ class HoldTestsNotifier extends Notifier<List<HoldTestResult>> {
 
   Future<void> add(double seconds) async {
     final HoldTestRepository repo = ref.read(holdTestRepositoryProvider);
-    await repo.add(
+    final HoldTestResult saved = await repo.add(
       HoldTestResult(at: ref.read(appClockProvider).now(), seconds: seconds),
     );
+    final String? syncId = saved.syncId;
+    if (syncId != null) {
+      await _syncMetaRef?.markHoldDirty(syncId);
+      _notifyDirty();
+    }
     state = repo.all();
   }
 }
 
-/// Day the "How to do a Kegel" guide was last finished (null = never).
+/// When the "How to do a Kegel" guide was last finished (null = never).
 final guideSeenOnProvider = NotifierProvider<GuideSeenNotifier, DateTime?>(
   GuideSeenNotifier.new,
 );
@@ -138,7 +177,7 @@ class GuideSeenNotifier extends Notifier<DateTime?> {
   Future<void> markToday() async {
     final DateTime now = ref.read(appClockProvider).now();
     await ref.read(holdTestRepositoryProvider).markGuideSeen(now);
-    state = DateTime(now.year, now.month, now.day);
+    state = now;
   }
 }
 
@@ -151,8 +190,9 @@ final planServiceProvider = Provider<PlanService>((Ref ref) {
 });
 
 /// Reactive user profile.
-final userProfileProvider =
-    NotifierProvider<UserProfileNotifier, UserProfile>(UserProfileNotifier.new);
+final userProfileProvider = NotifierProvider<UserProfileNotifier, UserProfile>(
+  UserProfileNotifier.new,
+);
 
 /// Holds and persists [UserProfile].
 class UserProfileNotifier extends Notifier<UserProfile> {
@@ -164,6 +204,13 @@ class UserProfileNotifier extends Notifier<UserProfile> {
   Future<void> save(UserProfile profile) async {
     await ref.read(settingsRepositoryProvider).save(profile);
     state = profile;
+    final SyncMetadataStore? meta = _syncMetaRef;
+    if (meta != null) {
+      // Safety-only edits still mark profile dirty; payload strips safety.
+      await meta.markProfileDirty();
+      await meta.markPrefsDirty();
+      _notifyDirty();
+    }
   }
 
   Future<void> reload() async {
@@ -181,21 +228,21 @@ final checkInsProvider = FutureProvider<List<CheckInRecord>>((Ref ref) {
   return ref.watch(checkInRepositoryProvider).getAll();
 });
 
-final latestSessionsProvider =
-    FutureProvider.family<List<SessionRecord>, int>((Ref ref, int limit) {
+final latestSessionsProvider = FutureProvider.family<List<SessionRecord>, int>((
+  Ref ref,
+  int limit,
+) {
   return ref.watch(sessionRepositoryProvider).latest(limit);
 });
 
 final todayPlanProvider = FutureProvider<TodayPlan>((Ref ref) async {
   final UserProfile profile = ref.watch(userProfileProvider);
-  final List<SessionRecord> sessions =
-      await ref.watch(sessionsProvider.future);
-  final List<LevelContent> levels =
-      await ref.watch(levelsProvider.future);
-  final List<TrackContent> tracks =
-      await ref.watch(tracksProvider.future);
-  final List<ExerciseContent> exercises =
-      await ref.watch(exercisesProvider.future);
+  final List<SessionRecord> sessions = await ref.watch(sessionsProvider.future);
+  final List<LevelContent> levels = await ref.watch(levelsProvider.future);
+  final List<TrackContent> tracks = await ref.watch(tracksProvider.future);
+  final List<ExerciseContent> exercises = await ref.watch(
+    exercisesProvider.future,
+  );
   final LevelContent level = levels.firstWhere(
     (LevelContent l) => l.id == profile.level,
     orElse: () => levels.first,
@@ -208,11 +255,14 @@ final todayPlanProvider = FutureProvider<TodayPlan>((Ref ref) async {
     for (final ExerciseContent e in exercises) e.id: e,
   };
   final DateTime today = ref.watch(appClockProvider).now();
-  final Set<String> habitsDone =
-      await ref.watch(habitRepositoryProvider).doneHabitIdsOn(today);
+  final Set<String> habitsDone = await ref
+      .watch(habitRepositoryProvider)
+      .doneHabitIdsOn(today);
   final int strengthSeconds =
       SessionDefinitionBuilder.strengtheningDurationForLevel(level);
-  return ref.watch(planServiceProvider).todayPlan(
+  return ref
+      .watch(planServiceProvider)
+      .todayPlan(
         profile: profile,
         sessions: sessions,
         trackContent: track,
@@ -245,8 +295,9 @@ final articlesProvider = FutureProvider<List<ArticleContent>>((Ref ref) {
 });
 
 /// Walking week stats for Progress (minutes + days with any minutes).
-final walkingWeekProvider =
-    FutureProvider<({int minutes, int days})>((Ref ref) async {
+final walkingWeekProvider = FutureProvider<({int minutes, int days})>((
+  Ref ref,
+) async {
   final DateTime today = ref.watch(appClockProvider).now();
   return ref.watch(walkingRepositoryProvider).weekStats(today);
 });

@@ -17,6 +17,19 @@ abstract final class PlanRules {
   static const int levelUnlockMinCompletedDays = 5;
   static const int relaxationFirstWeeks = 2;
 
+  /// Sessions that belong to the active plan ([profile.track] only).
+  ///
+  /// Other goals' history stays in Drift but must not paint Today, the week
+  /// strip, day-in-level, or streak for the selected goal.
+  static List<SessionRecord> sessionsForActivePlan({
+    required UserProfile profile,
+    required List<SessionRecord> sessions,
+  }) {
+    return sessions
+        .where((SessionRecord s) => s.track == profile.track)
+        .toList(growable: false);
+  }
+
   /// Calendar length of the relaxation-first track (spec: 2 weeks).
   static int get relaxationFirstDays => relaxationFirstWeeks * 7;
 
@@ -83,11 +96,8 @@ abstract final class PlanRules {
     if (done.isEmpty) {
       return 0;
     }
-    bool rest(DateTime d) => isRestDay(
-          date: d,
-          restWeekday: restWeekday,
-          sessions: sessions,
-        );
+    bool rest(DateTime d) =>
+        isRestDay(date: d, restWeekday: restWeekday, sessions: sessions);
     DateTime cursor = dateOnly(today);
     // If today is not done yet and is a rest day, start from yesterday.
     if (!done.contains(cursor) && rest(cursor)) {
@@ -278,18 +288,19 @@ abstract final class PlanRules {
 
   /// Suggest step-down after two consecutive mild-discomfort answers. Never auto-apply.
   static bool shouldSuggestStepDown(List<SessionRecord> sessions) {
-    final List<SessionRecord> completed = sessions
-        .where(
-          (SessionRecord s) =>
-              s.completed &&
-              s.kind == SessionKind.strengthening &&
-              s.feel != null,
-        )
-        .toList()
-      ..sort(
-        (SessionRecord a, SessionRecord b) =>
-            (a.completedAt ?? a.startedAt).compareTo(b.completedAt ?? b.startedAt),
-      );
+    final List<SessionRecord> completed =
+        sessions
+            .where(
+              (SessionRecord s) =>
+                  s.completed &&
+                  s.kind == SessionKind.strengthening &&
+                  s.feel != null,
+            )
+            .toList()
+          ..sort(
+            (SessionRecord a, SessionRecord b) => (a.completedAt ?? a.startedAt)
+                .compareTo(b.completedAt ?? b.startedAt),
+          );
     if (completed.length < 2) {
       return false;
     }
@@ -350,8 +361,9 @@ abstract final class PlanRules {
     required List<CheckInRecord> checkIns,
     required DateTime today,
   }) {
-    final int completedCount =
-        sessions.where((SessionRecord s) => s.completed).length;
+    final int completedCount = sessions
+        .where((SessionRecord s) => s.completed)
+        .length;
     if (completedCount < checkInBaselineSessionCount) {
       return false;
     }

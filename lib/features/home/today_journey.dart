@@ -42,14 +42,18 @@ class TodayJourney extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int celebrateIndex =
-        items.indexWhere((TodayItem i) => i.id == celebrateId);
+    final int celebrateIndex = items.indexWhere(
+      (TodayItem i) => i.id == celebrateId,
+    );
     return Column(
       children: [
         for (int i = 0; i < items.length; i++)
           Reveal(
             from: i.isEven ? RevealFrom.left : RevealFrom.right,
-            delay: AppMotion.stagger(i, base: const Duration(milliseconds: 260)),
+            delay: AppMotion.stagger(
+              i,
+              base: const Duration(milliseconds: 260),
+            ),
             child: _JourneyStep(
               l10n: l10n,
               item: items[i],
@@ -104,8 +108,10 @@ class _JourneyStep extends StatelessWidget {
   Widget build(BuildContext context) {
     // Line timing: on first open the line draws down step by step; after a
     // completion it flows from the finished node into the next one.
-    final Duration baseDelay =
-        AppMotion.stagger(index * 2, base: const Duration(milliseconds: 420));
+    final Duration baseDelay = AppMotion.stagger(
+      index * 2,
+      base: const Duration(milliseconds: 420),
+    );
     final Duration topDelay = arrivingAfterCelebration
         ? const Duration(milliseconds: 950)
         : baseDelay;
@@ -228,8 +234,12 @@ class _ConnectorPainter extends CustomPainter {
     if (progress <= 0) {
       return;
     }
-    final Rect fillRect =
-        Rect.fromLTWH(x - _width / 2, 0, _width, size.height * progress);
+    final Rect fillRect = Rect.fromLTWH(
+      x - _width / 2,
+      0,
+      _width,
+      size.height * progress,
+    );
     canvas.drawRRect(
       RRect.fromRectAndRadius(fillRect, const Radius.circular(_width / 2)),
       Paint()
@@ -305,7 +315,11 @@ class _Node extends StatelessWidget {
         return const _NodeCircle(
           fill: AppColors.surfaceMuted,
           border: AppColors.border,
-          child: Icon(Icons.lock_rounded, size: 16, color: AppColors.textSecondary),
+          child: Icon(
+            Icons.lock_rounded,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
         );
       case JourneyStatus.upcoming:
       case JourneyStatus.blocked:
@@ -376,9 +390,18 @@ IconData _kindIcon(SessionKind kind) {
 ({Color bg, Color fg}) _kindColors(SessionKind kind) {
   return switch (kind) {
     SessionKind.strengthening => (bg: AppColors.mint, fg: AppColors.primary),
-    SessionKind.body => (bg: AppColors.goalBladderBg, fg: AppColors.goalBladderFg),
-    SessionKind.breathing => (bg: AppColors.goalSurgeryBg, fg: AppColors.goalSurgeryFg),
-    SessionKind.relaxation => (bg: AppColors.goalSurgeryBg, fg: AppColors.goalSurgeryFg),
+    SessionKind.body => (
+      bg: AppColors.goalBladderBg,
+      fg: AppColors.goalBladderFg,
+    ),
+    SessionKind.breathing => (
+      bg: AppColors.goalSurgeryBg,
+      fg: AppColors.goalSurgeryFg,
+    ),
+    SessionKind.relaxation => (
+      bg: AppColors.goalSurgeryBg,
+      fg: AppColors.goalSurgeryFg,
+    ),
   };
 }
 
@@ -414,8 +437,9 @@ class _StepCard extends StatelessWidget {
     final bool isLocked = status == JourneyStatus.locked;
     final bool dim = status == JourneyStatus.blocked;
     final String title = HomeCopy.itemTitle(l10n, item);
-    final String meta =
-        isLocked ? l10n.h1BodyCardLocked : HomeCopy.itemMeta(l10n, item);
+    final String meta = isLocked
+        ? l10n.h1BodyCardLocked
+        : HomeCopy.itemMeta(l10n, item);
     final ({Color bg, Color fg}) colors = _kindColors(item.kind);
 
     final Widget body = Row(
@@ -452,7 +476,9 @@ class _StepCard extends StatelessWidget {
                         fontSize: 11,
                         letterSpacing: 0.6,
                         fontWeight: FontWeight.w800,
-                        color: isNext ? AppColors.primary : AppColors.textSecondary,
+                        color: isNext
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -487,15 +513,13 @@ class _StepCard extends StatelessWidget {
                     isLocked
                         ? Icons.workspace_premium_outlined
                         : (isDone
-                            ? Icons.check_circle_rounded
-                            : Icons.schedule_rounded),
+                              ? Icons.check_circle_rounded
+                              : Icons.schedule_rounded),
                     size: 14,
                     color: isDone ? AppColors.primary : AppColors.textSecondary,
                   ),
                   const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(meta, style: AppTypography.caption),
-                  ),
+                  Flexible(child: Text(meta, style: AppTypography.caption)),
                 ],
               ),
             ],
@@ -507,11 +531,16 @@ class _StepCard extends StatelessWidget {
         else if (isLocked)
           const Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary)
         else if (!isDone && !dim)
-          const Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.textSecondary,
+          ),
       ],
     );
 
-    final Color background = isDone ? AppColors.surfaceMuted : AppColors.surface;
+    final Color background = isDone
+        ? AppColors.surfaceMuted
+        : AppColors.surface;
     Widget card = AnimatedContainer(
       duration: AppMotion.quick,
       padding: const EdgeInsets.all(AppSpacing.sm),
@@ -627,10 +656,7 @@ class _Tag extends StatelessWidget {
         color: AppColors.surfaceMuted,
         borderRadius: AppRadii.pillAll,
       ),
-      child: Text(
-        label,
-        style: AppTypography.caption.copyWith(fontSize: 11),
-      ),
+      child: Text(label, style: AppTypography.caption.copyWith(fontSize: 11)),
     );
   }
 }

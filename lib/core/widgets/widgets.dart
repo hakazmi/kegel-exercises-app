@@ -5,6 +5,7 @@ export 'app_card.dart';
 export 'bottom_tab_bar.dart';
 export 'confirm_dialog.dart';
 export 'disclaimer_text.dart';
+export 'exercise_video.dart';
 export 'illustration.dart';
 export 'info_sheet.dart';
 export 'pelvic_floor_demo.dart';

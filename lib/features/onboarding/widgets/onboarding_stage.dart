@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'dart:ui' show ImageFilter, PathMetric;
+import 'dart:ui' show ImageFilter, PathMetric, Tangent;
 
 import 'package:material_ui/material_ui.dart';
 
@@ -19,13 +19,6 @@ abstract final class OnboardingArt {
   static const String stopwatch = '$_dir/stopwatch.png';
   static const String tutorialWhere = '$_dir/tutorial_where.png';
   static const String tutorialFind = '$_dir/tutorial_find.png';
-
-  /// Side-view X-ray style PF muscle demo (still frames + GIF).
-  static const String sideSqueeze =
-      'assets/images/onboarding/pf_side_squeeze.jpg';
-  static const String sideRelax = 'assets/images/onboarding/pf_side_relax.jpg';
-  static const String sideSqueezeRelaxGif =
-      'assets/images/onboarding/pf_side_squeeze_relax.gif';
 }
 
 /// Open hero area (no card): soft pastel blobs, a glowing floor and the
@@ -497,9 +490,10 @@ class _OrbitPainter extends CustomPainter {
   bool shouldRepaint(_OrbitPainter old) => old.t != t || old.color != color;
 }
 
-/// Curved dotted line between two points in the stage, ending in a dot
-/// (links a tile to the part of the body it shows).
-class ConnectorLine extends StatelessWidget {
+/// Curved arrow from a tile to the part of the body it shows: a soft
+/// solid line with an arrowhead, and a glowing dot that keeps travelling
+/// along it toward the body.
+class ConnectorLine extends StatefulWidget {
   const ConnectorLine({
     super.key,
     required this.from,
@@ -512,48 +506,163 @@ class ConnectorLine extends StatelessWidget {
   final Color color;
 
   @override
+  State<ConnectorLine> createState() => _ConnectorLineState();
+}
+
+class _ConnectorLineState extends State<ConnectorLine>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _c;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!AppMotion.isReduced(context) && _c == null) {
+      _c = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1800),
+      )..repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final AnimationController? c = _c;
+    CustomPaint paint(double t) => CustomPaint(
+          painter: _ConnectorPainter(
+            from: widget.from,
+            to: widget.to,
+            color: widget.color,
+            travel: t,
+          ),
+        );
     return Positioned.fill(
       child: IgnorePointer(
-        child: CustomPaint(
-          painter: _ConnectorPainter(from: from, to: to, color: color),
-        ),
+        child: c == null
+            ? paint(-1)
+            : AnimatedBuilder(
+                animation: c,
+                builder: (BuildContext context, Widget? _) => paint(c.value),
+              ),
       ),
     );
   }
 }
 
 class _ConnectorPainter extends CustomPainter {
-  _ConnectorPainter({required this.from, required this.to, required this.color});
+  _ConnectorPainter({
+    required this.from,
+    required this.to,
+    required this.color,
+    required this.travel,
+  });
 
   final Offset from;
   final Offset to;
   final Color color;
 
+  /// 0–1 position of the travelling dot; negative hides it.
+  final double travel;
+
+  static const double _head = 14;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final Path path = Path()
-      ..moveTo(from.dx, from.dy)
-      ..quadraticBezierTo(from.dx, to.dy, to.dx, to.dy);
-    final Paint line = Paint()
-      ..color = color.withValues(alpha: 0.7)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-    for (final PathMetric m in path.computeMetrics()) {
-      double d = 0;
-      while (d < m.length) {
-        canvas.drawPath(m.extractPath(d, math.min(d + 6, m.length)), line);
-        d += 11;
+    // Curve gently along the main direction so the arrowhead arrives
+    // pointing at the target (sideways links bend horizontally, up/down
+    // links vertically).
+    final Offset d = to - from;
+    final Path path = Path()..moveTo(from.dx, from.dy);
+    if (d.dx.abs() >= d.dy.abs()) {
+      final double k = d.dx * 0.5;
+      path.cubicTo(from.dx + k, from.dy, to.dx - k, to.dy, to.dx, to.dy);
+    } else {
+      final double k = d.dy * 0.5;
+      path.cubicTo(from.dx, from.dy + k, to.dx, to.dy - k, to.dx, to.dy);
+    }
+    final PathMetric? m = path.computeMetrics().firstOrNull;
+    if (m == null || m.length < _head * 2) {
+      return;
+    }
+    // Stop the line short so the arrowhead tip lands on the target.
+    final Path body = m.extractPath(0, m.length - _head * 0.6);
+
+    canvas.drawPath(
+      body,
+      Paint()
+        ..color = color.withValues(alpha: 0.25)
+        ..strokeWidth = 9
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+    );
+    canvas.drawPath(
+      body,
+      Paint()
+        ..shader = LinearGradient(
+          colors: <Color>[color.withValues(alpha: 0.35), color],
+        ).createShader(Rect.fromPoints(from, to))
+        ..strokeWidth = 3.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round,
+    );
+
+    // Arrowhead along the curve's final direction.
+    final Tangent? end = m.getTangentForOffset(m.length);
+    if (end != null) {
+      final Offset dir = end.vector / end.vector.distance;
+      final Offset normal = Offset(-dir.dy, dir.dx);
+      final Offset tip = end.position;
+      final Offset base = tip - dir * _head;
+      final Path head = Path()
+        ..moveTo(tip.dx, tip.dy)
+        ..lineTo(base.dx + normal.dx * _head * 0.6, base.dy + normal.dy * _head * 0.6)
+        ..lineTo(base.dx - normal.dx * _head * 0.6, base.dy - normal.dy * _head * 0.6)
+        ..close();
+      canvas.drawPath(
+        head,
+        Paint()
+          ..color = color
+          ..style = PaintingStyle.fill
+          ..strokeJoin = StrokeJoin.round,
+      );
+    }
+
+    // Travelling dot (fades in and out at the ends).
+    if (travel >= 0) {
+      final Tangent? at = m.getTangentForOffset(m.length * travel * 0.92);
+      if (at != null) {
+        final double a = math.sin(travel * math.pi);
+        canvas.drawCircle(
+          at.position,
+          8,
+          Paint()..color = color.withValues(alpha: 0.25 * a),
+        );
+        canvas.drawCircle(
+          at.position,
+          4.5,
+          Paint()..color = AppColors.surface.withValues(alpha: a),
+        );
+        canvas.drawCircle(
+          at.position,
+          3,
+          Paint()..color = color.withValues(alpha: a),
+        );
       }
     }
-    canvas.drawCircle(to, 7, Paint()..color = color.withValues(alpha: 0.25));
-    canvas.drawCircle(to, 4, Paint()..color = color);
   }
 
   @override
   bool shouldRepaint(_ConnectorPainter old) =>
-      old.from != from || old.to != to || old.color != color;
+      old.travel != travel ||
+      old.from != from ||
+      old.to != to ||
+      old.color != color;
 }
 
 /// Small floating round glass bubble with an icon (thought bubbles etc.).

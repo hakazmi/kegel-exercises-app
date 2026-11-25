@@ -14,5 +14,6 @@ class TodayCelebration extends Notifier<String?> {
 }
 
 /// Pending "just completed" Today item, or null.
-final todayCelebrationProvider =
-    NotifierProvider<TodayCelebration, String?>(TodayCelebration.new);
+final todayCelebrationProvider = NotifierProvider<TodayCelebration, String?>(
+  TodayCelebration.new,
+);

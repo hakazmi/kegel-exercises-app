@@ -47,7 +47,9 @@ abstract final class LevelUnlockActions {
     await ref.read(userProfileProvider.notifier).save(next);
     ref.invalidate(todayPlanProvider);
     await ref.read(reminderServiceProvider).clearLevelUnlockNotice();
-    await ref.read(analyticsServiceProvider).logEvent(
+    await ref
+        .read(analyticsServiceProvider)
+        .logEvent(
           'level_up',
           parameters: <String, Object?>{'level': nextLevel},
         );
@@ -59,8 +61,8 @@ abstract final class LevelUnlockActions {
     AppLocalizations l10n,
     int level,
   ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.h1LevelStartedConfirm(level))),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.h1LevelStartedConfirm(level))));
   }
 }

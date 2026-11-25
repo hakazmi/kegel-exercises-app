@@ -26,10 +26,7 @@ import 'session_controller.dart';
 /// hands the finished item to [todayCelebrationProvider] so the journey
 /// animates the step.
 class S4DoneScreen extends ConsumerStatefulWidget {
-  const S4DoneScreen({
-    super.key,
-    this.itemId,
-  });
+  const S4DoneScreen({super.key, this.itemId});
 
   final String? itemId;
 
@@ -65,8 +62,9 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
       return;
     }
     setState(() => _saving = true);
-    final SessionSaveResult result =
-        await ref.read(sessionControllerProvider.notifier).saveWithFeel(feel);
+    final SessionSaveResult result = await ref
+        .read(sessionControllerProvider.notifier)
+        .saveWithFeel(feel);
     if (!mounted) {
       return;
     }
@@ -92,10 +90,11 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
     if (finishedId != null && dest != SessionNext.goPainHelp) {
       ref.read(todayCelebrationProvider.notifier).mark(finishedId);
     }
-    await ref.read(sessionControllerProvider.notifier).clear();
     if (!mounted) {
       return;
     }
+    // Navigate first so S4 is not rebuilt with a null session (that tears
+    // down celebration tickers mid-frame and can assert `_dependents.isEmpty`).
     switch (dest) {
       case SessionNext.goPainHelp:
         context.go('${AppRoutes.painHelp}?fromSession=1');
@@ -104,6 +103,7 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
       case SessionNext.goToday:
         context.go(AppRoutes.today);
     }
+    await ref.read(sessionControllerProvider.notifier).clear();
   }
 
   void _select(SessionFeel feel) {
@@ -136,8 +136,9 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
     }
 
     final bool minutes = summary.durationSeconds >= 90;
-    final int timeValue =
-        minutes ? (summary.durationSeconds / 60).ceil() : summary.durationSeconds;
+    final int timeValue = minutes
+        ? (summary.durationSeconds / 60).ceil()
+        : summary.durationSeconds;
     final int? nextLevel = _nextLevel;
     final String subtitle = _subtitle(l10n, play!);
 
@@ -279,10 +280,10 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
                               onStart: () async {
                                 final bool advanced =
                                     await LevelUnlockActions.startNext(
-                                  context: context,
-                                  ref: ref,
-                                  nextLevel: nextLevel,
-                                );
+                                      context: context,
+                                      ref: ref,
+                                      nextLevel: nextLevel,
+                                    );
                                 if (!context.mounted) {
                                   return;
                                 }
@@ -321,8 +322,9 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            for (final (int i, _FeelOption option)
-                                in _options(l10n).indexed) ...[
+                            for (final (int i, _FeelOption option) in _options(
+                              l10n,
+                            ).indexed) ...[
                               if (i > 0) const SizedBox(width: AppSpacing.xs),
                               Expanded(
                                 child: Reveal(
@@ -334,7 +336,8 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
                                   child: _FeelTile(
                                     option: option,
                                     selected: _feel == option.feel,
-                                    dimmed: _feel != null && _feel != option.feel,
+                                    dimmed:
+                                        _feel != null && _feel != option.feel,
                                     onTap: () => _select(option.feel),
                                   ),
                                 ),
@@ -346,8 +349,9 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
                           duration: AppMotion.quick,
                           child: _suggestStepDown
                               ? Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: AppSpacing.md),
+                                  padding: const EdgeInsets.only(
+                                    top: AppSpacing.md,
+                                  ),
                                   child: _Note(text: l10n.s4StepDownSuggestion),
                                 )
                               : const SizedBox(width: double.infinity),
@@ -402,25 +406,25 @@ class _S4DoneScreenState extends ConsumerState<S4DoneScreen> {
   }
 
   List<_FeelOption> _options(AppLocalizations l10n) => <_FeelOption>[
-        _FeelOption(
-          feel: SessionFeel.fine,
-          label: l10n.s4FeelFine,
-          icon: Icons.sentiment_satisfied_alt_rounded,
-          color: AppColors.accent,
-        ),
-        _FeelOption(
-          feel: SessionFeel.mildDiscomfort,
-          label: l10n.s4FeelMild,
-          icon: Icons.sentiment_neutral_rounded,
-          color: AppColors.goalEjaculationBg,
-        ),
-        _FeelOption(
-          feel: SessionFeel.pain,
-          label: l10n.s4FeelPain,
-          icon: Icons.healing_outlined,
-          color: AppColors.goalGeneralBg,
-        ),
-      ];
+    _FeelOption(
+      feel: SessionFeel.fine,
+      label: l10n.s4FeelFine,
+      icon: Icons.sentiment_satisfied_alt_rounded,
+      color: AppColors.accent,
+    ),
+    _FeelOption(
+      feel: SessionFeel.mildDiscomfort,
+      label: l10n.s4FeelMild,
+      icon: Icons.sentiment_neutral_rounded,
+      color: AppColors.goalEjaculationBg,
+    ),
+    _FeelOption(
+      feel: SessionFeel.pain,
+      label: l10n.s4FeelPain,
+      icon: Icons.healing_outlined,
+      color: AppColors.goalGeneralBg,
+    ),
+  ];
 }
 
 class _Hero extends StatelessWidget {
@@ -501,8 +505,7 @@ class _StatTile extends StatelessWidget {
               borderRadius: AppRadii.mdAll,
             ),
             alignment: Alignment.center,
-            child: iconWidget ??
-                Icon(icon, size: 18, color: AppColors.accent),
+            child: iconWidget ?? Icon(icon, size: 18, color: AppColors.accent),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
@@ -575,8 +578,7 @@ class _NextTile extends StatelessWidget {
               ],
             ),
           ),
-          if (hasNext)
-            const NudgeArrow(color: AppColors.sessionTextSecondary),
+          if (hasNext) const NudgeArrow(color: AppColors.sessionTextSecondary),
         ],
       ),
     );
@@ -681,7 +683,11 @@ class _Note extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline_rounded, color: AppColors.accent, size: 20),
+          const Icon(
+            Icons.info_outline_rounded,
+            color: AppColors.accent,
+            size: 20,
+          ),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(

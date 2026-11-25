@@ -35,7 +35,7 @@ void main() {
     final HoldTestRepository repo =
         HoldTestRepository(await SharedPreferences.getInstance());
     await repo.markGuideSeen(DateTime(2026, 11, 11, 15, 30));
-    expect(repo.guideSeenOn(), DateTime(2026, 11, 11));
+    expect(repo.guideSeenOn(), DateTime(2026, 11, 11, 15, 30));
     await repo.add(HoldTestResult(at: DateTime(2026, 11, 11), seconds: 3));
     await repo.clear();
     expect(repo.all(), isEmpty);

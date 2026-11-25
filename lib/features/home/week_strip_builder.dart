@@ -54,8 +54,10 @@ List<WeekDayItem> buildTodayWeekStrip({
 
   return List<WeekDayItem>.generate(7, (int index) {
     final DateTime day = DateTime(first.year, first.month, first.day + index);
-    final bool configuredRest =
-        PlanRules.isConfiguredRestWeekday(day, restWeekday);
+    final bool configuredRest = PlanRules.isConfiguredRestWeekday(
+      day,
+      restWeekday,
+    );
     final bool activeRest = PlanRules.isRestDay(
       date: day,
       restWeekday: restWeekday,

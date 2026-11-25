@@ -27,7 +27,9 @@ class ContentRepository {
     if (_exercises != null) {
       return _exercises!;
     }
-    final Map<String, dynamic> json = await _loadMap('assets/content/exercises.json');
+    final Map<String, dynamic> json = await _loadMap(
+      'assets/content/exercises.json',
+    );
     _exercisesReviewed = json['reviewedByPhysio'] as bool? ?? false;
     _exercises = (json['exercises'] as List<dynamic>)
         .map((dynamic e) => ExerciseContent.fromJson(e as Map<String, dynamic>))
@@ -39,7 +41,9 @@ class ContentRepository {
     if (_levels != null) {
       return _levels!;
     }
-    final Map<String, dynamic> json = await _loadMap('assets/content/levels.json');
+    final Map<String, dynamic> json = await _loadMap(
+      'assets/content/levels.json',
+    );
     _levelsReviewed = json['reviewedByPhysio'] as bool? ?? false;
     _levels = (json['levels'] as List<dynamic>)
         .map((dynamic e) => LevelContent.fromJson(e as Map<String, dynamic>))
@@ -51,7 +55,9 @@ class ContentRepository {
     if (_tracks != null) {
       return _tracks!;
     }
-    final Map<String, dynamic> json = await _loadMap('assets/content/tracks.json');
+    final Map<String, dynamic> json = await _loadMap(
+      'assets/content/tracks.json',
+    );
     _tracksReviewed = json['reviewedByPhysio'] as bool? ?? false;
     _tracks = (json['tracks'] as List<dynamic>)
         .map((dynamic e) => TrackContent.fromJson(e as Map<String, dynamic>))
@@ -64,8 +70,9 @@ class ContentRepository {
     if (_articles != null) {
       return _articles!;
     }
-    final Map<String, dynamic> json =
-        await _loadMap('assets/content/articles.json');
+    final Map<String, dynamic> json = await _loadMap(
+      'assets/content/articles.json',
+    );
     _articles = (json['articles'] as List<dynamic>)
         .map((dynamic e) => ArticleContent.fromJson(e as Map<String, dynamic>))
         .toList();

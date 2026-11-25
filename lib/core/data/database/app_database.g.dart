@@ -129,6 +129,58 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _syncIdMeta = const VerificationMeta('syncId');
+  @override
+  late final GeneratedColumn<String> syncId = GeneratedColumn<String>(
+    'sync_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _updatedAtMillisMeta = const VerificationMeta(
+    'updatedAtMillis',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtMillis = GeneratedColumn<int>(
+    'updated_at_millis',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _syncDirtyMeta = const VerificationMeta(
+    'syncDirty',
+  );
+  @override
+  late final GeneratedColumn<bool> syncDirty = GeneratedColumn<bool>(
+    'sync_dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sync_dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -142,6 +194,10 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
     longestHoldSeconds,
     completed,
     feel,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -238,6 +294,33 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
         feel.isAcceptableOrUnknown(data['feel']!, _feelMeta),
       );
     }
+    if (data.containsKey('sync_id')) {
+      context.handle(
+        _syncIdMeta,
+        syncId.isAcceptableOrUnknown(data['sync_id']!, _syncIdMeta),
+      );
+    }
+    if (data.containsKey('updated_at_millis')) {
+      context.handle(
+        _updatedAtMillisMeta,
+        updatedAtMillis.isAcceptableOrUnknown(
+          data['updated_at_millis']!,
+          _updatedAtMillisMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sync_dirty')) {
+      context.handle(
+        _syncDirtyMeta,
+        syncDirty.isAcceptableOrUnknown(data['sync_dirty']!, _syncDirtyMeta),
+      );
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
     return context;
   }
 
@@ -291,6 +374,22 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
         DriftSqlType.string,
         data['${effectivePrefix}feel'],
       ),
+      syncId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_id'],
+      )!,
+      updatedAtMillis: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_millis'],
+      )!,
+      syncDirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sync_dirty'],
+      )!,
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
     );
   }
 
@@ -314,6 +413,12 @@ class Session extends DataClass implements Insertable<Session> {
   final int longestHoldSeconds;
   final bool completed;
   final String? feel;
+
+  /// Permanent cloud id (UUID). Empty until backfill / first write.
+  final String syncId;
+  final int updatedAtMillis;
+  final bool syncDirty;
+  final bool isDeleted;
   const Session({
     required this.id,
     required this.startedAt,
@@ -326,6 +431,10 @@ class Session extends DataClass implements Insertable<Session> {
     required this.longestHoldSeconds,
     required this.completed,
     this.feel,
+    required this.syncId,
+    required this.updatedAtMillis,
+    required this.syncDirty,
+    required this.isDeleted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -345,6 +454,10 @@ class Session extends DataClass implements Insertable<Session> {
     if (!nullToAbsent || feel != null) {
       map['feel'] = Variable<String>(feel);
     }
+    map['sync_id'] = Variable<String>(syncId);
+    map['updated_at_millis'] = Variable<int>(updatedAtMillis);
+    map['sync_dirty'] = Variable<bool>(syncDirty);
+    map['is_deleted'] = Variable<bool>(isDeleted);
     return map;
   }
 
@@ -363,6 +476,10 @@ class Session extends DataClass implements Insertable<Session> {
       longestHoldSeconds: Value(longestHoldSeconds),
       completed: Value(completed),
       feel: feel == null && nullToAbsent ? const Value.absent() : Value(feel),
+      syncId: Value(syncId),
+      updatedAtMillis: Value(updatedAtMillis),
+      syncDirty: Value(syncDirty),
+      isDeleted: Value(isDeleted),
     );
   }
 
@@ -383,6 +500,10 @@ class Session extends DataClass implements Insertable<Session> {
       longestHoldSeconds: serializer.fromJson<int>(json['longestHoldSeconds']),
       completed: serializer.fromJson<bool>(json['completed']),
       feel: serializer.fromJson<String?>(json['feel']),
+      syncId: serializer.fromJson<String>(json['syncId']),
+      updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
+      syncDirty: serializer.fromJson<bool>(json['syncDirty']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
     );
   }
   @override
@@ -400,6 +521,10 @@ class Session extends DataClass implements Insertable<Session> {
       'longestHoldSeconds': serializer.toJson<int>(longestHoldSeconds),
       'completed': serializer.toJson<bool>(completed),
       'feel': serializer.toJson<String?>(feel),
+      'syncId': serializer.toJson<String>(syncId),
+      'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
+      'syncDirty': serializer.toJson<bool>(syncDirty),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
     };
   }
 
@@ -415,6 +540,10 @@ class Session extends DataClass implements Insertable<Session> {
     int? longestHoldSeconds,
     bool? completed,
     Value<String?> feel = const Value.absent(),
+    String? syncId,
+    int? updatedAtMillis,
+    bool? syncDirty,
+    bool? isDeleted,
   }) => Session(
     id: id ?? this.id,
     startedAt: startedAt ?? this.startedAt,
@@ -427,6 +556,10 @@ class Session extends DataClass implements Insertable<Session> {
     longestHoldSeconds: longestHoldSeconds ?? this.longestHoldSeconds,
     completed: completed ?? this.completed,
     feel: feel.present ? feel.value : this.feel,
+    syncId: syncId ?? this.syncId,
+    updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+    syncDirty: syncDirty ?? this.syncDirty,
+    isDeleted: isDeleted ?? this.isDeleted,
   );
   Session copyWithCompanion(SessionsCompanion data) {
     return Session(
@@ -449,6 +582,12 @@ class Session extends DataClass implements Insertable<Session> {
           : this.longestHoldSeconds,
       completed: data.completed.present ? data.completed.value : this.completed,
       feel: data.feel.present ? data.feel.value : this.feel,
+      syncId: data.syncId.present ? data.syncId.value : this.syncId,
+      updatedAtMillis: data.updatedAtMillis.present
+          ? data.updatedAtMillis.value
+          : this.updatedAtMillis,
+      syncDirty: data.syncDirty.present ? data.syncDirty.value : this.syncDirty,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
     );
   }
 
@@ -465,7 +604,11 @@ class Session extends DataClass implements Insertable<Session> {
           ..write('durationSeconds: $durationSeconds, ')
           ..write('longestHoldSeconds: $longestHoldSeconds, ')
           ..write('completed: $completed, ')
-          ..write('feel: $feel')
+          ..write('feel: $feel, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
@@ -483,6 +626,10 @@ class Session extends DataClass implements Insertable<Session> {
     longestHoldSeconds,
     completed,
     feel,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
   );
   @override
   bool operator ==(Object other) =>
@@ -498,7 +645,11 @@ class Session extends DataClass implements Insertable<Session> {
           other.durationSeconds == this.durationSeconds &&
           other.longestHoldSeconds == this.longestHoldSeconds &&
           other.completed == this.completed &&
-          other.feel == this.feel);
+          other.feel == this.feel &&
+          other.syncId == this.syncId &&
+          other.updatedAtMillis == this.updatedAtMillis &&
+          other.syncDirty == this.syncDirty &&
+          other.isDeleted == this.isDeleted);
 }
 
 class SessionsCompanion extends UpdateCompanion<Session> {
@@ -513,6 +664,10 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   final Value<int> longestHoldSeconds;
   final Value<bool> completed;
   final Value<String?> feel;
+  final Value<String> syncId;
+  final Value<int> updatedAtMillis;
+  final Value<bool> syncDirty;
+  final Value<bool> isDeleted;
   const SessionsCompanion({
     this.id = const Value.absent(),
     this.startedAt = const Value.absent(),
@@ -525,6 +680,10 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     this.longestHoldSeconds = const Value.absent(),
     this.completed = const Value.absent(),
     this.feel = const Value.absent(),
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   });
   SessionsCompanion.insert({
     this.id = const Value.absent(),
@@ -538,6 +697,10 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     this.longestHoldSeconds = const Value.absent(),
     this.completed = const Value.absent(),
     this.feel = const Value.absent(),
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   }) : startedAt = Value(startedAt),
        level = Value(level),
        dayInLevel = Value(dayInLevel),
@@ -554,6 +717,10 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     Expression<int>? longestHoldSeconds,
     Expression<bool>? completed,
     Expression<String>? feel,
+    Expression<String>? syncId,
+    Expression<int>? updatedAtMillis,
+    Expression<bool>? syncDirty,
+    Expression<bool>? isDeleted,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -568,6 +735,10 @@ class SessionsCompanion extends UpdateCompanion<Session> {
         'longest_hold_seconds': longestHoldSeconds,
       if (completed != null) 'completed': completed,
       if (feel != null) 'feel': feel,
+      if (syncId != null) 'sync_id': syncId,
+      if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
+      if (syncDirty != null) 'sync_dirty': syncDirty,
+      if (isDeleted != null) 'is_deleted': isDeleted,
     });
   }
 
@@ -583,6 +754,10 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     Value<int>? longestHoldSeconds,
     Value<bool>? completed,
     Value<String?>? feel,
+    Value<String>? syncId,
+    Value<int>? updatedAtMillis,
+    Value<bool>? syncDirty,
+    Value<bool>? isDeleted,
   }) {
     return SessionsCompanion(
       id: id ?? this.id,
@@ -596,6 +771,10 @@ class SessionsCompanion extends UpdateCompanion<Session> {
       longestHoldSeconds: longestHoldSeconds ?? this.longestHoldSeconds,
       completed: completed ?? this.completed,
       feel: feel ?? this.feel,
+      syncId: syncId ?? this.syncId,
+      updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+      syncDirty: syncDirty ?? this.syncDirty,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -635,6 +814,18 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     if (feel.present) {
       map['feel'] = Variable<String>(feel.value);
     }
+    if (syncId.present) {
+      map['sync_id'] = Variable<String>(syncId.value);
+    }
+    if (updatedAtMillis.present) {
+      map['updated_at_millis'] = Variable<int>(updatedAtMillis.value);
+    }
+    if (syncDirty.present) {
+      map['sync_dirty'] = Variable<bool>(syncDirty.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
     return map;
   }
 
@@ -651,7 +842,11 @@ class SessionsCompanion extends UpdateCompanion<Session> {
           ..write('durationSeconds: $durationSeconds, ')
           ..write('longestHoldSeconds: $longestHoldSeconds, ')
           ..write('completed: $completed, ')
-          ..write('feel: $feel')
+          ..write('feel: $feel, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
@@ -702,8 +897,69 @@ class $CheckinsTable extends Checkins with TableInfo<$CheckinsTable, Checkin> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _syncIdMeta = const VerificationMeta('syncId');
   @override
-  List<GeneratedColumn> get $columns => [id, date, goal, score];
+  late final GeneratedColumn<String> syncId = GeneratedColumn<String>(
+    'sync_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _updatedAtMillisMeta = const VerificationMeta(
+    'updatedAtMillis',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtMillis = GeneratedColumn<int>(
+    'updated_at_millis',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _syncDirtyMeta = const VerificationMeta(
+    'syncDirty',
+  );
+  @override
+  late final GeneratedColumn<bool> syncDirty = GeneratedColumn<bool>(
+    'sync_dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sync_dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    goal,
+    score,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -743,6 +999,33 @@ class $CheckinsTable extends Checkins with TableInfo<$CheckinsTable, Checkin> {
     } else if (isInserting) {
       context.missing(_scoreMeta);
     }
+    if (data.containsKey('sync_id')) {
+      context.handle(
+        _syncIdMeta,
+        syncId.isAcceptableOrUnknown(data['sync_id']!, _syncIdMeta),
+      );
+    }
+    if (data.containsKey('updated_at_millis')) {
+      context.handle(
+        _updatedAtMillisMeta,
+        updatedAtMillis.isAcceptableOrUnknown(
+          data['updated_at_millis']!,
+          _updatedAtMillisMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sync_dirty')) {
+      context.handle(
+        _syncDirtyMeta,
+        syncDirty.isAcceptableOrUnknown(data['sync_dirty']!, _syncDirtyMeta),
+      );
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
     return context;
   }
 
@@ -768,6 +1051,22 @@ class $CheckinsTable extends Checkins with TableInfo<$CheckinsTable, Checkin> {
         DriftSqlType.int,
         data['${effectivePrefix}score'],
       )!,
+      syncId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_id'],
+      )!,
+      updatedAtMillis: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_millis'],
+      )!,
+      syncDirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sync_dirty'],
+      )!,
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
     );
   }
 
@@ -782,11 +1081,19 @@ class Checkin extends DataClass implements Insertable<Checkin> {
   final DateTime date;
   final String goal;
   final int score;
+  final String syncId;
+  final int updatedAtMillis;
+  final bool syncDirty;
+  final bool isDeleted;
   const Checkin({
     required this.id,
     required this.date,
     required this.goal,
     required this.score,
+    required this.syncId,
+    required this.updatedAtMillis,
+    required this.syncDirty,
+    required this.isDeleted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -795,6 +1102,10 @@ class Checkin extends DataClass implements Insertable<Checkin> {
     map['date'] = Variable<DateTime>(date);
     map['goal'] = Variable<String>(goal);
     map['score'] = Variable<int>(score);
+    map['sync_id'] = Variable<String>(syncId);
+    map['updated_at_millis'] = Variable<int>(updatedAtMillis);
+    map['sync_dirty'] = Variable<bool>(syncDirty);
+    map['is_deleted'] = Variable<bool>(isDeleted);
     return map;
   }
 
@@ -804,6 +1115,10 @@ class Checkin extends DataClass implements Insertable<Checkin> {
       date: Value(date),
       goal: Value(goal),
       score: Value(score),
+      syncId: Value(syncId),
+      updatedAtMillis: Value(updatedAtMillis),
+      syncDirty: Value(syncDirty),
+      isDeleted: Value(isDeleted),
     );
   }
 
@@ -817,6 +1132,10 @@ class Checkin extends DataClass implements Insertable<Checkin> {
       date: serializer.fromJson<DateTime>(json['date']),
       goal: serializer.fromJson<String>(json['goal']),
       score: serializer.fromJson<int>(json['score']),
+      syncId: serializer.fromJson<String>(json['syncId']),
+      updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
+      syncDirty: serializer.fromJson<bool>(json['syncDirty']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
     );
   }
   @override
@@ -827,22 +1146,44 @@ class Checkin extends DataClass implements Insertable<Checkin> {
       'date': serializer.toJson<DateTime>(date),
       'goal': serializer.toJson<String>(goal),
       'score': serializer.toJson<int>(score),
+      'syncId': serializer.toJson<String>(syncId),
+      'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
+      'syncDirty': serializer.toJson<bool>(syncDirty),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
     };
   }
 
-  Checkin copyWith({int? id, DateTime? date, String? goal, int? score}) =>
-      Checkin(
-        id: id ?? this.id,
-        date: date ?? this.date,
-        goal: goal ?? this.goal,
-        score: score ?? this.score,
-      );
+  Checkin copyWith({
+    int? id,
+    DateTime? date,
+    String? goal,
+    int? score,
+    String? syncId,
+    int? updatedAtMillis,
+    bool? syncDirty,
+    bool? isDeleted,
+  }) => Checkin(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    goal: goal ?? this.goal,
+    score: score ?? this.score,
+    syncId: syncId ?? this.syncId,
+    updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+    syncDirty: syncDirty ?? this.syncDirty,
+    isDeleted: isDeleted ?? this.isDeleted,
+  );
   Checkin copyWithCompanion(CheckinsCompanion data) {
     return Checkin(
       id: data.id.present ? data.id.value : this.id,
       date: data.date.present ? data.date.value : this.date,
       goal: data.goal.present ? data.goal.value : this.goal,
       score: data.score.present ? data.score.value : this.score,
+      syncId: data.syncId.present ? data.syncId.value : this.syncId,
+      updatedAtMillis: data.updatedAtMillis.present
+          ? data.updatedAtMillis.value
+          : this.updatedAtMillis,
+      syncDirty: data.syncDirty.present ? data.syncDirty.value : this.syncDirty,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
     );
   }
 
@@ -852,13 +1193,26 @@ class Checkin extends DataClass implements Insertable<Checkin> {
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('goal: $goal, ')
-          ..write('score: $score')
+          ..write('score: $score, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, date, goal, score);
+  int get hashCode => Object.hash(
+    id,
+    date,
+    goal,
+    score,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -866,7 +1220,11 @@ class Checkin extends DataClass implements Insertable<Checkin> {
           other.id == this.id &&
           other.date == this.date &&
           other.goal == this.goal &&
-          other.score == this.score);
+          other.score == this.score &&
+          other.syncId == this.syncId &&
+          other.updatedAtMillis == this.updatedAtMillis &&
+          other.syncDirty == this.syncDirty &&
+          other.isDeleted == this.isDeleted);
 }
 
 class CheckinsCompanion extends UpdateCompanion<Checkin> {
@@ -874,17 +1232,29 @@ class CheckinsCompanion extends UpdateCompanion<Checkin> {
   final Value<DateTime> date;
   final Value<String> goal;
   final Value<int> score;
+  final Value<String> syncId;
+  final Value<int> updatedAtMillis;
+  final Value<bool> syncDirty;
+  final Value<bool> isDeleted;
   const CheckinsCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
     this.goal = const Value.absent(),
     this.score = const Value.absent(),
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   });
   CheckinsCompanion.insert({
     this.id = const Value.absent(),
     required DateTime date,
     required String goal,
     required int score,
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   }) : date = Value(date),
        goal = Value(goal),
        score = Value(score);
@@ -893,12 +1263,20 @@ class CheckinsCompanion extends UpdateCompanion<Checkin> {
     Expression<DateTime>? date,
     Expression<String>? goal,
     Expression<int>? score,
+    Expression<String>? syncId,
+    Expression<int>? updatedAtMillis,
+    Expression<bool>? syncDirty,
+    Expression<bool>? isDeleted,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (date != null) 'date': date,
       if (goal != null) 'goal': goal,
       if (score != null) 'score': score,
+      if (syncId != null) 'sync_id': syncId,
+      if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
+      if (syncDirty != null) 'sync_dirty': syncDirty,
+      if (isDeleted != null) 'is_deleted': isDeleted,
     });
   }
 
@@ -907,12 +1285,20 @@ class CheckinsCompanion extends UpdateCompanion<Checkin> {
     Value<DateTime>? date,
     Value<String>? goal,
     Value<int>? score,
+    Value<String>? syncId,
+    Value<int>? updatedAtMillis,
+    Value<bool>? syncDirty,
+    Value<bool>? isDeleted,
   }) {
     return CheckinsCompanion(
       id: id ?? this.id,
       date: date ?? this.date,
       goal: goal ?? this.goal,
       score: score ?? this.score,
+      syncId: syncId ?? this.syncId,
+      updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+      syncDirty: syncDirty ?? this.syncDirty,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -931,6 +1317,18 @@ class CheckinsCompanion extends UpdateCompanion<Checkin> {
     if (score.present) {
       map['score'] = Variable<int>(score.value);
     }
+    if (syncId.present) {
+      map['sync_id'] = Variable<String>(syncId.value);
+    }
+    if (updatedAtMillis.present) {
+      map['updated_at_millis'] = Variable<int>(updatedAtMillis.value);
+    }
+    if (syncDirty.present) {
+      map['sync_dirty'] = Variable<bool>(syncDirty.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
     return map;
   }
 
@@ -940,7 +1338,11 @@ class CheckinsCompanion extends UpdateCompanion<Checkin> {
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('goal: $goal, ')
-          ..write('score: $score')
+          ..write('score: $score, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
@@ -985,8 +1387,68 @@ class $HabitTicksTable extends HabitTicks
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _syncIdMeta = const VerificationMeta('syncId');
   @override
-  List<GeneratedColumn> get $columns => [id, date, habitId];
+  late final GeneratedColumn<String> syncId = GeneratedColumn<String>(
+    'sync_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _updatedAtMillisMeta = const VerificationMeta(
+    'updatedAtMillis',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtMillis = GeneratedColumn<int>(
+    'updated_at_millis',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _syncDirtyMeta = const VerificationMeta(
+    'syncDirty',
+  );
+  @override
+  late final GeneratedColumn<bool> syncDirty = GeneratedColumn<bool>(
+    'sync_dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sync_dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    habitId,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1018,6 +1480,33 @@ class $HabitTicksTable extends HabitTicks
     } else if (isInserting) {
       context.missing(_habitIdMeta);
     }
+    if (data.containsKey('sync_id')) {
+      context.handle(
+        _syncIdMeta,
+        syncId.isAcceptableOrUnknown(data['sync_id']!, _syncIdMeta),
+      );
+    }
+    if (data.containsKey('updated_at_millis')) {
+      context.handle(
+        _updatedAtMillisMeta,
+        updatedAtMillis.isAcceptableOrUnknown(
+          data['updated_at_millis']!,
+          _updatedAtMillisMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sync_dirty')) {
+      context.handle(
+        _syncDirtyMeta,
+        syncDirty.isAcceptableOrUnknown(data['sync_dirty']!, _syncDirtyMeta),
+      );
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
     return context;
   }
 
@@ -1039,6 +1528,22 @@ class $HabitTicksTable extends HabitTicks
         DriftSqlType.string,
         data['${effectivePrefix}habit_id'],
       )!,
+      syncId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_id'],
+      )!,
+      updatedAtMillis: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_millis'],
+      )!,
+      syncDirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sync_dirty'],
+      )!,
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
     );
   }
 
@@ -1052,10 +1557,18 @@ class HabitTick extends DataClass implements Insertable<HabitTick> {
   final int id;
   final DateTime date;
   final String habitId;
+  final String syncId;
+  final int updatedAtMillis;
+  final bool syncDirty;
+  final bool isDeleted;
   const HabitTick({
     required this.id,
     required this.date,
     required this.habitId,
+    required this.syncId,
+    required this.updatedAtMillis,
+    required this.syncDirty,
+    required this.isDeleted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1063,6 +1576,10 @@ class HabitTick extends DataClass implements Insertable<HabitTick> {
     map['id'] = Variable<int>(id);
     map['date'] = Variable<DateTime>(date);
     map['habit_id'] = Variable<String>(habitId);
+    map['sync_id'] = Variable<String>(syncId);
+    map['updated_at_millis'] = Variable<int>(updatedAtMillis);
+    map['sync_dirty'] = Variable<bool>(syncDirty);
+    map['is_deleted'] = Variable<bool>(isDeleted);
     return map;
   }
 
@@ -1071,6 +1588,10 @@ class HabitTick extends DataClass implements Insertable<HabitTick> {
       id: Value(id),
       date: Value(date),
       habitId: Value(habitId),
+      syncId: Value(syncId),
+      updatedAtMillis: Value(updatedAtMillis),
+      syncDirty: Value(syncDirty),
+      isDeleted: Value(isDeleted),
     );
   }
 
@@ -1083,6 +1604,10 @@ class HabitTick extends DataClass implements Insertable<HabitTick> {
       id: serializer.fromJson<int>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
       habitId: serializer.fromJson<String>(json['habitId']),
+      syncId: serializer.fromJson<String>(json['syncId']),
+      updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
+      syncDirty: serializer.fromJson<bool>(json['syncDirty']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
     );
   }
   @override
@@ -1092,19 +1617,41 @@ class HabitTick extends DataClass implements Insertable<HabitTick> {
       'id': serializer.toJson<int>(id),
       'date': serializer.toJson<DateTime>(date),
       'habitId': serializer.toJson<String>(habitId),
+      'syncId': serializer.toJson<String>(syncId),
+      'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
+      'syncDirty': serializer.toJson<bool>(syncDirty),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
     };
   }
 
-  HabitTick copyWith({int? id, DateTime? date, String? habitId}) => HabitTick(
+  HabitTick copyWith({
+    int? id,
+    DateTime? date,
+    String? habitId,
+    String? syncId,
+    int? updatedAtMillis,
+    bool? syncDirty,
+    bool? isDeleted,
+  }) => HabitTick(
     id: id ?? this.id,
     date: date ?? this.date,
     habitId: habitId ?? this.habitId,
+    syncId: syncId ?? this.syncId,
+    updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+    syncDirty: syncDirty ?? this.syncDirty,
+    isDeleted: isDeleted ?? this.isDeleted,
   );
   HabitTick copyWithCompanion(HabitTicksCompanion data) {
     return HabitTick(
       id: data.id.present ? data.id.value : this.id,
       date: data.date.present ? data.date.value : this.date,
       habitId: data.habitId.present ? data.habitId.value : this.habitId,
+      syncId: data.syncId.present ? data.syncId.value : this.syncId,
+      updatedAtMillis: data.updatedAtMillis.present
+          ? data.updatedAtMillis.value
+          : this.updatedAtMillis,
+      syncDirty: data.syncDirty.present ? data.syncDirty.value : this.syncDirty,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
     );
   }
 
@@ -1113,46 +1660,82 @@ class HabitTick extends DataClass implements Insertable<HabitTick> {
     return (StringBuffer('HabitTick(')
           ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('habitId: $habitId')
+          ..write('habitId: $habitId, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, date, habitId);
+  int get hashCode => Object.hash(
+    id,
+    date,
+    habitId,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is HabitTick &&
           other.id == this.id &&
           other.date == this.date &&
-          other.habitId == this.habitId);
+          other.habitId == this.habitId &&
+          other.syncId == this.syncId &&
+          other.updatedAtMillis == this.updatedAtMillis &&
+          other.syncDirty == this.syncDirty &&
+          other.isDeleted == this.isDeleted);
 }
 
 class HabitTicksCompanion extends UpdateCompanion<HabitTick> {
   final Value<int> id;
   final Value<DateTime> date;
   final Value<String> habitId;
+  final Value<String> syncId;
+  final Value<int> updatedAtMillis;
+  final Value<bool> syncDirty;
+  final Value<bool> isDeleted;
   const HabitTicksCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
     this.habitId = const Value.absent(),
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   });
   HabitTicksCompanion.insert({
     this.id = const Value.absent(),
     required DateTime date,
     required String habitId,
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   }) : date = Value(date),
        habitId = Value(habitId);
   static Insertable<HabitTick> custom({
     Expression<int>? id,
     Expression<DateTime>? date,
     Expression<String>? habitId,
+    Expression<String>? syncId,
+    Expression<int>? updatedAtMillis,
+    Expression<bool>? syncDirty,
+    Expression<bool>? isDeleted,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (date != null) 'date': date,
       if (habitId != null) 'habit_id': habitId,
+      if (syncId != null) 'sync_id': syncId,
+      if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
+      if (syncDirty != null) 'sync_dirty': syncDirty,
+      if (isDeleted != null) 'is_deleted': isDeleted,
     });
   }
 
@@ -1160,11 +1743,19 @@ class HabitTicksCompanion extends UpdateCompanion<HabitTick> {
     Value<int>? id,
     Value<DateTime>? date,
     Value<String>? habitId,
+    Value<String>? syncId,
+    Value<int>? updatedAtMillis,
+    Value<bool>? syncDirty,
+    Value<bool>? isDeleted,
   }) {
     return HabitTicksCompanion(
       id: id ?? this.id,
       date: date ?? this.date,
       habitId: habitId ?? this.habitId,
+      syncId: syncId ?? this.syncId,
+      updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+      syncDirty: syncDirty ?? this.syncDirty,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -1180,6 +1771,18 @@ class HabitTicksCompanion extends UpdateCompanion<HabitTick> {
     if (habitId.present) {
       map['habit_id'] = Variable<String>(habitId.value);
     }
+    if (syncId.present) {
+      map['sync_id'] = Variable<String>(syncId.value);
+    }
+    if (updatedAtMillis.present) {
+      map['updated_at_millis'] = Variable<int>(updatedAtMillis.value);
+    }
+    if (syncDirty.present) {
+      map['sync_dirty'] = Variable<bool>(syncDirty.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
     return map;
   }
 
@@ -1188,7 +1791,11 @@ class HabitTicksCompanion extends UpdateCompanion<HabitTick> {
     return (StringBuffer('HabitTicksCompanion(')
           ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('habitId: $habitId')
+          ..write('habitId: $habitId, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
@@ -1233,8 +1840,68 @@ class $WalkingLogsTable extends WalkingLogs
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _syncIdMeta = const VerificationMeta('syncId');
   @override
-  List<GeneratedColumn> get $columns => [id, date, minutes];
+  late final GeneratedColumn<String> syncId = GeneratedColumn<String>(
+    'sync_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _updatedAtMillisMeta = const VerificationMeta(
+    'updatedAtMillis',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtMillis = GeneratedColumn<int>(
+    'updated_at_millis',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _syncDirtyMeta = const VerificationMeta(
+    'syncDirty',
+  );
+  @override
+  late final GeneratedColumn<bool> syncDirty = GeneratedColumn<bool>(
+    'sync_dirty',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sync_dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _isDeletedMeta = const VerificationMeta(
+    'isDeleted',
+  );
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+    'is_deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_deleted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    minutes,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1266,6 +1933,33 @@ class $WalkingLogsTable extends WalkingLogs
     } else if (isInserting) {
       context.missing(_minutesMeta);
     }
+    if (data.containsKey('sync_id')) {
+      context.handle(
+        _syncIdMeta,
+        syncId.isAcceptableOrUnknown(data['sync_id']!, _syncIdMeta),
+      );
+    }
+    if (data.containsKey('updated_at_millis')) {
+      context.handle(
+        _updatedAtMillisMeta,
+        updatedAtMillis.isAcceptableOrUnknown(
+          data['updated_at_millis']!,
+          _updatedAtMillisMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sync_dirty')) {
+      context.handle(
+        _syncDirtyMeta,
+        syncDirty.isAcceptableOrUnknown(data['sync_dirty']!, _syncDirtyMeta),
+      );
+    }
+    if (data.containsKey('is_deleted')) {
+      context.handle(
+        _isDeletedMeta,
+        isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta),
+      );
+    }
     return context;
   }
 
@@ -1287,6 +1981,22 @@ class $WalkingLogsTable extends WalkingLogs
         DriftSqlType.int,
         data['${effectivePrefix}minutes'],
       )!,
+      syncId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sync_id'],
+      )!,
+      updatedAtMillis: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_millis'],
+      )!,
+      syncDirty: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sync_dirty'],
+      )!,
+      isDeleted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_deleted'],
+      )!,
     );
   }
 
@@ -1300,10 +2010,18 @@ class WalkingLog extends DataClass implements Insertable<WalkingLog> {
   final int id;
   final DateTime date;
   final int minutes;
+  final String syncId;
+  final int updatedAtMillis;
+  final bool syncDirty;
+  final bool isDeleted;
   const WalkingLog({
     required this.id,
     required this.date,
     required this.minutes,
+    required this.syncId,
+    required this.updatedAtMillis,
+    required this.syncDirty,
+    required this.isDeleted,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1311,6 +2029,10 @@ class WalkingLog extends DataClass implements Insertable<WalkingLog> {
     map['id'] = Variable<int>(id);
     map['date'] = Variable<DateTime>(date);
     map['minutes'] = Variable<int>(minutes);
+    map['sync_id'] = Variable<String>(syncId);
+    map['updated_at_millis'] = Variable<int>(updatedAtMillis);
+    map['sync_dirty'] = Variable<bool>(syncDirty);
+    map['is_deleted'] = Variable<bool>(isDeleted);
     return map;
   }
 
@@ -1319,6 +2041,10 @@ class WalkingLog extends DataClass implements Insertable<WalkingLog> {
       id: Value(id),
       date: Value(date),
       minutes: Value(minutes),
+      syncId: Value(syncId),
+      updatedAtMillis: Value(updatedAtMillis),
+      syncDirty: Value(syncDirty),
+      isDeleted: Value(isDeleted),
     );
   }
 
@@ -1331,6 +2057,10 @@ class WalkingLog extends DataClass implements Insertable<WalkingLog> {
       id: serializer.fromJson<int>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
       minutes: serializer.fromJson<int>(json['minutes']),
+      syncId: serializer.fromJson<String>(json['syncId']),
+      updatedAtMillis: serializer.fromJson<int>(json['updatedAtMillis']),
+      syncDirty: serializer.fromJson<bool>(json['syncDirty']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
     );
   }
   @override
@@ -1340,19 +2070,41 @@ class WalkingLog extends DataClass implements Insertable<WalkingLog> {
       'id': serializer.toJson<int>(id),
       'date': serializer.toJson<DateTime>(date),
       'minutes': serializer.toJson<int>(minutes),
+      'syncId': serializer.toJson<String>(syncId),
+      'updatedAtMillis': serializer.toJson<int>(updatedAtMillis),
+      'syncDirty': serializer.toJson<bool>(syncDirty),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
     };
   }
 
-  WalkingLog copyWith({int? id, DateTime? date, int? minutes}) => WalkingLog(
+  WalkingLog copyWith({
+    int? id,
+    DateTime? date,
+    int? minutes,
+    String? syncId,
+    int? updatedAtMillis,
+    bool? syncDirty,
+    bool? isDeleted,
+  }) => WalkingLog(
     id: id ?? this.id,
     date: date ?? this.date,
     minutes: minutes ?? this.minutes,
+    syncId: syncId ?? this.syncId,
+    updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+    syncDirty: syncDirty ?? this.syncDirty,
+    isDeleted: isDeleted ?? this.isDeleted,
   );
   WalkingLog copyWithCompanion(WalkingLogsCompanion data) {
     return WalkingLog(
       id: data.id.present ? data.id.value : this.id,
       date: data.date.present ? data.date.value : this.date,
       minutes: data.minutes.present ? data.minutes.value : this.minutes,
+      syncId: data.syncId.present ? data.syncId.value : this.syncId,
+      updatedAtMillis: data.updatedAtMillis.present
+          ? data.updatedAtMillis.value
+          : this.updatedAtMillis,
+      syncDirty: data.syncDirty.present ? data.syncDirty.value : this.syncDirty,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
     );
   }
 
@@ -1361,46 +2113,82 @@ class WalkingLog extends DataClass implements Insertable<WalkingLog> {
     return (StringBuffer('WalkingLog(')
           ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('minutes: $minutes')
+          ..write('minutes: $minutes, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, date, minutes);
+  int get hashCode => Object.hash(
+    id,
+    date,
+    minutes,
+    syncId,
+    updatedAtMillis,
+    syncDirty,
+    isDeleted,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is WalkingLog &&
           other.id == this.id &&
           other.date == this.date &&
-          other.minutes == this.minutes);
+          other.minutes == this.minutes &&
+          other.syncId == this.syncId &&
+          other.updatedAtMillis == this.updatedAtMillis &&
+          other.syncDirty == this.syncDirty &&
+          other.isDeleted == this.isDeleted);
 }
 
 class WalkingLogsCompanion extends UpdateCompanion<WalkingLog> {
   final Value<int> id;
   final Value<DateTime> date;
   final Value<int> minutes;
+  final Value<String> syncId;
+  final Value<int> updatedAtMillis;
+  final Value<bool> syncDirty;
+  final Value<bool> isDeleted;
   const WalkingLogsCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
     this.minutes = const Value.absent(),
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   });
   WalkingLogsCompanion.insert({
     this.id = const Value.absent(),
     required DateTime date,
     required int minutes,
+    this.syncId = const Value.absent(),
+    this.updatedAtMillis = const Value.absent(),
+    this.syncDirty = const Value.absent(),
+    this.isDeleted = const Value.absent(),
   }) : date = Value(date),
        minutes = Value(minutes);
   static Insertable<WalkingLog> custom({
     Expression<int>? id,
     Expression<DateTime>? date,
     Expression<int>? minutes,
+    Expression<String>? syncId,
+    Expression<int>? updatedAtMillis,
+    Expression<bool>? syncDirty,
+    Expression<bool>? isDeleted,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (date != null) 'date': date,
       if (minutes != null) 'minutes': minutes,
+      if (syncId != null) 'sync_id': syncId,
+      if (updatedAtMillis != null) 'updated_at_millis': updatedAtMillis,
+      if (syncDirty != null) 'sync_dirty': syncDirty,
+      if (isDeleted != null) 'is_deleted': isDeleted,
     });
   }
 
@@ -1408,11 +2196,19 @@ class WalkingLogsCompanion extends UpdateCompanion<WalkingLog> {
     Value<int>? id,
     Value<DateTime>? date,
     Value<int>? minutes,
+    Value<String>? syncId,
+    Value<int>? updatedAtMillis,
+    Value<bool>? syncDirty,
+    Value<bool>? isDeleted,
   }) {
     return WalkingLogsCompanion(
       id: id ?? this.id,
       date: date ?? this.date,
       minutes: minutes ?? this.minutes,
+      syncId: syncId ?? this.syncId,
+      updatedAtMillis: updatedAtMillis ?? this.updatedAtMillis,
+      syncDirty: syncDirty ?? this.syncDirty,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -1428,6 +2224,18 @@ class WalkingLogsCompanion extends UpdateCompanion<WalkingLog> {
     if (minutes.present) {
       map['minutes'] = Variable<int>(minutes.value);
     }
+    if (syncId.present) {
+      map['sync_id'] = Variable<String>(syncId.value);
+    }
+    if (updatedAtMillis.present) {
+      map['updated_at_millis'] = Variable<int>(updatedAtMillis.value);
+    }
+    if (syncDirty.present) {
+      map['sync_dirty'] = Variable<bool>(syncDirty.value);
+    }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
     return map;
   }
 
@@ -1436,7 +2244,11 @@ class WalkingLogsCompanion extends UpdateCompanion<WalkingLog> {
     return (StringBuffer('WalkingLogsCompanion(')
           ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('minutes: $minutes')
+          ..write('minutes: $minutes, ')
+          ..write('syncId: $syncId, ')
+          ..write('updatedAtMillis: $updatedAtMillis, ')
+          ..write('syncDirty: $syncDirty, ')
+          ..write('isDeleted: $isDeleted')
           ..write(')'))
         .toString();
   }
@@ -1473,6 +2285,10 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   Value<int> longestHoldSeconds,
   Value<bool> completed,
   Value<String?> feel,
+  Value<String> syncId,
+  Value<int> updatedAtMillis,
+  Value<bool> syncDirty,
+  Value<bool> isDeleted,
 });
 typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int> id,
@@ -1486,6 +2302,10 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<int> longestHoldSeconds,
   Value<bool> completed,
   Value<String?> feel,
+  Value<String> syncId,
+  Value<int> updatedAtMillis,
+  Value<bool> syncDirty,
+  Value<bool> isDeleted,
 });
 
 class $$SessionsTableFilterComposer
@@ -1549,6 +2369,26 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<String> get feel => $composableBuilder(
     column: $table.feel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1616,6 +2456,26 @@ class $$SessionsTableOrderingComposer
     column: $table.feel,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SessionsTableAnnotationComposer
@@ -1667,6 +2527,20 @@ class $$SessionsTableAnnotationComposer
 
   GeneratedColumn<String> get feel =>
       $composableBuilder(column: $table.feel, builder: (column) => column);
+
+  GeneratedColumn<String> get syncId =>
+      $composableBuilder(column: $table.syncId, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get syncDirty =>
+      $composableBuilder(column: $table.syncDirty, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
 }
 
 class $$SessionsTableTableManager
@@ -1708,6 +2582,10 @@ class $$SessionsTableTableManager
                 Value<int> longestHoldSeconds = const Value.absent(),
                 Value<bool> completed = const Value.absent(),
                 Value<String?> feel = const Value.absent(),
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
               }) => SessionsCompanion(
                 id: id,
                 startedAt: startedAt,
@@ -1720,6 +2598,10 @@ class $$SessionsTableTableManager
                 longestHoldSeconds: longestHoldSeconds,
                 completed: completed,
                 feel: feel,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
               ),
           createCompanionCallback:
               ({
@@ -1734,6 +2616,10 @@ class $$SessionsTableTableManager
                 Value<int> longestHoldSeconds = const Value.absent(),
                 Value<bool> completed = const Value.absent(),
                 Value<String?> feel = const Value.absent(),
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
               }) => SessionsCompanion.insert(
                 id: id,
                 startedAt: startedAt,
@@ -1746,6 +2632,10 @@ class $$SessionsTableTableManager
                 longestHoldSeconds: longestHoldSeconds,
                 completed: completed,
                 feel: feel,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -1783,12 +2673,20 @@ typedef $$CheckinsTableCreateCompanionBuilder = CheckinsCompanion Function({
   required DateTime date,
   required String goal,
   required int score,
+  Value<String> syncId,
+  Value<int> updatedAtMillis,
+  Value<bool> syncDirty,
+  Value<bool> isDeleted,
 });
 typedef $$CheckinsTableUpdateCompanionBuilder = CheckinsCompanion Function({
   Value<int> id,
   Value<DateTime> date,
   Value<String> goal,
   Value<int> score,
+  Value<String> syncId,
+  Value<int> updatedAtMillis,
+  Value<bool> syncDirty,
+  Value<bool> isDeleted,
 });
 
 class $$CheckinsTableFilterComposer
@@ -1817,6 +2715,26 @@ class $$CheckinsTableFilterComposer
 
   ColumnFilters<int> get score => $composableBuilder(
     column: $table.score,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1849,6 +2767,26 @@ class $$CheckinsTableOrderingComposer
     column: $table.score,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CheckinsTableAnnotationComposer
@@ -1871,6 +2809,20 @@ class $$CheckinsTableAnnotationComposer
 
   GeneratedColumn<int> get score =>
       $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<String> get syncId =>
+      $composableBuilder(column: $table.syncId, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get syncDirty =>
+      $composableBuilder(column: $table.syncDirty, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
 }
 
 class $$CheckinsTableTableManager
@@ -1899,23 +2851,45 @@ class $$CheckinsTableTableManager
               $$CheckinsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$CheckinsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<DateTime> date = const Value.absent(),
-            Value<String> goal = const Value.absent(),
-            Value<int> score = const Value.absent(),
-          }) => CheckinsCompanion(id: id, date: date, goal: goal, score: score),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<String> goal = const Value.absent(),
+                Value<int> score = const Value.absent(),
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+              }) => CheckinsCompanion(
+                id: id,
+                date: date,
+                goal: goal,
+                score: score,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime date,
                 required String goal,
                 required int score,
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
               }) => CheckinsCompanion.insert(
                 id: id,
                 date: date,
                 goal: goal,
                 score: score,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -1952,11 +2926,19 @@ typedef $$HabitTicksTableCreateCompanionBuilder = HabitTicksCompanion Function({
   Value<int> id,
   required DateTime date,
   required String habitId,
+  Value<String> syncId,
+  Value<int> updatedAtMillis,
+  Value<bool> syncDirty,
+  Value<bool> isDeleted,
 });
 typedef $$HabitTicksTableUpdateCompanionBuilder = HabitTicksCompanion Function({
   Value<int> id,
   Value<DateTime> date,
   Value<String> habitId,
+  Value<String> syncId,
+  Value<int> updatedAtMillis,
+  Value<bool> syncDirty,
+  Value<bool> isDeleted,
 });
 
 class $$HabitTicksTableFilterComposer
@@ -1980,6 +2962,26 @@ class $$HabitTicksTableFilterComposer
 
   ColumnFilters<String> get habitId => $composableBuilder(
     column: $table.habitId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2007,6 +3009,26 @@ class $$HabitTicksTableOrderingComposer
     column: $table.habitId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$HabitTicksTableAnnotationComposer
@@ -2026,6 +3048,20 @@ class $$HabitTicksTableAnnotationComposer
 
   GeneratedColumn<String> get habitId =>
       $composableBuilder(column: $table.habitId, builder: (column) => column);
+
+  GeneratedColumn<String> get syncId =>
+      $composableBuilder(column: $table.syncId, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get syncDirty =>
+      $composableBuilder(column: $table.syncDirty, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
 }
 
 class $$HabitTicksTableTableManager
@@ -2057,20 +3093,41 @@ class $$HabitTicksTableTableManager
               $$HabitTicksTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$HabitTicksTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<DateTime> date = const Value.absent(),
-            Value<String> habitId = const Value.absent(),
-          }) => HabitTicksCompanion(id: id, date: date, habitId: habitId),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<String> habitId = const Value.absent(),
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+              }) => HabitTicksCompanion(
+                id: id,
+                date: date,
+                habitId: habitId,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime date,
                 required String habitId,
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
               }) => HabitTicksCompanion.insert(
                 id: id,
                 date: date,
                 habitId: habitId,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -2108,12 +3165,20 @@ typedef $$WalkingLogsTableCreateCompanionBuilder =
       Value<int> id,
       required DateTime date,
       required int minutes,
+      Value<String> syncId,
+      Value<int> updatedAtMillis,
+      Value<bool> syncDirty,
+      Value<bool> isDeleted,
     });
 typedef $$WalkingLogsTableUpdateCompanionBuilder =
     WalkingLogsCompanion Function({
       Value<int> id,
       Value<DateTime> date,
       Value<int> minutes,
+      Value<String> syncId,
+      Value<int> updatedAtMillis,
+      Value<bool> syncDirty,
+      Value<bool> isDeleted,
     });
 
 class $$WalkingLogsTableFilterComposer
@@ -2137,6 +3202,26 @@ class $$WalkingLogsTableFilterComposer
 
   ColumnFilters<int> get minutes => $composableBuilder(
     column: $table.minutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2164,6 +3249,26 @@ class $$WalkingLogsTableOrderingComposer
     column: $table.minutes,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get syncId => $composableBuilder(
+    column: $table.syncId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get syncDirty => $composableBuilder(
+    column: $table.syncDirty,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isDeleted => $composableBuilder(
+    column: $table.isDeleted,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$WalkingLogsTableAnnotationComposer
@@ -2183,6 +3288,20 @@ class $$WalkingLogsTableAnnotationComposer
 
   GeneratedColumn<int> get minutes =>
       $composableBuilder(column: $table.minutes, builder: (column) => column);
+
+  GeneratedColumn<String> get syncId =>
+      $composableBuilder(column: $table.syncId, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAtMillis => $composableBuilder(
+    column: $table.updatedAtMillis,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get syncDirty =>
+      $composableBuilder(column: $table.syncDirty, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDeleted =>
+      $composableBuilder(column: $table.isDeleted, builder: (column) => column);
 }
 
 class $$WalkingLogsTableTableManager
@@ -2214,20 +3333,41 @@ class $$WalkingLogsTableTableManager
               $$WalkingLogsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$WalkingLogsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<DateTime> date = const Value.absent(),
-            Value<int> minutes = const Value.absent(),
-          }) => WalkingLogsCompanion(id: id, date: date, minutes: minutes),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<int> minutes = const Value.absent(),
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
+              }) => WalkingLogsCompanion(
+                id: id,
+                date: date,
+                minutes: minutes,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime date,
                 required int minutes,
+                Value<String> syncId = const Value.absent(),
+                Value<int> updatedAtMillis = const Value.absent(),
+                Value<bool> syncDirty = const Value.absent(),
+                Value<bool> isDeleted = const Value.absent(),
               }) => WalkingLogsCompanion.insert(
                 id: id,
                 date: date,
                 minutes: minutes,
+                syncId: syncId,
+                updatedAtMillis: updatedAtMillis,
+                syncDirty: syncDirty,
+                isDeleted: isDeleted,
               ),
           withReferenceMapper: (p0) => p0
               .map(

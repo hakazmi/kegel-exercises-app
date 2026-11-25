@@ -31,8 +31,8 @@ class _SessionMuscleRingState extends State<SessionMuscleRing>
   late Animation<double> _liftAnim;
 
   bool get _wantUp {
-    final EngineMachineState m = widget.engineState.machine ==
-            EngineMachineState.paused
+    final EngineMachineState m =
+        widget.engineState.machine == EngineMachineState.paused
         ? (widget.engineState.pausedFrom ?? EngineMachineState.rest)
         : widget.engineState.machine;
     return m == EngineMachineState.squeeze;
@@ -91,8 +91,8 @@ class _SessionMuscleRingState extends State<SessionMuscleRing>
         widget.engineState.completed) {
       return _ArrowKind.check;
     }
-    final EngineMachineState m = widget.engineState.machine ==
-            EngineMachineState.paused
+    final EngineMachineState m =
+        widget.engineState.machine == EngineMachineState.paused
         ? (widget.engineState.pausedFrom ?? EngineMachineState.rest)
         : widget.engineState.machine;
     switch (m) {

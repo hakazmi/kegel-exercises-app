@@ -4,10 +4,12 @@ import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/l10n/app_localizations.dart';
+import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/content/content_models.dart';
 import '../../core/data/providers.dart';
 import '../../core/widgets/widgets.dart';
+import 'learn_media_carousel.dart';
 import 'simple_markdown.dart';
 
 /// L2 Article — Markdown body from assets plus a Sources list.
@@ -24,8 +26,9 @@ class L2ArticleScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    final AsyncValue<ArticleContent?> articleAsync =
-        ref.watch(_articleBodyProvider(articleId));
+    final AsyncValue<ArticleContent?> articleAsync = ref.watch(
+      _articleBodyProvider(articleId),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -54,23 +57,38 @@ class L2ArticleScreen extends ConsumerWidget {
               bottomInset + AppSpacing.xxl,
             ),
             children: [
-              DecoratedBox(
-                decoration: const BoxDecoration(
-                  color: AppColors.mint,
+              if (article.hasMedia)
+                _ArticleMediaGallery(l10n: l10n, media: article.media)
+              else if (article.cover != null)
+                ClipRRect(
                   borderRadius: AppRadii.xlAll,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: Center(
-                    child: Illustration(
-                      assetPath: article.image,
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.asset(
+                      article.cover!,
+                      fit: BoxFit.cover,
                       semanticLabel: article.title,
-                      width: 120,
-                      height: 120,
+                    ),
+                  ),
+                )
+              else
+                DecoratedBox(
+                  decoration: const BoxDecoration(
+                    color: AppColors.mint,
+                    borderRadius: AppRadii.xlAll,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    child: Center(
+                      child: Illustration(
+                        assetPath: article.image,
+                        semanticLabel: article.title,
+                        width: 120,
+                        height: 120,
+                      ),
                     ),
                   ),
                 ),
-              ),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 l10n.l2MinutesRead(article.minutes).toUpperCase(),
@@ -98,7 +116,9 @@ class L2ArticleScreen extends ConsumerWidget {
                 InkWell(
                   onTap: () => _openUrl(source.url),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppSpacing.xs,
+                    ),
                     child: Text(
                       source.title,
                       style: AppTypography.body.copyWith(
@@ -118,7 +138,82 @@ class L2ArticleScreen extends ConsumerWidget {
   }
 }
 
-final _articleBodyProvider =
-    FutureProvider.family<ArticleContent?, String>((Ref ref, String id) {
+/// Auto-advancing article media with caption; exercise link follows the slide.
+class _ArticleMediaGallery extends StatefulWidget {
+  const _ArticleMediaGallery({required this.l10n, required this.media});
+
+  final AppLocalizations l10n;
+  final List<ArticleMedia> media;
+
+  @override
+  State<_ArticleMediaGallery> createState() => _ArticleMediaGalleryState();
+}
+
+class _ArticleMediaGalleryState extends State<_ArticleMediaGallery> {
+  int _index = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final ArticleMedia current = widget.media[_index];
+    final bool anyVideo = widget.media.any((ArticleMedia m) => m.isVideo);
+    final String heading = anyVideo
+        ? widget.l10n.l2WatchHeading
+        : widget.l10n.l2LookHeading;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          heading.toUpperCase(),
+          style: AppTypography.caption.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.6,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        DecoratedBox(
+          decoration: const BoxDecoration(
+            borderRadius: AppRadii.xlAll,
+            boxShadow: AppElevation.level2,
+          ),
+          child: LearnMediaCarousel(
+            media: widget.media,
+            showCaption: true,
+            showDots: true,
+            onPageChanged: (int i) => setState(() => _index = i),
+          ),
+        ),
+        if (current.exerciseId != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => context.push(
+                '${AppRoutes.exercise}?id=${Uri.encodeComponent(current.exerciseId!)}',
+              ),
+              icon: const Icon(
+                Icons.menu_book_rounded,
+                size: 18,
+                color: AppColors.primary,
+              ),
+              label: Text(
+                widget.l10n.l2OpenExercise,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+final _articleBodyProvider = FutureProvider.family<ArticleContent?, String>((
+  Ref ref,
+  String id,
+) {
   return ref.watch(contentRepositoryProvider).loadArticleById(id);
 });

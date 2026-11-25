@@ -2,18 +2,27 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show User, UserIdentity;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/cloud/auth_repository.dart';
+import '../../core/cloud/cloud_config.dart';
+import '../../core/cloud/cloud_providers.dart';
+import '../../core/cloud/sync_coordinator.dart';
+import '../../core/cloud/sync_metadata_store.dart';
 import '../../core/constants/links.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/user_profile.dart';
+import '../../core/plan/goal_routing.dart';
 import '../../core/services/reminder_service.dart';
 import '../../core/content/info_copy.dart';
 import '../../core/motion/app_motion.dart';
@@ -78,17 +87,31 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
     }
   }
 
-  Future<void> _deleteAllData() async {
+  Future<void> _resetAllData() async {
     final AppLocalizations l10n = AppLocalizations.of(context);
+    final bool signedIn = ref.read(authRepositoryProvider).isSignedIn;
     final bool ok = await ConfirmDialog.show(
       context,
       title: l10n.x1DeleteTitle,
-      message: l10n.x1DeleteMessage,
+      message: signedIn
+          ? '${l10n.x1DeleteMessage}\n\nThis also erases your cloud backup. Your account stays signed in.'
+          : l10n.x1DeleteMessage,
       confirmLabel: l10n.x1DeleteConfirm,
       cancelLabel: l10n.commonCancel,
     );
     if (!ok) {
       return;
+    }
+    if (signedIn) {
+      final result = await ref.read(syncRepositoryProvider).resetCloudData();
+      if (!result.ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.errorMessage ?? 'Couldn’t erase cloud data.'),
+          ),
+        );
+        return;
+      }
     }
     await ref.read(reminderServiceProvider).disableReminder();
     await ref.read(dataResetServiceProvider).deleteEverything();
@@ -100,6 +123,127 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
       return;
     }
     context.go(AppRoutes.welcome);
+  }
+
+  /// Debug / legacy alias.
+  Future<void> _deleteAllData() => _resetAllData();
+
+  Future<void> _signOut() async {
+    final SyncCoordinator sync = ref.read(syncCoordinatorProvider);
+    final int pending = await sync.pendingCount();
+    await sync.flushBeforeSignOut();
+    final int still = await sync.pendingCount();
+    if (still > 0 && mounted) {
+      final bool ok = await ConfirmDialog.show(
+        context,
+        title: 'Sign out?',
+        message:
+            '$pending changes haven’t backed up. Sign out anyway?',
+        confirmLabel: 'Sign out',
+        cancelLabel: 'Cancel',
+      );
+      if (!ok) {
+        return;
+      }
+    } else if (mounted) {
+      final bool ok = await ConfirmDialog.show(
+        context,
+        title: 'Sign out?',
+        message: 'You’ll need to sign in again to sync.',
+        confirmLabel: 'Sign out',
+        cancelLabel: 'Cancel',
+      );
+      if (!ok) {
+        return;
+      }
+    }
+    sync.cancelPending();
+    await ref.read(authRepositoryProvider).signOut();
+    if (!mounted) {
+      return;
+    }
+    context.go(AppRoutes.auth);
+  }
+
+  Future<void> _deleteAccount() async {
+    final bool ok = await ConfirmDialog.show(
+      context,
+      title: 'Delete account?',
+      message:
+          'This permanently deletes your account and all cloud data, and clears this phone. Type DELETE to confirm on the next step.',
+      confirmLabel: 'Continue',
+      cancelLabel: 'Cancel',
+    );
+    if (!ok || !mounted) {
+      return;
+    }
+    final TextEditingController controller = TextEditingController();
+    final bool? typed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: const Text('Type DELETE'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(hintText: 'DELETE'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () =>
+                  Navigator.pop(ctx, controller.text.trim() == 'DELETE'),
+              child: const Text('Delete account'),
+            ),
+          ],
+        );
+      },
+    );
+    controller.dispose();
+    if (typed != true) {
+      return;
+    }
+    final result = await ref.read(syncRepositoryProvider).deleteAccount();
+    if (!result.ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.errorMessage ?? 'Couldn’t delete account.'),
+        ),
+      );
+      return;
+    }
+    ref.read(syncCoordinatorProvider).cancelPending();
+    await ref.read(authRepositoryProvider).signOut();
+    await ref.read(reminderServiceProvider).disableReminder();
+    await ref
+        .read(dataResetServiceProvider)
+        .deleteEverything(clearAuthHint: true);
+    ref.read(onboardingControllerProvider.notifier).reset();
+    ref.invalidate(sessionsProvider);
+    ref.invalidate(checkInsProvider);
+    await ref.read(userProfileProvider.notifier).reload();
+    if (!mounted) {
+      return;
+    }
+    context.go(AppRoutes.auth);
+  }
+
+  Future<void> _backupNow() async {
+    final result = await ref.read(syncCoordinatorProvider).backupNow();
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result.ok
+              ? 'Backup complete.'
+              : (result.errorMessage ?? 'Backup failed.'),
+        ),
+      ),
+    );
   }
 
   Future<void> _pickGoal() async {
@@ -139,11 +283,18 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
       return;
     }
     final UserProfile current = ref.read(userProfileProvider);
-    TrackId track = current.track;
-    if (!current.safetyFlags.pain && !current.safetyFlags.painSexual) {
-      track = trackForGoal(selected);
+    final DateTime now = ref.read(appClockProvider).now();
+    final UserProfile next = GoalRouting.apply(
+      profile: current,
+      goal: selected,
+      now: now,
+    );
+    await _save(next);
+    if (next.track != current.track &&
+        next.reminderEnabled &&
+        mounted) {
+      await ref.read(reminderServiceProvider).reschedule();
     }
-    await _save(current.copyWith(goal: selected, track: track));
   }
 
   Future<void> _pickSessions() async {
@@ -313,6 +464,8 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final UserProfile profile = ref.watch(userProfileProvider);
     final bool premium = ref.watch(isPremiumProvider);
+    final bool signedIn =
+        CloudConfig.isConfigured && ref.watch(isSignedInProvider);
     final double bottomInset = MediaQuery.paddingOf(context).bottom;
     int slot = 0;
     Duration next() =>
@@ -361,6 +514,14 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
+            if (signedIn) ...[
+              Reveal(
+                from: RevealFrom.drop,
+                delay: next(),
+                child: const _ProfileHeader(),
+              ),
+              const SizedBox(height: AppSpacing.md),
+            ],
             Reveal(
               from: RevealFrom.left,
               delay: next(),
@@ -372,50 +533,6 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            if (kDebugMode) ...[
-              Reveal(
-                from: RevealFrom.right,
-                delay: next(),
-                child: _Section(
-                  title: l10n.x1SectionTesting,
-                  icon: Icons.bug_report_outlined,
-                  children: [
-                    _SettingsTile(
-                      icon: Icons.workspace_premium_outlined,
-                      color: AppColors.goalEjaculationFg,
-                      background: AppColors.goalEjaculationBg,
-                      label: l10n.x1TestingPremium,
-                      trailing: _AnimatedSwitch(
-                        value: premium,
-                        onChanged: (bool value) {
-                          ref.read(isPremiumOverrideProvider.notifier).set(value);
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.sm,
-                        AppSpacing.xs,
-                        AppSpacing.sm,
-                        AppSpacing.xxs,
-                      ),
-                      child: SecondaryButton(
-                        label: l10n.x1TestingReset,
-                        icon: Icons.restart_alt_rounded,
-                        onPressed: _deleteAllData,
-                      ),
-                    ),
-                    Center(
-                      child: TextLinkButton(
-                        label: l10n.devDataOpen,
-                        onPressed: () => context.push(AppRoutes.dataDebug),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-            ],
             Reveal(
               from: RevealFrom.right,
               delay: next(),
@@ -607,40 +724,60 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
-            Reveal(
-              from: RevealFrom.rise,
-              delay: next(),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.goalGeneralBg.withValues(alpha: 0.5),
-                  borderRadius: AppRadii.lgAll,
-                  border: Border.all(
-                    color: AppColors.goalGeneralFg.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+            if (kDebugMode) ...[
+              const SizedBox(height: AppSpacing.md),
+              Reveal(
+                from: RevealFrom.right,
+                delay: next(),
+                child: _Section(
+                  title: l10n.x1SectionTesting,
+                  icon: Icons.bug_report_outlined,
                   children: [
-                    Text(
-                      l10n.x1DeleteMessage,
-                      style: AppTypography.caption.copyWith(
-                        color: AppColors.textPrimary,
+                    _SettingsTile(
+                      icon: Icons.workspace_premium_outlined,
+                      color: AppColors.goalEjaculationFg,
+                      background: AppColors.goalEjaculationBg,
+                      label: l10n.x1TestingPremium,
+                      trailing: _AnimatedSwitch(
+                        value: premium,
+                        onChanged: (bool value) {
+                          ref.read(isPremiumOverrideProvider.notifier).set(value);
+                        },
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    SecondaryButton(
-                      label: l10n.x1DeleteAll,
-                      icon: Icons.delete_outline_rounded,
-                      color: AppColors.goalGeneralFg,
-                      onPressed: _deleteAllData,
+                    _SettingsTile(
+                      icon: Icons.storage_rounded,
+                      color: AppColors.textSecondary,
+                      background: AppColors.surfaceMuted,
+                      label: l10n.devDataOpen,
+                      onTap: () => context.push(AppRoutes.dataDebug),
                     ),
                   ],
                 ),
               ),
-            ),
+            ],
+            if (signedIn) ...[
+              const SizedBox(height: AppSpacing.md),
+              Reveal(
+                from: RevealFrom.left,
+                delay: next(),
+                child: _AccountSection(
+                  onBackup: _backupNow,
+                  onDeleteAccount: _deleteAccount,
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.xl),
+            Reveal(
+              from: RevealFrom.rise,
+              delay: next(),
+              child: _BottomActions(
+                resetLabel: signedIn ? 'Reset all my data' : l10n.x1DeleteAll,
+                onReset: _deleteAllData,
+                onSignOut: signedIn ? _signOut : null,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
             Center(
               child: Text(
                 l10n.x1VersionFooter(_version.isEmpty ? '—' : _version),
@@ -1081,3 +1218,484 @@ class _AnimatedSwitch extends StatelessWidget {
     );
   }
 }
+
+/// Signed-in identity read from the auth user and local sync metadata.
+class _AccountInfo {
+  const _AccountInfo({
+    required this.name,
+    required this.email,
+    required this.google,
+    required this.avatarUrl,
+  });
+
+  factory _AccountInfo.read(WidgetRef ref) {
+    final AuthRepository auth = ref.watch(authRepositoryProvider);
+    final SyncMetadataStore meta = ref.watch(syncMetadataStoreProvider);
+    final User? user = auth.currentUser;
+    final Map<String, dynamic> data = user?.userMetadata ?? <String, dynamic>{};
+    final String? metaName = meta.displayName?.trim();
+    final String? authName =
+        (data['full_name'] ?? data['name']) as String?;
+    final String name = (metaName?.isNotEmpty ?? false)
+        ? metaName!
+        : (authName?.trim().isNotEmpty ?? false)
+        ? authName!.trim()
+        : '';
+    final bool google = user?.appMetadata['provider'] == 'google' ||
+        (user?.identities?.any((UserIdentity i) => i.provider == 'google') ??
+            false);
+    return _AccountInfo(
+      name: name,
+      email: user?.email ?? '',
+      google: google,
+      avatarUrl: (data['avatar_url'] ?? data['picture']) as String?,
+    );
+  }
+
+  final String name;
+  final String email;
+  final bool google;
+  final String? avatarUrl;
+
+  String get title => name.isNotEmpty ? name : email;
+
+  String get initials {
+    final String source = name.isNotEmpty ? name : email;
+    final List<String> parts = source
+        .split(RegExp(r'[\s@._-]+'))
+        .where((String p) => p.isNotEmpty)
+        .toList();
+    if (parts.isEmpty) {
+      return '?';
+    }
+    if (parts.length == 1 || name.isEmpty) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+    return '${parts.first[0]}${parts[1][0]}'.toUpperCase();
+  }
+}
+
+/// Account card at the top of Settings: avatar, name, email, sign-in method.
+class _ProfileHeader extends ConsumerWidget {
+  const _ProfileHeader();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _AccountInfo info = _AccountInfo.read(ref);
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: AppRadii.xlAll,
+        border: Border.all(color: AppColors.border),
+        boxShadow: AppElevation.level1,
+      ),
+      child: Row(
+        children: [
+          _Avatar(info: info, size: 60),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  info.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.title.copyWith(letterSpacing: -0.3),
+                ),
+                if (info.name.isNotEmpty && info.email.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    info.email,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.caption,
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.xs),
+                _ProviderChip(google: info.google),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Round avatar: Google photo when available, otherwise initials.
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.info, required this.size});
+
+  final _AccountInfo info;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget initials = Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[AppColors.accent, AppColors.primary],
+        ),
+      ),
+      child: Text(
+        info.initials,
+        style: AppTypography.title.copyWith(
+          color: AppColors.textOnPrimary,
+          fontSize: size * 0.36,
+        ),
+      ),
+    );
+    final String? url = info.avatarUrl;
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(2.5),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.mint, width: 2),
+      ),
+      child: ClipOval(
+        child: url == null || url.isEmpty
+            ? initials
+            : Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (BuildContext context, Object e, StackTrace? s) =>
+                    initials,
+              ),
+      ),
+    );
+  }
+}
+
+/// "Google" or "Email" sign-in method tag.
+class _ProviderChip extends StatelessWidget {
+  const _ProviderChip({required this.google});
+
+  final bool google;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xxs,
+      ),
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        borderRadius: AppRadii.pillAll,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (google)
+            SvgPicture.asset(
+              'assets/images/google_g.svg',
+              width: 12,
+              height: 12,
+              excludeFromSemantics: true,
+            )
+          else
+            const Icon(
+              Icons.mail_outline_rounded,
+              size: 13,
+              color: AppColors.textSecondary,
+            ),
+          const SizedBox(width: 6),
+          Text(
+            google ? 'Signed in with Google' : 'Signed in with email',
+            style: AppTypography.caption.copyWith(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Collapsed Account card at the end of Settings; tap to reveal backup
+/// status, "Back up now" and "Delete account".
+class _AccountSection extends ConsumerStatefulWidget {
+  const _AccountSection({
+    required this.onBackup,
+    required this.onDeleteAccount,
+  });
+
+  final VoidCallback onBackup;
+  final VoidCallback onDeleteAccount;
+
+  @override
+  ConsumerState<_AccountSection> createState() => _AccountSectionState();
+}
+
+class _AccountSectionState extends ConsumerState<_AccountSection> {
+  bool _open = false;
+
+  static String _syncLabel(String? iso) {
+    final DateTime? at = iso == null ? null : DateTime.tryParse(iso);
+    if (at == null) {
+      return 'Not backed up yet';
+    }
+    return 'Last backup ${DateFormat.MMMd().add_jm().format(at.toLocal())}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _AccountInfo info = _AccountInfo.read(ref);
+    final SyncMetadataStore meta = ref.watch(syncMetadataStoreProvider);
+    final String? lastError = meta.lastError;
+    final bool issue = lastError != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            left: AppSpacing.xxs,
+            bottom: AppSpacing.xs,
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.person_outline_rounded,
+                size: 16,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: AppSpacing.xxs),
+              Text(
+                'ACCOUNT',
+                style: AppTypography.caption.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: AppRadii.lgAll,
+            border: Border.all(color: AppColors.border),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  onTap: () => setState(() => _open = !_open),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.sm,
+                    ),
+                    child: Row(
+                      children: [
+                        _Avatar(info: info, size: 40),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Account and backup',
+                                style: AppTypography.body.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                info.email,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTypography.caption,
+                              ),
+                            ],
+                          ),
+                        ),
+                        AnimatedRotation(
+                          turns: _open ? 0.5 : 0,
+                          duration: const Duration(milliseconds: 220),
+                          child: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              AnimatedCrossFade(
+                duration: const Duration(milliseconds: 240),
+                sizeCurve: Curves.easeOutCubic,
+                crossFadeState: _open
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                firstChild: const SizedBox(width: double.infinity),
+                secondChild: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Divider(height: 1, color: AppColors.border),
+                    _SettingsTile(
+                      icon: issue
+                          ? Icons.cloud_off_outlined
+                          : Icons.cloud_done_outlined,
+                      color: issue
+                          ? _dangerColor
+                          : AppColors.goalSurgeryFg,
+                      background: issue
+                          ? const Color(0xFFFFF1F4)
+                          : AppColors.goalSurgeryBg,
+                      label: issue ? 'Backup issue' : 'Cloud backup',
+                      subtitle: lastError ?? _syncLabel(meta.lastSyncIso),
+                    ),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.border,
+                      indent: 64,
+                    ),
+                    _SettingsTile(
+                      icon: Icons.cloud_upload_outlined,
+                      color: AppColors.primary,
+                      background: AppColors.mint,
+                      label: 'Back up now',
+                      onTap: widget.onBackup,
+                    ),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.border,
+                      indent: 64,
+                    ),
+                    _SettingsTile(
+                      icon: Icons.delete_forever_outlined,
+                      color: _dangerColor,
+                      background: const Color(0xFFFFF1F4),
+                      label: 'Delete account',
+                      subtitle: 'Removes your account and cloud backup',
+                      onTap: widget.onDeleteAccount,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.md,
+                        AppSpacing.xs,
+                        AppSpacing.md,
+                        AppSpacing.md,
+                      ),
+                      child: Text(
+                        'Backed up: plan, sessions, habits, walking, hold tests, '
+                        'check-ins, reminders. Never leaves this phone: safety '
+                        'answers, session feel.',
+                        style: AppTypography.caption.copyWith(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+const Color _dangerColor = Color(0xFFB42318);
+
+/// Bottom of Settings: reset data and, when signed in, sign out.
+class _BottomActions extends StatelessWidget {
+  const _BottomActions({
+    required this.resetLabel,
+    required this.onReset,
+    required this.onSignOut,
+  });
+
+  final String resetLabel;
+  final VoidCallback onReset;
+  final VoidCallback? onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> buttons = <Widget>[
+      _ActionPill(
+        label: resetLabel,
+        icon: Icons.restart_alt_rounded,
+        color: AppColors.goalGeneralFg,
+        background: AppColors.goalGeneralBg,
+        onTap: onReset,
+      ),
+      if (onSignOut != null)
+        _ActionPill(
+          label: 'Sign out',
+          icon: Icons.logout_rounded,
+          color: _dangerColor,
+          background: const Color(0xFFFFF1F4),
+          onTap: onSignOut!,
+        ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (int i = 0; i < buttons.length; i++) ...[
+          if (i > 0) const SizedBox(height: AppSpacing.sm),
+          buttons[i],
+        ],
+      ],
+    );
+  }
+}
+
+/// Full-width tinted action button with a leading icon.
+class _ActionPill extends StatelessWidget {
+  const _ActionPill({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.background,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final Color background;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressScale(
+      onTap: onTap,
+      semanticLabel: label,
+      child: Container(
+        height: 54,
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: AppRadii.pillAll,
+          border: Border.all(color: color.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 20, color: color),
+            const SizedBox(width: AppSpacing.xs),
+            Text(
+              label,
+              style: AppTypography.button.copyWith(color: color),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

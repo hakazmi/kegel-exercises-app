@@ -36,14 +36,14 @@ enum DayPose {
   static const int trainingDaysPerWeek = 6;
 
   String label(AppLocalizations l10n) => switch (this) {
-        DayPose.standing => l10n.poseStanding,
-        DayPose.sitting => l10n.poseSitting,
-        DayPose.lyingOnBack => l10n.poseLyingOnBack,
-        DayPose.gluteBridge => l10n.poseGluteBridge,
-        DayPose.squatting => l10n.poseSquatting,
-        DayPose.kneeling => l10n.poseKneeling,
-        DayPose.restBreathing => l10n.poseRestBreathing,
-      };
+    DayPose.standing => l10n.poseStanding,
+    DayPose.sitting => l10n.poseSitting,
+    DayPose.lyingOnBack => l10n.poseLyingOnBack,
+    DayPose.gluteBridge => l10n.poseGluteBridge,
+    DayPose.squatting => l10n.poseSquatting,
+    DayPose.kneeling => l10n.poseKneeling,
+    DayPose.restBreathing => l10n.poseRestBreathing,
+  };
 }
 
 /// Cut-out figure standing on a dark panel and popping out above it.

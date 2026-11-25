@@ -9,10 +9,7 @@ abstract final class CheckInRules {
   static const int maxScore = 5;
 
   /// Weeks since the baseline check-in (0 = baseline week).
-  static int weekIndex({
-    required DateTime baselineDate,
-    required DateTime at,
-  }) {
+  static int weekIndex({required DateTime baselineDate, required DateTime at}) {
     final DateTime start = dateOnly(baselineDate);
     final DateTime day = dateOnly(at);
     if (day.isBefore(start)) {

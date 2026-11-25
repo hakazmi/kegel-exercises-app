@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../core/cloud/cloud_providers.dart';
+import '../core/cloud/sync_coordinator.dart';
 import '../core/constants/app_constants.dart';
 import '../core/motion/app_motion.dart';
 import '../core/services/reminder_service.dart';
@@ -51,6 +53,15 @@ class _KegelAppState extends ConsumerState<KegelApp>
     if (state == AppLifecycleState.resumed &&
         _bootstrapTimer?.isActive != true) {
       unawaited(_bootstrapReminders());
+      unawaited(
+        ref.read(syncCoordinatorProvider).requestFullSync(
+          onlyIfOlderThan: SyncCoordinator.resumeStale,
+        ),
+      );
+    }
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      unawaited(ref.read(syncCoordinatorProvider).requestPush());
     }
   }
 

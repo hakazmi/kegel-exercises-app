@@ -59,7 +59,12 @@ class ConfirmDialog extends StatelessWidget {
           children: [
             Text(title, style: AppTypography.title),
             const SizedBox(height: AppSpacing.sm),
-            Text(message, style: AppTypography.body.copyWith(color: AppColors.textSecondary)),
+            Text(
+              message,
+              style: AppTypography.body.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
             const SizedBox(height: AppSpacing.xl),
             Semantics(
               button: true,

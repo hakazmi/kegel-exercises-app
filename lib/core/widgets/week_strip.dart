@@ -15,6 +15,7 @@ class WeekDayItem {
   });
 
   final String label;
+
   /// Calendar day number, or the rest label (same typography as day numbers).
   final String dayNumber;
   final bool completed;
@@ -51,7 +52,10 @@ class WeekStrip extends StatelessWidget {
                 child: Reveal(
                   from: RevealFrom.drop,
                   distance: 18,
-                  delay: AppMotion.stagger(i, base: const Duration(milliseconds: 80)),
+                  delay: AppMotion.stagger(
+                    i,
+                    base: const Duration(milliseconds: 80),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: _DayCell(day: days[i], index: i),
@@ -74,8 +78,9 @@ class _DayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool today = day.isToday;
-    final Color labelColor =
-        today ? AppColors.textOnPrimary.withValues(alpha: 0.8) : AppColors.textSecondary;
+    final Color labelColor = today
+        ? AppColors.textOnPrimary.withValues(alpha: 0.8)
+        : AppColors.textSecondary;
     final Color numberColor = today
         ? AppColors.textOnPrimary
         : (day.isFuture ? AppColors.textSecondary : AppColors.textPrimary);
@@ -124,10 +129,7 @@ class _DayCell extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              SizedBox(
-                height: 16,
-                child: Center(child: _marker(today)),
-              ),
+              SizedBox(height: 16, child: Center(child: _marker(today))),
             ],
           ),
         ),
@@ -141,7 +143,10 @@ class _DayCell extends StatelessWidget {
         size: 16,
         color: today ? AppColors.accent : AppColors.primary,
         checkColor: AppColors.textOnPrimary,
-        delay: AppMotion.stagger(index, base: const Duration(milliseconds: 300)),
+        delay: AppMotion.stagger(
+          index,
+          base: const Duration(milliseconds: 300),
+        ),
         strokeWidth: 2,
       );
     }

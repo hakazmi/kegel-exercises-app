@@ -12,23 +12,10 @@ abstract final class SessionPhaseKey {
 }
 
 /// Machine states for the session player (pure Dart).
-enum EngineMachineState {
-  idle,
-  countdown,
-  squeeze,
-  relax,
-  rest,
-  paused,
-  done,
-}
+enum EngineMachineState { idle, countdown, squeeze, relax, rest, paused, done }
 
 /// One-off cues for haptics and voice.
-enum EngineEvent {
-  squeezeStarted,
-  relaxStarted,
-  restStarted,
-  done,
-}
+enum EngineEvent { squeezeStarted, relaxStarted, restStarted, done }
 
 /// Immutable snapshot emitted by [SessionEngine].
 class EngineState {
@@ -118,13 +105,13 @@ class EngineState {
       totalReps: totalReps ?? this.totalReps,
       blockIndex: blockIndex ?? this.blockIndex,
       blockTitleKey: blockTitleKey ?? this.blockTitleKey,
-      nextBlockTitleKey:
-          clearNext ? null : (nextBlockTitleKey ?? this.nextBlockTitleKey),
+      nextBlockTitleKey: clearNext
+          ? null
+          : (nextBlockTitleKey ?? this.nextBlockTitleKey),
       secondsRemaining: secondsRemaining ?? this.secondsRemaining,
       totalProgress: totalProgress ?? this.totalProgress,
       elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,
-      totalDurationSeconds:
-          totalDurationSeconds ?? this.totalDurationSeconds,
+      totalDurationSeconds: totalDurationSeconds ?? this.totalDurationSeconds,
       completed: completed ?? this.completed,
       exited: exited ?? this.exited,
       longestHoldSeconds: longestHoldSeconds ?? this.longestHoldSeconds,
@@ -179,7 +166,8 @@ class TimelineSegment {
   final bool isCountdown;
 
   String phaseWordAt(Duration elapsedInSegment) {
-    if (holdAfterFirstSecond && elapsedInSegment >= const Duration(seconds: 1)) {
+    if (holdAfterFirstSecond &&
+        elapsedInSegment >= const Duration(seconds: 1)) {
       return SessionPhaseKey.hold;
     }
     return phaseWordAtStart;

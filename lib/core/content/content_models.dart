@@ -144,6 +144,36 @@ class ArticleSource {
   }
 }
 
+/// One item in an article gallery: looping video, still photo, or GIF.
+class ArticleMedia {
+  const ArticleMedia({
+    required this.poster,
+    required this.caption,
+    this.video,
+    this.exerciseId,
+  });
+
+  /// Optional looping video. When null, [poster] is shown (jpg/png/gif).
+  final String? video;
+  final String poster;
+  final String caption;
+
+  /// Exercise detail to open from this clip, if any.
+  final String? exerciseId;
+
+  bool get isVideo => video != null && video!.isNotEmpty;
+
+  factory ArticleMedia.fromJson(Map<String, dynamic> json) {
+    final String? video = json['video'] as String?;
+    return ArticleMedia(
+      video: (video == null || video.isEmpty) ? null : video,
+      poster: (json['poster'] as String?) ?? (json['image'] as String),
+      caption: json['caption'] as String,
+      exerciseId: json['exerciseId'] as String?,
+    );
+  }
+}
+
 /// Article entry from `assets/content/articles.json` plus loaded Markdown body.
 class ArticleContent {
   const ArticleContent({
@@ -155,6 +185,8 @@ class ArticleContent {
     required this.opensTutorial,
     required this.bodyAsset,
     required this.sources,
+    this.cover,
+    this.media = const <ArticleMedia>[],
     this.bodyMarkdown = '',
   });
 
@@ -166,7 +198,31 @@ class ArticleContent {
   final bool opensTutorial;
   final String bodyAsset;
   final List<ArticleSource> sources;
+
+  /// Photo/GIF cover shown instead of the [image] icon when present.
+  final String? cover;
+
+  /// Demo clips, stills or GIFs shown at the top of the article.
+  final List<ArticleMedia> media;
   final String bodyMarkdown;
+
+  /// List/detail gallery (videos, photos or GIFs).
+  bool get hasMedia => media.isNotEmpty;
+
+  /// At least one looping video clip.
+  bool get hasVideo => media.any((ArticleMedia m) => m.isVideo);
+
+  /// Best list thumbnail: cover, first media poster, else SVG [image].
+  String get thumbAsset => cover ?? (media.isEmpty ? image : media.first.poster);
+
+  bool get hasPhotoThumb {
+    final String path = thumbAsset.toLowerCase();
+    return path.endsWith('.jpg') ||
+        path.endsWith('.jpeg') ||
+        path.endsWith('.png') ||
+        path.endsWith('.gif') ||
+        path.endsWith('.webp');
+  }
 
   ArticleContent copyWith({String? bodyMarkdown}) {
     return ArticleContent(
@@ -178,6 +234,8 @@ class ArticleContent {
       opensTutorial: opensTutorial,
       bodyAsset: bodyAsset,
       sources: sources,
+      cover: cover,
+      media: media,
       bodyMarkdown: bodyMarkdown ?? this.bodyMarkdown,
     );
   }
@@ -192,9 +250,11 @@ class ArticleContent {
       opensTutorial: json['opensTutorial'] as bool? ?? false,
       bodyAsset: json['bodyAsset'] as String,
       sources: (json['sources'] as List<dynamic>? ?? const <dynamic>[])
-          .map(
-            (dynamic e) => ArticleSource.fromJson(e as Map<String, dynamic>),
-          )
+          .map((dynamic e) => ArticleSource.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      cover: json['cover'] as String?,
+      media: (json['media'] as List<dynamic>? ?? const <dynamic>[])
+          .map((dynamic e) => ArticleMedia.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -255,8 +315,7 @@ class TrackContent {
       habits: (json['habits'] as List<dynamic>? ?? const <dynamic>[])
           .cast<String>(),
       weeklyActivity: json['weeklyActivity'] as String?,
-      weeklyActivityOptional:
-          json['weeklyActivityOptional'] as bool? ?? true,
+      weeklyActivityOptional: json['weeklyActivityOptional'] as bool? ?? true,
     );
   }
 }

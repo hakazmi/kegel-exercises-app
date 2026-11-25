@@ -41,16 +41,14 @@ class AnatomyDiagram extends StatelessWidget {
                     _gifAsset,
                     fit: BoxFit.cover,
                     gaplessPlayback: true,
-                    errorBuilder: (
-                      BuildContext context,
-                      Object error,
-                      StackTrace? stackTrace,
-                    ) {
-                      return Image.asset(
-                        _relaxFallback,
-                        fit: BoxFit.cover,
-                      );
-                    },
+                    errorBuilder:
+                        (
+                          BuildContext context,
+                          Object error,
+                          StackTrace? stackTrace,
+                        ) {
+                          return Image.asset(_relaxFallback, fit: BoxFit.cover);
+                        },
                   ),
                 ),
                 Positioned(

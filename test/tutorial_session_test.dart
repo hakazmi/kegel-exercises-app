@@ -15,6 +15,7 @@ import 'package:kegelexercisesapp/core/domain/user_profile.dart';
 import 'package:kegelexercisesapp/core/plan/plan_models.dart';
 import 'package:kegelexercisesapp/core/widgets/progress_header.dart';
 import 'package:kegelexercisesapp/features/session/s1_before_screen.dart';
+import 'package:kegelexercisesapp/features/tutorial/side_pelvic_demo.dart';
 import 'package:kegelexercisesapp/features/tutorial/anatomy_diagram.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -302,6 +303,10 @@ void main() {
       ),
     );
     addTearDown(container.dispose);
+    // Tall screen so the exercise cards and the full step list both build.
+    tester.view.physicalSize = const Size(800, 3200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -316,11 +321,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('LEVEL 1'), findsOneWidget);
-    expect(find.text('Slow holds'), findsOneWidget);
+    // Each Kegel exercise has an animated card plus its step in the list.
+    expect(find.byType(SidePelvicDemoLoop), findsNWidgets(2));
+    expect(find.text('Slow holds'), findsNWidgets(2));
     expect(find.text('Squeeze, hold, fully release'), findsOneWidget);
     expect(find.text('Rest'), findsOneWidget);
     expect(find.text('10 s'), findsOneWidget);
-    expect(find.text('Quick squeezes'), findsOneWidget);
+    expect(find.text('Quick squeezes'), findsNWidgets(2));
     expect(
       find.text('Squeeze hard for 1 second, release at once'),
       findsOneWidget,

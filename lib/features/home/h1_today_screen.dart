@@ -61,6 +61,10 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
       if (!mounted) {
         return;
       }
+      // Only celebrate when this route is actually ticking on screen.
+      if (!TickerMode.valuesOf(context).enabled) {
+        return;
+      }
       setState(() => _celebrating = pending);
       ref.read(todayCelebrationProvider.notifier).clear();
       _celebrationTimer?.cancel();
@@ -77,26 +81,37 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final UserProfile profile = ref.watch(userProfileProvider);
     final AsyncValue<TodayPlan> planAsync = ref.watch(todayPlanProvider);
-    final AsyncValue<List<SessionRecord>> sessionsAsync =
-        ref.watch(sessionsProvider);
-    final AsyncValue<List<LevelContent>> levelsAsync =
-        ref.watch(levelsProvider);
+    final AsyncValue<List<SessionRecord>> sessionsAsync = ref.watch(
+      sessionsProvider,
+    );
+    final AsyncValue<List<LevelContent>> levelsAsync = ref.watch(
+      levelsProvider,
+    );
     final DateTime now = ref.watch(appClockProvider).now();
     final DateTime today = dateOnly(now);
     final DateTime? guideSeen = ref.watch(guideSeenOnProvider);
+    // Ticked only if finished today *after* this plan started (a guide
+    // seen earlier the same day, e.g. before re-doing onboarding, does not
+    // count).
+    final DateTime? planStart = profile.planStartedOn;
     final bool guideDoneToday =
-        guideSeen != null && dateOnly(guideSeen) == today;
+        guideSeen != null &&
+        dateOnly(guideSeen) == today &&
+        (planStart == null || !guideSeen.isBefore(planStart));
     final bool testDoneToday = ref
         .watch(holdTestsProvider)
         .any((HoldTestResult r) => dateOnly(r.at) == today);
-    final Map<String, ExerciseContent> exercisesById = <String, ExerciseContent>{
-      for (final ExerciseContent e
-          in ref.watch(exercisesProvider).asData?.value ??
-              const <ExerciseContent>[])
-        e.id: e,
-    };
+    final Map<String, ExerciseContent> exercisesById =
+        <String, ExerciseContent>{
+          for (final ExerciseContent e
+              in ref.watch(exercisesProvider).asData?.value ??
+                  const <ExerciseContent>[])
+            e.id: e,
+        };
     final String? pendingCelebration = ref.watch(todayCelebrationProvider);
-    _maybeStartCelebration(pendingCelebration, TickerMode.valuesOf(context).enabled);
+    // Avoid depending on TickerMode during build (can assert when the shell
+    // is swapped for a session route). Visibility is checked in the callback.
+    _maybeStartCelebration(pendingCelebration, true);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -107,6 +122,11 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
           data: (TodayPlan plan) {
             final List<SessionRecord> sessions =
                 sessionsAsync.asData?.value ?? const <SessionRecord>[];
+            final List<SessionRecord> planSessions =
+                PlanRules.sessionsForActivePlan(
+                  profile: profile,
+                  sessions: sessions,
+                );
             final List<LevelContent> levels =
                 levelsAsync.asData?.value ?? const <LevelContent>[];
             final LevelContent? levelContent = levels.isEmpty
@@ -116,7 +136,7 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
                     orElse: () => levels.first,
                   );
             final int streak = PlanRules.streak(
-              sessions,
+              planSessions,
               now,
               restWeekday: profile.restWeekday,
             );
@@ -130,7 +150,7 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
 
             final bool showUnlock = LevelProgression.shouldShowUnlockCard(
               profile: profile,
-              sessions: sessions,
+              sessions: planSessions,
               today: now,
               daySpan: levelContent == null
                   ? null
@@ -142,11 +162,12 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
             // plan or while a catheter is in place (no squeezing).
             final bool prepVisible =
                 plan.track != TrackId.relaxationFirst &&
-                    plan.state != TodayPlanState.catheterBlocked &&
-                    !profile.safetyFlags.catheter;
+                plan.state != TodayPlanState.catheterBlocked &&
+                !profile.safetyFlags.catheter;
             final List<JourneyStatus> statuses = _statuses(plan, canStart);
-            final int doneCount =
-                plan.items.where((TodayItem i) => i.done).length;
+            final int doneCount = plan.items
+                .where((TodayItem i) => i.done)
+                .length;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(
@@ -178,10 +199,10 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
                         onStart: () async {
                           final bool advanced =
                               await LevelUnlockActions.startNext(
-                            context: context,
-                            ref: ref,
-                            nextLevel: nextLevel,
-                          );
+                                context: context,
+                                ref: ref,
+                                nextLevel: nextLevel,
+                              );
                           if (advanced && context.mounted) {
                             LevelUnlockActions.showStartedConfirm(
                               context,
@@ -230,7 +251,7 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
                       l10n: l10n,
                       today: now,
                       restWeekday: profile.restWeekday,
-                      sessions: sessions,
+                      sessions: planSessions,
                       planStart: profile.planStartedOn,
                     ),
                   ),
@@ -269,7 +290,10 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                l10n.h1JourneySubtitle(doneCount, plan.items.length),
+                                l10n.h1JourneySubtitle(
+                                  doneCount,
+                                  plan.items.length,
+                                ),
                                 style: AppTypography.caption,
                               ),
                             ],
@@ -317,10 +341,9 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
                         habits: plan.habits,
                         exercisesById: exercisesById,
                         onToggle: (TodayHabitItem habit) async {
-                          await ref.read(habitRepositoryProvider).toggle(
-                                habitId: habit.id,
-                                day: dateOnly(now),
-                              );
+                          await ref
+                              .read(habitRepositoryProvider)
+                              .toggle(habitId: habit.id, day: dateOnly(now));
                           ref.invalidate(todayPlanProvider);
                           await ref.read(todayPlanProvider.future);
                         },
@@ -337,8 +360,19 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
                       trailingArrow: canStart,
                       shimmer: canStart,
                       enabled: canStart,
-                      onPressed:
-                          canStart ? () => _startNext(context, plan) : null,
+                      onPressed: canStart
+                          ? () => _startNext(
+                              context,
+                              plan,
+                              // A beginner who has never seen the guide
+                              // learns the technique before session 1.
+                              needsGuide:
+                                  prepVisible &&
+                                  plan.level == 1 &&
+                                  guideSeen == null &&
+                                  !profile.tutorialDone,
+                            )
+                          : null,
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
@@ -398,14 +432,24 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
 
   _Banner? _stateBanner(AppLocalizations l10n, TodayPlan plan) {
     return switch (plan.state) {
-      TodayPlanState.restDay =>
-        _Banner(Icons.bedtime_outlined, l10n.h1RestDay, AppColors.goalSurgeryBg,
-            AppColors.goalSurgeryFg),
-      TodayPlanState.allDone =>
-        _Banner(Icons.verified_outlined, l10n.h1AllDone, AppColors.mint,
-            AppColors.primary),
-      TodayPlanState.dailyCapReached => _Banner(Icons.hourglass_bottom_rounded,
-          l10n.h1DailyCap, AppColors.streakBg, AppColors.streakFg),
+      TodayPlanState.restDay => _Banner(
+        Icons.bedtime_outlined,
+        l10n.h1RestDay,
+        AppColors.goalSurgeryBg,
+        AppColors.goalSurgeryFg,
+      ),
+      TodayPlanState.allDone => _Banner(
+        Icons.verified_outlined,
+        l10n.h1AllDone,
+        AppColors.mint,
+        AppColors.primary,
+      ),
+      TodayPlanState.dailyCapReached => _Banner(
+        Icons.hourglass_bottom_rounded,
+        l10n.h1DailyCap,
+        AppColors.streakBg,
+        AppColors.streakFg,
+      ),
       _ => null,
     };
   }
@@ -450,7 +494,15 @@ class _H1TodayScreenState extends ConsumerState<H1TodayScreen> {
       );
   }
 
-  void _startNext(BuildContext context, TodayPlan plan) {
+  void _startNext(
+    BuildContext context,
+    TodayPlan plan, {
+    bool needsGuide = false,
+  }) {
+    if (needsGuide) {
+      context.push('${AppRoutes.tutorial}?replay=1');
+      return;
+    }
     for (final TodayItem item in plan.items) {
       if (!item.done && !item.locked) {
         context.push(
@@ -480,10 +532,7 @@ class _StateBannerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: banner.bg,
-        borderRadius: AppRadii.lgAll,
-      ),
+      decoration: BoxDecoration(color: banner.bg, borderRadius: AppRadii.lgAll),
       child: Row(
         children: [
           FloatBob(
@@ -529,19 +578,66 @@ class _TodayHeader extends StatelessWidget {
 
   String _greeting() {
     final int hour = now.hour;
-    if (hour < 12) {
+    if (hour >= 5 && hour < 12) {
       return l10n.h1GreetingMorning;
     }
-    if (hour < 18) {
+    if (hour >= 12 && hour < 18) {
       return l10n.h1GreetingAfternoon;
     }
     return l10n.h1GreetingEvening;
   }
 
+  /// Icon and colours for the time of day: sunrise in the morning, sun in
+  /// the afternoon, moon and stars in the evening and at night.
+  ({IconData icon, Color bg, Color fg}) _timeStyle() {
+    final int hour = now.hour;
+    if (hour >= 5 && hour < 12) {
+      return (
+        icon: Icons.wb_twilight_rounded,
+        bg: AppColors.streakBg,
+        fg: AppColors.streakFg,
+      );
+    }
+    if (hour >= 12 && hour < 18) {
+      return (
+        icon: Icons.wb_sunny_rounded,
+        bg: const Color(0xFFFFF3C4),
+        fg: const Color(0xFFB07800),
+      );
+    }
+    return (
+      icon: Icons.nights_stay_rounded,
+      bg: AppColors.goalErectionBg,
+      fg: AppColors.goalErectionFg,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final ({IconData icon, Color bg, Color fg}) time = _timeStyle();
     return Row(
       children: [
+        FloatBob(
+          lift: 2,
+          period: const Duration(milliseconds: 3000),
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: time.bg,
+              shape: BoxShape.circle,
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: time.fg.withValues(alpha: 0.2),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Icon(time.icon, color: time.fg, size: 26),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,7 +736,7 @@ class _LevelHero extends StatelessWidget {
   final VoidCallback onTap;
 
   static const double _rise = 34;
-  static const double _height = 172;
+  static const double _height = 220;
 
   @override
   Widget build(BuildContext context) {
@@ -649,7 +745,15 @@ class _LevelHero extends StatelessWidget {
       track: plan.track,
       level: levelContent,
     );
-    final int doneDays = (plan.dayInLevel - 1).clamp(0, totalDays);
+    // Level 5 is open-ended maintenance: it runs in 7-day weeks, so the
+    // bar shows this week and starts again each new week.
+    final bool maintenance =
+        !relaxation && levelContent != null && levelContent!.dayEnd == null;
+    final int maintenanceWeek = (plan.dayInLevel - 1) ~/ totalDays + 1;
+    final int dayInCycle = maintenance
+        ? (plan.dayInLevel - 1) % totalDays + 1
+        : plan.dayInLevel;
+    final int doneDays = (dayInCycle - 1).clamp(0, totalDays);
     final int percent = totalDays == 0
         ? 0
         : (doneDays / totalDays * 100).round().clamp(0, 100);
@@ -659,20 +763,31 @@ class _LevelHero extends StatelessWidget {
         : HomeCopy.levelName(l10n, plan.level);
     final String progressLine = relaxation
         ? l10n.h1DayProgress(doneDays, totalDays)
+        : maintenance
+        ? l10n.h1MaintenanceDay(maintenanceWeek, dayInCycle, totalDays)
         : l10n.h1LevelDayOf(
             plan.level,
             plan.dayInLevel.clamp(1, totalDays == 0 ? 1 : totalDays),
             totalDays,
           );
-    final String badge = l10n
-        .o6TrackBadge(HomeCopy.trackName(l10n, plan.track))
-        .toUpperCase();
-    final LevelPalette palette =
-        relaxation ? LevelPalette.rest : LevelPalette.of(plan.level);
+    final String badge =
+        (maintenance
+                ? l10n.h1ProgramComplete
+                : l10n.o6TrackBadge(HomeCopy.trackName(l10n, plan.track)))
+            .toUpperCase();
+    final LevelPalette palette = relaxation
+        ? LevelPalette.rest
+        : LevelPalette.of(plan.level);
     final DayPose pose = relaxation
         ? DayPose.restBreathing
         : DayPose.forDay(plan.dayInLevel);
     final bool wide = pose.isWide || pose == DayPose.restBreathing;
+    final String motivation = HomeCopy.motivation(
+      l10n,
+      level: plan.level,
+      dayInLevel: plan.dayInLevel,
+      relaxation: relaxation,
+    );
 
     return PressScale(
       onTap: onTap,
@@ -791,6 +906,15 @@ class _LevelHero extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Padding(
+                      // Keep the line clear of the day figure on the right.
+                      padding: EdgeInsets.only(right: wide ? 8 : 96),
+                      child: _MotivationLine(
+                        text: motivation,
+                        accent: palette.deep,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
                     Row(
                       children: [
                         Expanded(
@@ -840,6 +964,56 @@ class _LevelHero extends StatelessWidget {
   }
 }
 
+/// Daily motivation line on the level card: accent bar, sparkle icon and
+/// two lines of text that fade in when the day changes.
+class _MotivationLine extends StatelessWidget {
+  const _MotivationLine({required this.text, required this.accent});
+
+  final String text;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 320),
+      child: Container(
+        key: ValueKey<String>(text),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.xs,
+          AppSpacing.xxs + 2,
+          AppSpacing.xs,
+          AppSpacing.xxs + 2,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.surface.withValues(alpha: 0.55),
+          borderRadius: AppRadii.mdAll,
+          border: Border(left: BorderSide(color: accent, width: 3)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 1),
+              child: Icon(Icons.auto_awesome_rounded, size: 14, color: accent),
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                text,
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.ink,
+                  fontWeight: FontWeight.w700,
+                  height: 1.3,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _GlowBar extends StatelessWidget {
   const _GlowBar({required this.progress});
 
@@ -875,7 +1049,6 @@ class _GlowBar extends StatelessWidget {
     );
   }
 }
-
 
 class _HabitsSection extends StatelessWidget {
   const _HabitsSection({
@@ -936,18 +1109,20 @@ class _HabitTile extends StatelessWidget {
   final InfoContent? info;
 
   IconData get _icon => switch (habit.exerciseId) {
-        'after_dribble_squeeze' => Icons.water_drop_outlined,
-        'urge_control_squeeze' => Icons.front_hand_outlined,
-        _ => Icons.repeat_rounded,
-      };
+    'after_dribble_squeeze' => Icons.water_drop_outlined,
+    'urge_control_squeeze' => Icons.front_hand_outlined,
+    _ => Icons.repeat_rounded,
+  };
 
   @override
   Widget build(BuildContext context) {
     final bool done = habit.done;
+    // The card opens the habit guide; the pill on the right ticks it off.
     return PressScale(
-      onTap: onToggle,
-      semanticLabel:
-          '${habit.label}. ${done ? l10n.h1HabitClear : l10n.h1HabitMarkDone}',
+      onTap: () => context.push(
+        '${AppRoutes.habit}?id=${Uri.encodeComponent(habit.id)}',
+      ),
+      semanticLabel: '${habit.label}. ${l10n.hgOpen}',
       child: AnimatedContainer(
         duration: AppMotion.quick,
         padding: const EdgeInsets.symmetric(
@@ -957,9 +1132,7 @@ class _HabitTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: done ? AppColors.mint : AppColors.surface,
           borderRadius: AppRadii.lgAll,
-          border: Border.all(
-            color: done ? AppColors.mint : AppColors.border,
-          ),
+          border: Border.all(color: done ? AppColors.mint : AppColors.border),
         ),
         child: Row(
           children: [
@@ -972,49 +1145,54 @@ class _HabitTile extends StatelessWidget {
               ),
             ),
             if (info != null) InfoButton(content: info!, size: 24),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 260),
-              transitionBuilder: (Widget child, Animation<double> a) =>
-                  ScaleTransition(scale: a, child: child),
-              child: done
-                  ? Row(
-                      key: const ValueKey<String>('done'),
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          l10n.h1HabitDone,
-                          style: AppTypography.caption.copyWith(
+            const SizedBox(width: AppSpacing.xxs),
+            PressScale(
+              onTap: onToggle,
+              semanticLabel: done ? l10n.h1HabitClear : l10n.h1HabitMarkDone,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 260),
+                transitionBuilder: (Widget child, Animation<double> a) =>
+                    ScaleTransition(scale: a, child: child),
+                child: done
+                    ? Row(
+                        key: const ValueKey<String>('done'),
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            l10n.h1HabitDone,
+                            style: AppTypography.caption.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.xxs),
+                          const AnimatedCheckBadge(
+                            size: 22,
                             color: AppColors.primary,
+                            checkColor: AppColors.textOnPrimary,
+                            strokeWidth: 2.5,
+                          ),
+                        ],
+                      )
+                    : Container(
+                        key: const ValueKey<String>('todo'),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: AppSpacing.xxs + 2,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: AppRadii.pillAll,
+                          border: Border.all(color: AppColors.borderStrong),
+                        ),
+                        child: Text(
+                          l10n.h1HabitMarkDone,
+                          style: AppTypography.caption.copyWith(
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(width: AppSpacing.xxs),
-                        const AnimatedCheckBadge(
-                          size: 22,
-                          color: AppColors.primary,
-                          checkColor: AppColors.textOnPrimary,
-                          strokeWidth: 2.5,
-                        ),
-                      ],
-                    )
-                  : Container(
-                      key: const ValueKey<String>('todo'),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xxs + 2,
                       ),
-                      decoration: BoxDecoration(
-                        borderRadius: AppRadii.pillAll,
-                        border: Border.all(color: AppColors.borderStrong),
-                      ),
-                      child: Text(
-                        l10n.h1HabitMarkDone,
-                        style: AppTypography.caption.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
+              ),
             ),
           ],
         ),
@@ -1063,10 +1241,7 @@ class _CatheterBody extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.xl),
-          PrimaryButton(
-            label: l10n.h1UpdateCatheter,
-            onPressed: onUpdate,
-          ),
+          PrimaryButton(label: l10n.h1UpdateCatheter, onPressed: onUpdate),
           const Spacer(),
         ],
       ),

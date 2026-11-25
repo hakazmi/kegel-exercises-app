@@ -54,6 +54,7 @@ class TodayPrepSteps extends StatelessWidget {
               subtitle: l10n.htTodayTestSub,
               art: OnboardingArt.stopwatch,
               tint: AppColors.sky,
+              tag: l10n.h1SessionOptional,
               onTap: () => context.push(AppRoutes.holdTest),
             ),
           ),
@@ -72,8 +73,11 @@ class _PrepRow extends StatelessWidget {
     required this.art,
     required this.tint,
     required this.onTap,
+    this.tag,
   });
 
+  /// Small label next to the title (e.g. "Optional").
+  final String? tag;
   final bool done;
   final bool isFirst;
 
@@ -148,6 +152,7 @@ class _PrepRow extends StatelessWidget {
                 art: art,
                 tint: tint,
                 done: done,
+                tag: tag,
                 onTap: onTap,
               ),
             ),
@@ -167,8 +172,10 @@ class _PrepCard extends StatelessWidget {
     required this.done,
     required this.onTap,
     this.compact = false,
+    this.tag,
   });
 
+  final String? tag;
   final String title;
   final String subtitle;
   final String art;
@@ -206,6 +213,26 @@ class _PrepCard extends StatelessWidget {
                       height: 1.25,
                     ),
                   ),
+                  if (tag != null) ...[
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xs,
+                        vertical: 2,
+                      ),
+                      decoration: const BoxDecoration(
+                        color: AppColors.surfaceMuted,
+                        borderRadius: AppRadii.pillAll,
+                      ),
+                      child: Text(
+                        tag!,
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
                   if (!compact) ...[
                     const SizedBox(height: 2),
                     Text(subtitle, style: AppTypography.caption),

@@ -79,8 +79,12 @@ abstract final class ReminderPlanner {
     final List<PlannedNotification> out = <PlannedNotification>[];
     final DateTime now = input.now;
     final bool discreet = input.profile.discreetNotifications;
+    final List<SessionRecord> planSessions = PlanRules.sessionsForActivePlan(
+      profile: input.profile,
+      sessions: input.sessions,
+    );
     final int streak = PlanRules.streak(
-      input.sessions,
+      planSessions,
       now,
       restWeekday: input.profile.restWeekday,
     );
@@ -94,7 +98,7 @@ abstract final class ReminderPlanner {
 
       final _DayContext dayCtx = _dayContext(
         profile: input.profile,
-        sessions: input.sessions,
+        sessions: planSessions,
         day: day,
       );
       if (dayCtx.sessionsDone) {
@@ -139,7 +143,8 @@ abstract final class ReminderPlanner {
         );
       }
 
-      final bool checkInDue = !checkInScheduled &&
+      final bool checkInDue =
+          !checkInScheduled &&
           !dayCtx.restDay &&
           PlanRules.isCheckInDue(
             sessions: input.sessions,
@@ -192,8 +197,10 @@ abstract final class ReminderPlanner {
       out.addAll(dayItems.take(maxPerDay));
     }
 
-    out.sort((PlannedNotification a, PlannedNotification b) =>
-        a.when.compareTo(b.when));
+    out.sort(
+      (PlannedNotification a, PlannedNotification b) =>
+          a.when.compareTo(b.when),
+    );
     return out;
   }
 
@@ -217,16 +224,15 @@ abstract final class ReminderPlanner {
     required List<SessionRecord> sessions,
     required DateTime day,
   }) {
-    final TodayPlan plan = PlanService(clock: FakeClock(day)).todayPlan(
-      profile: profile,
-      sessions: sessions,
-    );
+    final TodayPlan plan = PlanService(clock: FakeClock(day))
+        .todayPlan(profile: profile, sessions: sessions);
     final bool rest = PlanRules.isRestDay(
       date: day,
       restWeekday: profile.restWeekday,
       sessions: sessions,
     );
-    final bool done = plan.state == TodayPlanState.allDone ||
+    final bool done =
+        plan.state == TodayPlanState.allDone ||
         plan.state == TodayPlanState.dailyCapReached ||
         plan.state == TodayPlanState.catheterBlocked;
     return _DayContext(restDay: rest, sessionsDone: done);

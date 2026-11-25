@@ -160,7 +160,7 @@
   "o6RelaxationTimelineAfterBody": "If the pain has settled and a clinician agrees, you can start Level 1.",
   "o6RelaxationTimelineAlwaysTitle": "Always",
   "o6RelaxationTimelineAlwaysBody": "Please see a doctor or pelvic floor physiotherapist if pain continues.",
-  "o6Start": "Start my first session",
+  "o6Start": "Start my plan",
   "o6BridgeSemantic": "Bridge exercise illustration",
   "o6ChildSemantic": "Child pose illustration",
   "o6TrackGeneralBladder": "General and bladder",
@@ -741,6 +741,30 @@
   },
   "l2Sources": "Sources",
   "l2NotFound": "Article not found.",
+  "h1Motivation": "{key, select, l1a{Every session counts. Squeeze gently, then fully relax.} l1b{Find the muscles, then let them fully let go.} l1c{Small, steady reps build a habit you can keep.} l1d{Keep breathing. Soften buttocks, thighs and stomach.} l2a{A little longer each hold. Quality over quantity.} l2b{Steady holds, easy breathing, full release.} l2c{You are building a routine. Keep showing up.} l2d{Rest fully between reps. The release matters too.} l3a{Consistency matters more than intensity.} l3b{Bring the squeeze into everyday moments.} l3c{Control the lift, then control the release.} l3d{Short sessions, done often, add up.} l4a{Longer holds now. Rest if it feels like strain.} l4b{Strong squeeze, slow release, steady breath.} l4c{Every rep is practice in control.} l4d{Stay tall, stay relaxed, keep breathing.} l5a{A few minutes a day keeps the habit going.} l5b{Keep the routine that got you here.} l5c{Steady practice, week after week.} l5d{Pair your session with something you already do each day.} ra{Today is about letting go, not squeezing.} rb{Slow breaths. Let the pelvic floor soften.} rc{Relaxation is training too.} other{Go gently. Stop if anything hurts.}}",
+  "@h1Motivation": {
+    "description": "Short line on the Today level card; key is l<level><a-d> or r<a-d> for relaxation",
+    "placeholders": {
+      "key": {"type": "String"}
+    }
+  },
+  "l1VideoBadge": "Video",
+  "l1GuideBadge": "Guide",
+  "l1Clips": "{count} clips",
+  "@l1Clips": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "l1Images": "{count} images",
+  "@l1Images": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "l2WatchHeading": "Watch and follow",
+  "l2LookHeading": "See how it looks",
+  "l2OpenExercise": "How to do it",
 
   "x1Title": "Settings",
   "x1SectionTesting": "Testing",
@@ -965,6 +989,13 @@
   "infoSessionsBody": "How many short sessions you plan each day. One is a fine start; more than 3 strengthening sessions a day is never planned, because tired muscles recover slower.",
 
   "splashTagline": "Pelvic floor trainer",
+  "splashMotivation": "{key, select, d0{Breathe in, let go. A few calm minutes a day.} d1{Steady practice, one breath at a time.} d2{Relax first, then squeeze gently.} other{Small daily steps for your pelvic health.}}",
+  "@splashMotivation": {
+    "placeholders": {
+      "key": {"type": "String"}
+    }
+  },
+  "splashImageLabel": "Calm breathing, with the pelvic floor highlighted",
 
   "h2DayLabel": "Day {day}",
   "@h2DayLabel": {
@@ -1105,5 +1136,60 @@
   "h2Motivation12": "You know the moves now. Own them.",
   "h2Motivation13": "A short session still counts. Show up today.",
   "h2Motivation14": "Two weeks of practice. Be proud of that.",
-  "h2MotivationLast": "Last day of this level. Finish strong."
+  "h2MotivationLast": "Last day of this level. Finish strong.",
+  "hgHowTitle": "How to do it",
+  "hgWhenTitle": "When",
+  "hgWhyTitle": "Why it helps",
+  "hgMarkDone": "Mark as done today",
+  "hgDoneToday": "Done today",
+  "hgUndo": "Not done yet",
+  "hgOpen": "How to do it",
+  "hgAdIntro": "A quick squeeze after you urinate, before you get dressed.",
+  "hgAdStep1": "Finish urinating and wait a moment.",
+  "hgAdStep2": "Squeeze your pelvic floor firmly, as if lifting the base of the penis.",
+  "hgAdStep3": "Hold for 2 to 3 seconds, then let go fully.",
+  "hgAdStep4": "Shake gently, then get dressed.",
+  "hgAdWhen1": "Every time you urinate",
+  "hgAdWhen2": "Before you leave the toilet",
+  "hgAdWhy": "After urinating, a little urine can stay in the tube inside the penis. A firm squeeze helps move it out before you get dressed.",
+  "hgAdCaution": "Do it after you finish, not while urine is flowing. Stopping the stream mid-flow is not an exercise.",
+  "hgUcIntro": "What to do when a sudden, strong urge to urinate comes.",
+  "hgUcStep1": "Stop and stay still. Sit or stand; don't rush to the toilet.",
+  "hgUcStep2": "Breathe slowly and soften your belly.",
+  "hgUcStep3": "Do 3 to 5 quick, gentle squeezes, or one easy hold.",
+  "hgUcStep4": "Wait until the urge settles, then walk calmly to the toilet.",
+  "hgUcWhen1": "A sudden strong urge",
+  "hgUcWhen2": "Arriving home",
+  "hgUcWhen3": "Hearing running water",
+  "hgUcWhy": "Rushing while the urge is strong makes it harder to hold on. Staying still and squeezing gently gives the urge time to settle, so you stay in control on the way.",
+  "hgUcCaution": "Keep the squeezes gentle. Repeated hard squeezes are not needed.",
+  "hgUrgeLabel": "Urge",
+  "hgCalmLabel": "Calm",
+  "s1ContentTitle": "What you'll do",
+  "s1ContentRounds": "{count, plural, =1{1 round} other{{count} rounds}}",
+  "@s1ContentRounds": {"placeholders": {"count": {"type": "int"}}},
+  "s1ContentTiming": "{squeeze} s squeeze · {relax} s relax",
+  "@s1ContentTiming": {"placeholders": {"squeeze": {"type": "int"}, "relax": {"type": "int"}}},
+  "h1MaintenanceDay": "Week {week} · Day {day} of {total}",
+  "@h1MaintenanceDay": {"placeholders": {"week": {"type": "int"}, "day": {"type": "int"}, "total": {"type": "int"}}},
+  "h1ProgramComplete": "Core program complete",
+  "exdHowTo": "How to do it",
+  "exdWhy": "Why it helps",
+  "exdInsideTitle": "What happens inside",
+  "exdInsideHint": "The pelvic floor lifts on the squeeze, stays up while you hold, and lets go on the relax.",
+  "exdBodyTag": "Your body",
+  "exdInsideTag": "Inside",
+  "exdAnyPosition": "Any position",
+  "exdGotIt": "Got it",
+  "exdOpen": "Open {name}",
+  "@exdOpen": {"placeholders": {"name": {"type": "String"}}},
+  "s3DoneExercise": "Done, next exercise",
+  "s3DoneLast": "Done, finish session",
+  "exdReps": "{count, plural, =1{1 time} other{{count} reps}}",
+  "@exdReps": {"placeholders": {"count": {"type": "int"}}},
+  "exdHoldSec": "{seconds} s hold",
+  "@exdHoldSec": {"placeholders": {"seconds": {"type": "int"}}},
+  "exdMinutes": "{minutes} min",
+  "@exdMinutes": {"placeholders": {"minutes": {"type": "int"}}},
+  "o6GoHome": "Go to home"
 }

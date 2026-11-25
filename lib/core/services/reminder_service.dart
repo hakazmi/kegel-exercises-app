@@ -159,10 +159,12 @@ final reminderServiceProvider = Provider<ReminderService>((Ref ref) {
     prefs: prefs,
     loadInput: () async {
       final UserProfile profile = ref.read(userProfileProvider);
-      final List<SessionRecord> sessions =
-          await ref.read(sessionRepositoryProvider).getAll();
-      final List<CheckInRecord> checkIns =
-          await ref.read(checkInRepositoryProvider).getAll();
+      final List<SessionRecord> sessions = await ref
+          .read(sessionRepositoryProvider)
+          .getAll();
+      final List<CheckInRecord> checkIns = await ref
+          .read(checkInRepositoryProvider)
+          .getAll();
       return ReminderPlanInput(
         profile: profile,
         sessions: sessions,

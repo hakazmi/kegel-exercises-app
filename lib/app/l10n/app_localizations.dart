@@ -799,7 +799,7 @@ abstract class AppLocalizations {
   /// No description provided for @o6Start.
   ///
   /// In en, this message translates to:
-  /// **'Start my first session'**
+  /// **'Start my plan'**
   String get o6Start;
 
   /// No description provided for @o6BridgeSemantic.
@@ -2518,6 +2518,54 @@ abstract class AppLocalizations {
   /// **'Article not found.'**
   String get l2NotFound;
 
+  /// Short line on the Today level card; key is l<level><a-d> or r<a-d> for relaxation
+  ///
+  /// In en, this message translates to:
+  /// **'{key, select, l1a{Every session counts. Squeeze gently, then fully relax.} l1b{Find the muscles, then let them fully let go.} l1c{Small, steady reps build a habit you can keep.} l1d{Keep breathing. Soften buttocks, thighs and stomach.} l2a{A little longer each hold. Quality over quantity.} l2b{Steady holds, easy breathing, full release.} l2c{You are building a routine. Keep showing up.} l2d{Rest fully between reps. The release matters too.} l3a{Consistency matters more than intensity.} l3b{Bring the squeeze into everyday moments.} l3c{Control the lift, then control the release.} l3d{Short sessions, done often, add up.} l4a{Longer holds now. Rest if it feels like strain.} l4b{Strong squeeze, slow release, steady breath.} l4c{Every rep is practice in control.} l4d{Stay tall, stay relaxed, keep breathing.} l5a{A few minutes a day keeps the habit going.} l5b{Keep the routine that got you here.} l5c{Steady practice, week after week.} l5d{Pair your session with something you already do each day.} ra{Today is about letting go, not squeezing.} rb{Slow breaths. Let the pelvic floor soften.} rc{Relaxation is training too.} other{Go gently. Stop if anything hurts.}}'**
+  String h1Motivation(String key);
+
+  /// No description provided for @l1VideoBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get l1VideoBadge;
+
+  /// No description provided for @l1GuideBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Guide'**
+  String get l1GuideBadge;
+
+  /// No description provided for @l1Clips.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} clips'**
+  String l1Clips(int count);
+
+  /// No description provided for @l1Images.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} images'**
+  String l1Images(int count);
+
+  /// No description provided for @l2WatchHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch and follow'**
+  String get l2WatchHeading;
+
+  /// No description provided for @l2LookHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'See how it looks'**
+  String get l2LookHeading;
+
+  /// No description provided for @l2OpenExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'How to do it'**
+  String get l2OpenExercise;
+
   /// No description provided for @x1Title.
   ///
   /// In en, this message translates to:
@@ -3400,6 +3448,18 @@ abstract class AppLocalizations {
   /// **'Pelvic floor trainer'**
   String get splashTagline;
 
+  /// No description provided for @splashMotivation.
+  ///
+  /// In en, this message translates to:
+  /// **'{key, select, d0{Breathe in, let go. A few calm minutes a day.} d1{Steady practice, one breath at a time.} d2{Relax first, then squeeze gently.} other{Small daily steps for your pelvic health.}}'**
+  String splashMotivation(String key);
+
+  /// No description provided for @splashImageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm breathing, with the pelvic floor highlighted'**
+  String get splashImageLabel;
+
   /// No description provided for @h2DayLabel.
   ///
   /// In en, this message translates to:
@@ -4083,6 +4143,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Last day of this level. Finish strong.'**
   String get h2MotivationLast;
+
+  /// No description provided for @hgHowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to do it'**
+  String get hgHowTitle;
+
+  /// No description provided for @hgWhenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When'**
+  String get hgWhenTitle;
+
+  /// No description provided for @hgWhyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it helps'**
+  String get hgWhyTitle;
+
+  /// No description provided for @hgMarkDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as done today'**
+  String get hgMarkDone;
+
+  /// No description provided for @hgDoneToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Done today'**
+  String get hgDoneToday;
+
+  /// No description provided for @hgUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Not done yet'**
+  String get hgUndo;
+
+  /// No description provided for @hgOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'How to do it'**
+  String get hgOpen;
+
+  /// No description provided for @hgAdIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick squeeze after you urinate, before you get dressed.'**
+  String get hgAdIntro;
+
+  /// No description provided for @hgAdStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish urinating and wait a moment.'**
+  String get hgAdStep1;
+
+  /// No description provided for @hgAdStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Squeeze your pelvic floor firmly, as if lifting the base of the penis.'**
+  String get hgAdStep2;
+
+  /// No description provided for @hgAdStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold for 2 to 3 seconds, then let go fully.'**
+  String get hgAdStep3;
+
+  /// No description provided for @hgAdStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'Shake gently, then get dressed.'**
+  String get hgAdStep4;
+
+  /// No description provided for @hgAdWhen1.
+  ///
+  /// In en, this message translates to:
+  /// **'Every time you urinate'**
+  String get hgAdWhen1;
+
+  /// No description provided for @hgAdWhen2.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you leave the toilet'**
+  String get hgAdWhen2;
+
+  /// No description provided for @hgAdWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'After urinating, a little urine can stay in the tube inside the penis. A firm squeeze helps move it out before you get dressed.'**
+  String get hgAdWhy;
+
+  /// No description provided for @hgAdCaution.
+  ///
+  /// In en, this message translates to:
+  /// **'Do it after you finish, not while urine is flowing. Stopping the stream mid-flow is not an exercise.'**
+  String get hgAdCaution;
+
+  /// No description provided for @hgUcIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'What to do when a sudden, strong urge to urinate comes.'**
+  String get hgUcIntro;
+
+  /// No description provided for @hgUcStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop and stay still. Sit or stand; don\'t rush to the toilet.'**
+  String get hgUcStep1;
+
+  /// No description provided for @hgUcStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe slowly and soften your belly.'**
+  String get hgUcStep2;
+
+  /// No description provided for @hgUcStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Do 3 to 5 quick, gentle squeezes, or one easy hold.'**
+  String get hgUcStep3;
+
+  /// No description provided for @hgUcStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait until the urge settles, then walk calmly to the toilet.'**
+  String get hgUcStep4;
+
+  /// No description provided for @hgUcWhen1.
+  ///
+  /// In en, this message translates to:
+  /// **'A sudden strong urge'**
+  String get hgUcWhen1;
+
+  /// No description provided for @hgUcWhen2.
+  ///
+  /// In en, this message translates to:
+  /// **'Arriving home'**
+  String get hgUcWhen2;
+
+  /// No description provided for @hgUcWhen3.
+  ///
+  /// In en, this message translates to:
+  /// **'Hearing running water'**
+  String get hgUcWhen3;
+
+  /// No description provided for @hgUcWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Rushing while the urge is strong makes it harder to hold on. Staying still and squeezing gently gives the urge time to settle, so you stay in control on the way.'**
+  String get hgUcWhy;
+
+  /// No description provided for @hgUcCaution.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the squeezes gentle. Repeated hard squeezes are not needed.'**
+  String get hgUcCaution;
+
+  /// No description provided for @hgUrgeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Urge'**
+  String get hgUrgeLabel;
+
+  /// No description provided for @hgCalmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm'**
+  String get hgCalmLabel;
+
+  /// No description provided for @s1ContentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What you\'ll do'**
+  String get s1ContentTitle;
+
+  /// No description provided for @s1ContentRounds.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 round} other{{count} rounds}}'**
+  String s1ContentRounds(int count);
+
+  /// No description provided for @s1ContentTiming.
+  ///
+  /// In en, this message translates to:
+  /// **'{squeeze} s squeeze · {relax} s relax'**
+  String s1ContentTiming(int squeeze, int relax);
+
+  /// No description provided for @h1MaintenanceDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week} · Day {day} of {total}'**
+  String h1MaintenanceDay(int week, int day, int total);
+
+  /// No description provided for @h1ProgramComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Core program complete'**
+  String get h1ProgramComplete;
+
+  /// No description provided for @exdHowTo.
+  ///
+  /// In en, this message translates to:
+  /// **'How to do it'**
+  String get exdHowTo;
+
+  /// No description provided for @exdWhy.
+  ///
+  /// In en, this message translates to:
+  /// **'Why it helps'**
+  String get exdWhy;
+
+  /// No description provided for @exdInsideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What happens inside'**
+  String get exdInsideTitle;
+
+  /// No description provided for @exdInsideHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The pelvic floor lifts on the squeeze, stays up while you hold, and lets go on the relax.'**
+  String get exdInsideHint;
+
+  /// No description provided for @exdBodyTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Your body'**
+  String get exdBodyTag;
+
+  /// No description provided for @exdInsideTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside'**
+  String get exdInsideTag;
+
+  /// No description provided for @exdAnyPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Any position'**
+  String get exdAnyPosition;
+
+  /// No description provided for @exdGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get exdGotIt;
+
+  /// No description provided for @exdOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open {name}'**
+  String exdOpen(String name);
+
+  /// No description provided for @s3DoneExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Done, next exercise'**
+  String get s3DoneExercise;
+
+  /// No description provided for @s3DoneLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Done, finish session'**
+  String get s3DoneLast;
+
+  /// No description provided for @exdReps.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 time} other{{count} reps}}'**
+  String exdReps(int count);
+
+  /// No description provided for @exdHoldSec.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s hold'**
+  String exdHoldSec(int seconds);
+
+  /// No description provided for @exdMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String exdMinutes(int minutes);
+
+  /// No description provided for @o6GoHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to home'**
+  String get o6GoHome;
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/cloud/cloud_config.dart';
 import '../../core/constants/links.dart';
 import '../../core/motion/app_motion.dart';
 import '../../core/widgets/widgets.dart';
@@ -57,7 +58,9 @@ class O1WelcomeScreen extends ConsumerWidget {
     return OnboardingScaffold(
       step: 1,
       showHeader: false,
-      onBack: null,
+      onBack: CloudConfig.isConfigured
+          ? () => context.go(AppRoutes.auth)
+          : null,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -185,10 +188,6 @@ class _Hero extends StatelessWidget {
           height: _height,
           semanticLabel: l10n.o1HeroSemantic,
           children: [
-            ConnectorLine(
-              from: const Offset(tileSize / 2, tileTop + tileSize + 4),
-              to: Offset(manLeft + manWidth * 0.36, _height * 0.6),
-            ),
             Positioned(
               left: manLeft,
               bottom: 6,
@@ -196,6 +195,13 @@ class _Hero extends StatelessWidget {
                 asset: OnboardingArt.welcomeMan,
                 height: manHeight,
               ),
+            ),
+            // Arrow from the pelvic floor tile to where those muscles sit
+            // in the body (drawn over the figure so the tip shows).
+            ConnectorLine(
+              from: const Offset(tileSize + 6, tileTop + tileSize * 0.62),
+              to: Offset(manLeft + manWidth * 0.42, manHeight * 0.58),
+              color: AppColors.primary,
             ),
             Positioned(
               left: 0,

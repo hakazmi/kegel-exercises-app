@@ -94,7 +94,9 @@ class InfoButton extends StatelessWidget {
               child: Icon(
                 Icons.info_outline_rounded,
                 size: size * 0.64,
-                color: dark ? AppColors.sessionTextSecondary : AppColors.textSecondary,
+                color: dark
+                    ? AppColors.sessionTextSecondary
+                    : AppColors.textSecondary,
               ),
             ),
           ),
@@ -218,7 +220,10 @@ class _InfoSheetBody extends StatelessWidget {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Expanded(
-                            child: Text(content.points[i], style: AppTypography.body),
+                            child: Text(
+                              content.points[i],
+                              style: AppTypography.body,
+                            ),
                           ),
                         ],
                       ),
@@ -243,7 +248,10 @@ class _InfoSheetBody extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
-                        child: Text(content.note!, style: AppTypography.caption),
+                        child: Text(
+                          content.note!,
+                          style: AppTypography.caption,
+                        ),
                       ),
                     ],
                   ),

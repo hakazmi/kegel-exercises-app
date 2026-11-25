@@ -21,6 +21,22 @@ abstract final class HomeCopy {
     }
   }
 
+  /// Motivation line for the level card: four lines per level (or for the
+  /// relaxation track), rotating by day so it changes every day.
+  static String motivation(
+    AppLocalizations l10n, {
+    required int level,
+    required int dayInLevel,
+    required bool relaxation,
+  }) {
+    const List<String> slots = <String>['a', 'b', 'c', 'd'];
+    final String slot = slots[(dayInLevel < 1 ? 0 : dayInLevel - 1) % 4];
+    final String key = relaxation
+        ? 'r$slot'
+        : 'l${level.clamp(1, 5)}$slot';
+    return l10n.h1Motivation(key);
+  }
+
   static String levelName(AppLocalizations l10n, int levelId) {
     switch (levelId) {
       case 1:
@@ -47,10 +63,7 @@ abstract final class HomeCopy {
   }
 
   /// Total days shown on Today / Levels for the active plan segment.
-  static int planTotalDays({
-    required TrackId track,
-    LevelContent? level,
-  }) {
+  static int planTotalDays({required TrackId track, LevelContent? level}) {
     if (track == TrackId.relaxationFirst) {
       return PlanRules.relaxationFirstDays;
     }

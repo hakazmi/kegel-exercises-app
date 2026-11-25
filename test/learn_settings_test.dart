@@ -10,6 +10,7 @@ import 'package:kegelexercisesapp/core/domain/enums.dart';
 import 'package:kegelexercisesapp/core/domain/safety_flags.dart';
 import 'package:kegelexercisesapp/core/domain/session_record.dart';
 import 'package:kegelexercisesapp/core/domain/user_profile.dart';
+import 'package:kegelexercisesapp/core/plan/goal_routing.dart';
 import 'package:kegelexercisesapp/core/plan/safety_routing.dart';
 import 'package:kegelexercisesapp/core/services/reminder_service.dart';
 import 'package:kegelexercisesapp/core/time/app_clock.dart';
@@ -141,6 +142,99 @@ void main() {
     );
     expect(next.track, TrackId.relaxationFirst);
     expect(next.safetyFlags.pain, isTrue);
+  });
+
+  test('GoalRouting starts fresh plan and saves outgoing snapshot', () {
+    final DateTime now = DateTime(2026, 11, 13, 9);
+    final UserProfile next = GoalRouting.apply(
+      profile: UserProfile.initial().copyWith(
+        onboardingDone: true,
+        goal: Goal.bladderControl,
+        track: TrackId.generalBladder,
+        level: 3,
+        levelStartedOn: DateTime(2026, 10, 1),
+        planStartedOn: DateTime(2026, 9, 1),
+        restWeekday: DateTime.sunday,
+      ),
+      goal: Goal.erectionSupport,
+      now: now,
+    );
+    expect(next.goal, Goal.erectionSupport);
+    expect(next.track, TrackId.erectionSupport);
+    expect(next.level, 1);
+    expect(next.levelStartedOn, DateTime(2026, 11, 13));
+    expect(next.planStartedOn, DateTime(2026, 11, 13));
+    expect(next.restWeekday, restWeekdayForStart(DateTime(2026, 11, 13)));
+    expect(next.goalPlans[Goal.bladderControl.storageValue]?.level, 3);
+  });
+
+  test('GoalRouting restores previous goal snapshot', () {
+    final DateTime now = DateTime(2026, 11, 20, 9);
+    final UserProfile afterNew = GoalRouting.apply(
+      profile: UserProfile.initial().copyWith(
+        onboardingDone: true,
+        goal: Goal.erectionSupport,
+        track: TrackId.erectionSupport,
+        level: 2,
+        levelStartedOn: DateTime(2026, 11, 1),
+        planStartedOn: DateTime(2026, 10, 20),
+        restWeekday: DateTime.saturday,
+      ),
+      goal: Goal.ejaculationControl,
+      now: now,
+    );
+    expect(afterNew.track, TrackId.ejaculationControl);
+    expect(afterNew.level, 1);
+
+    final UserProfile restored = GoalRouting.apply(
+      profile: afterNew,
+      goal: Goal.erectionSupport,
+      now: now,
+    );
+    expect(restored.goal, Goal.erectionSupport);
+    expect(restored.track, TrackId.erectionSupport);
+    expect(restored.level, 2);
+    expect(restored.levelStartedOn, DateTime(2026, 11, 1));
+    expect(restored.planStartedOn, DateTime(2026, 10, 20));
+    expect(restored.restWeekday, DateTime.saturday);
+  });
+
+  test('GoalRouting same-track goal only updates goal', () {
+    final UserProfile profile = UserProfile.initial().copyWith(
+      onboardingDone: true,
+      goal: Goal.bladderControl,
+      track: TrackId.generalBladder,
+      level: 2,
+      levelStartedOn: DateTime(2026, 10, 1),
+      planStartedOn: DateTime(2026, 9, 1),
+    );
+    final UserProfile next = GoalRouting.apply(
+      profile: profile,
+      goal: Goal.generalPelvicHealth,
+      now: DateTime(2026, 11, 13),
+    );
+    expect(next.goal, Goal.generalPelvicHealth);
+    expect(next.track, TrackId.generalBladder);
+    expect(next.level, 2);
+    expect(next.levelStartedOn, profile.levelStartedOn);
+    expect(next.planStartedOn, profile.planStartedOn);
+  });
+
+  test('GoalRouting pain-locked keeps relaxation track', () {
+    final UserProfile next = GoalRouting.apply(
+      profile: UserProfile.initial().copyWith(
+        onboardingDone: true,
+        goal: Goal.bladderControl,
+        track: TrackId.relaxationFirst,
+        safetyFlags: const SafetyFlags(pain: true),
+        level: 1,
+      ),
+      goal: Goal.ejaculationControl,
+      now: DateTime(2026, 11, 13),
+    );
+    expect(next.goal, Goal.ejaculationControl);
+    expect(next.track, TrackId.relaxationFirst);
+    expect(next.level, 1);
   });
 
   testWidgets('delete all my data clears storage and returns to Welcome',

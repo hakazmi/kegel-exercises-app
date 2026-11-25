@@ -1,4 +1,5 @@
 import 'enums.dart';
+import 'goal_plan_snapshot.dart';
 import 'safety_flags.dart';
 
 /// Rest weekday for a plan that starts on [start]: the 7th day of the first
@@ -29,6 +30,7 @@ class UserProfile {
     this.tutorialDone = false,
     this.paywallSeen = false,
     this.levelUnlockSnoozed = false,
+    this.goalPlans = const <String, GoalPlanSnapshot>{},
   });
 
   final Goal? goal;
@@ -71,6 +73,9 @@ class UserProfile {
   /// When true, hide the Level unlocked card until the next completed session.
   final bool levelUnlockSnoozed;
 
+  /// Per-goal plan cursors (level + calendar). Keyed by [Goal.storageValue].
+  final Map<String, GoalPlanSnapshot> goalPlans;
+
   /// Fresh install defaults before onboarding.
   factory UserProfile.initial() {
     return const UserProfile(
@@ -108,6 +113,7 @@ class UserProfile {
     bool? tutorialDone,
     bool? paywallSeen,
     bool? levelUnlockSnoozed,
+    Map<String, GoalPlanSnapshot>? goalPlans,
     bool clearGoal = false,
     bool clearExperience = false,
     bool clearLevelStartedOn = false,
@@ -122,8 +128,9 @@ class UserProfile {
       reminderDays: reminderDays ?? this.reminderDays,
       track: track ?? this.track,
       level: level ?? this.level,
-      levelStartedOn:
-          clearLevelStartedOn ? null : (levelStartedOn ?? this.levelStartedOn),
+      levelStartedOn: clearLevelStartedOn
+          ? null
+          : (levelStartedOn ?? this.levelStartedOn),
       planStartedOn: planStartedOn ?? this.planStartedOn,
       restWeekday: restWeekday ?? this.restWeekday,
       discreetNotifications:
@@ -134,37 +141,43 @@ class UserProfile {
       tutorialDone: tutorialDone ?? this.tutorialDone,
       paywallSeen: paywallSeen ?? this.paywallSeen,
       levelUnlockSnoozed: levelUnlockSnoozed ?? this.levelUnlockSnoozed,
+      goalPlans: goalPlans ?? this.goalPlans,
     );
   }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'goal': goal?.storageValue,
-        'safetyFlags': safetyFlags.toJson(),
-        'experience': experience?.storageValue,
-        'sessionsPerDay': sessionsPerDay,
-        'reminderEnabled': reminderEnabled,
-        'reminderTime': reminderTime,
-        'reminderDays': reminderDays,
-        'track': track.storageValue,
-        'level': level,
-        'levelStartedOn': levelStartedOn?.toIso8601String(),
-        'planStartedOn': planStartedOn?.toIso8601String(),
-        'restWeekday': restWeekday,
-        'discreetNotifications': discreetNotifications,
-        'voiceOn': voiceOn,
-        'vibrationOn': vibrationOn,
-        'onboardingDone': onboardingDone,
-        'tutorialDone': tutorialDone,
-        'paywallSeen': paywallSeen,
-        'levelUnlockSnoozed': levelUnlockSnoozed,
-      };
+    'goal': goal?.storageValue,
+    'safetyFlags': safetyFlags.toJson(),
+    'experience': experience?.storageValue,
+    'sessionsPerDay': sessionsPerDay,
+    'reminderEnabled': reminderEnabled,
+    'reminderTime': reminderTime,
+    'reminderDays': reminderDays,
+    'track': track.storageValue,
+    'level': level,
+    'levelStartedOn': levelStartedOn?.toIso8601String(),
+    'planStartedOn': planStartedOn?.toIso8601String(),
+    'restWeekday': restWeekday,
+    'discreetNotifications': discreetNotifications,
+    'voiceOn': voiceOn,
+    'vibrationOn': vibrationOn,
+    'onboardingDone': onboardingDone,
+    'tutorialDone': tutorialDone,
+    'paywallSeen': paywallSeen,
+    'levelUnlockSnoozed': levelUnlockSnoozed,
+    'goalPlans': <String, dynamic>{
+      for (final MapEntry<String, GoalPlanSnapshot> e in goalPlans.entries)
+        e.key: e.value.toJson(),
+    },
+  };
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     final String? goalRaw = json['goal'] as String?;
     final String? experienceRaw = json['experience'] as String?;
     final String? started = json['levelStartedOn'] as String?;
-    final DateTime? levelStart =
-        started == null ? null : DateTime.parse(started);
+    final DateTime? levelStart = started == null
+        ? null
+        : DateTime.parse(started);
     int rest = (json['restWeekday'] as int? ?? DateTime.sunday).clamp(1, 7);
     DateTime? planStart;
     if (json.containsKey('planStartedOn')) {
@@ -178,19 +191,34 @@ class UserProfile {
       planStart = levelStart;
       rest = restWeekdayForStart(levelStart);
     }
+    final Map<String, GoalPlanSnapshot> plans = <String, GoalPlanSnapshot>{};
+    final Object? rawPlans = json['goalPlans'];
+    if (rawPlans is Map) {
+      for (final MapEntry<dynamic, dynamic> e in rawPlans.entries) {
+        final Object? value = e.value;
+        if (value is Map) {
+          plans['${e.key}'] = GoalPlanSnapshot.fromJson(
+            Map<String, dynamic>.from(value),
+          );
+        }
+      }
+    }
     return UserProfile(
       goal: goalRaw == null ? null : GoalX.parse(goalRaw),
       safetyFlags: SafetyFlags.fromJson(
         Map<String, dynamic>.from(json['safetyFlags'] as Map? ?? const {}),
       ),
-      experience: experienceRaw == null ? null : ExperienceX.parse(experienceRaw),
+      experience: experienceRaw == null
+          ? null
+          : ExperienceX.parse(experienceRaw),
       sessionsPerDay: (json['sessionsPerDay'] as int? ?? 1).clamp(1, 3),
       reminderEnabled: json['reminderEnabled'] as bool? ?? false,
       reminderTime: json['reminderTime'] as int? ?? 21 * 60,
-      reminderDays: (json['reminderDays'] as List<dynamic>? ??
-              <dynamic>[1, 2, 3, 4, 5, 6, 7])
-          .map((dynamic e) => e as int)
-          .toList(),
+      reminderDays:
+          (json['reminderDays'] as List<dynamic>? ??
+                  <dynamic>[1, 2, 3, 4, 5, 6, 7])
+              .map((dynamic e) => e as int)
+              .toList(),
       track: TrackIdX.parse(
         json['track'] as String? ?? TrackId.generalBladder.storageValue,
       ),
@@ -205,6 +233,7 @@ class UserProfile {
       tutorialDone: json['tutorialDone'] as bool? ?? false,
       paywallSeen: json['paywallSeen'] as bool? ?? false,
       levelUnlockSnoozed: json['levelUnlockSnoozed'] as bool? ?? false,
+      goalPlans: plans,
     );
   }
 }

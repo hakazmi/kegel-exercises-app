@@ -39,15 +39,20 @@ class H2LevelsScreen extends ConsumerWidget {
     final AppLocalizations l10n = AppLocalizations.of(context);
     final UserProfile profile = ref.watch(userProfileProvider);
     final bool isPremium = ref.watch(isPremiumProvider);
-    final AsyncValue<List<LevelContent>> levelsAsync =
-        ref.watch(levelsProvider);
+    final AsyncValue<List<LevelContent>> levelsAsync = ref.watch(
+      levelsProvider,
+    );
     // Today's real rest day (calendar), from the plan.
-    final bool restToday = ref.watch(todayPlanProvider).asData?.value.state ==
+    final bool restToday =
+        ref.watch(todayPlanProvider).asData?.value.state ==
         TodayPlanState.restDay;
-    final AsyncValue<List<SessionRecord>> sessionsAsync =
-        ref.watch(sessionsProvider);
-    final List<SessionRecord> sessions =
-        sessionsAsync.asData?.value ?? const <SessionRecord>[];
+    final AsyncValue<List<SessionRecord>> sessionsAsync = ref.watch(
+      sessionsProvider,
+    );
+    final List<SessionRecord> sessions = PlanRules.sessionsForActivePlan(
+      profile: profile,
+      sessions: sessionsAsync.asData?.value ?? const <SessionRecord>[],
+    );
     final DateTime today = ref.watch(appClockProvider).now();
     final int dayInLevel = PlanRules.dayInLevel(
       profile: profile,
@@ -84,9 +89,7 @@ class H2LevelsScreen extends ConsumerWidget {
                 return 0;
               }
               final int span = HomeCopy.daysInLevel(level);
-              return span == 0
-                  ? 0
-                  : ((dayInLevel - 1) / span).clamp(0.0, 1.0);
+              return span == 0 ? 0 : ((dayInLevel - 1) / span).clamp(0.0, 1.0);
             }
 
             return Column(
@@ -97,9 +100,7 @@ class H2LevelsScreen extends ConsumerWidget {
                       AppSpacing.lg,
                       AppSpacing.xs,
                       AppSpacing.lg,
-                      showAdjust
-                          ? AppSpacing.md
-                          : bottomInset + AppSpacing.md,
+                      showAdjust ? AppSpacing.md : bottomInset + AppSpacing.md,
                     ),
                     children: [
                       Reveal(
@@ -179,10 +180,7 @@ class H2LevelsScreen extends ConsumerWidget {
                         const SizedBox(height: AppSpacing.lg),
                       ],
                       if (relaxation) ...[
-                        _RelaxationRow(
-                          l10n: l10n,
-                          dayInLevel: dayInLevel,
-                        ),
+                        _RelaxationRow(l10n: l10n, dayInLevel: dayInLevel),
                         const SizedBox(height: AppSpacing.sm),
                       ],
                       for (final LevelContent level in levels) ...[
@@ -204,10 +202,12 @@ class H2LevelsScreen extends ConsumerWidget {
                             dayInLevel: dayInLevel,
                             progress: levelProgress(level),
                             premiumLocked: level.id > 1 && !isPremium,
-                            isNext: !relaxation &&
+                            isNext:
+                                !relaxation &&
                                 nextLevel != null &&
                                 level.id == nextLevel,
-                            unlockReady: unlockReady &&
+                            unlockReady:
+                                unlockReady &&
                                 !relaxation &&
                                 nextLevel != null &&
                                 level.id == nextLevel,
@@ -235,17 +235,18 @@ class H2LevelsScreen extends ConsumerWidget {
                                   ),
                                 );
                             },
-                            onStartNext: unlockReady &&
+                            onStartNext:
+                                unlockReady &&
                                     !relaxation &&
                                     nextLevel != null &&
                                     level.id == nextLevel
                                 ? () async {
                                     final bool advanced =
                                         await LevelUnlockActions.startNext(
-                                      context: context,
-                                      ref: ref,
-                                      nextLevel: nextLevel,
-                                    );
+                                          context: context,
+                                          ref: ref,
+                                          nextLevel: nextLevel,
+                                        );
                                     if (advanced && context.mounted) {
                                       LevelUnlockActions.showStartedConfirm(
                                         context,
@@ -255,15 +256,16 @@ class H2LevelsScreen extends ConsumerWidget {
                                     }
                                   }
                                 : null,
-                            onTestComplete: _kShowLevelTestComplete &&
+                            onTestComplete:
+                                _kShowLevelTestComplete &&
                                     !relaxation &&
                                     level.id == profile.level &&
                                     level.id < 5
                                 ? () => _testCompleteLevel(
-                                      context,
-                                      ref,
-                                      fromLevel: level.id,
-                                    )
+                                    context,
+                                    ref,
+                                    fromLevel: level.id,
+                                  )
                                 : null,
                           ),
                         ),
@@ -400,8 +402,7 @@ class H2LevelsScreen extends ConsumerWidget {
       return;
     }
     final PlanService plan = ref.read(planServiceProvider);
-    final UserProfile next =
-        plan.repeatLevel(ref.read(userProfileProvider));
+    final UserProfile next = plan.repeatLevel(ref.read(userProfileProvider));
     await ref.read(userProfileProvider.notifier).save(next);
     ref.invalidate(todayPlanProvider);
   }
@@ -426,10 +427,7 @@ class H2LevelsScreen extends ConsumerWidget {
 }
 
 class _RelaxationRow extends StatelessWidget {
-  const _RelaxationRow({
-    required this.l10n,
-    required this.dayInLevel,
-  });
+  const _RelaxationRow({required this.l10n, required this.dayInLevel});
 
   final AppLocalizations l10n;
   final int dayInLevel;
@@ -581,80 +579,81 @@ class _LevelRings extends StatelessWidget {
           final double p = progressOf(level);
           final Color fg = current ? AppColors.textOnPrimary : AppColors.ink;
           final Widget card = Container(
-              width: 112,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.sm,
-              ),
-              decoration: BoxDecoration(
-                color: current
-                    ? AppColors.ink
-                    : (locked ? palette.tint : palette.base),
-                borderRadius: AppRadii.xlAll,
-                boxShadow: current
-                    ? <BoxShadow>[
-                        BoxShadow(
-                          color: AppColors.ink.withValues(alpha: 0.25),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
+            width: 112,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              color: current
+                  ? AppColors.ink
+                  : (locked ? palette.tint : palette.base),
+              borderRadius: AppRadii.xlAll,
+              boxShadow: current
+                  ? <BoxShadow>[
+                      BoxShadow(
+                        color: AppColors.ink.withValues(alpha: 0.25),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : AppElevation.none,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.h2LevelShort(level.id).toUpperCase(),
+                  maxLines: 1,
+                  style: AppTypography.caption.copyWith(
+                    color: current ? palette.base : palette.deep,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 11,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+                Text(
+                  HomeCopy.levelName(l10n, level.id),
+                  maxLines: 2,
+                  style: AppTypography.title.copyWith(
+                    color: fg,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
+                  ),
+                ),
+                const Spacer(),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 46,
+                      height: 46,
+                      child: AnimatedFraction(
+                        value: p,
+                        delay: AppMotion.stagger(
+                          i,
+                          base: const Duration(milliseconds: 300),
                         ),
-                      ]
-                    : AppElevation.none,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.h2LevelShort(level.id).toUpperCase(),
-                    maxLines: 1,
-                    style: AppTypography.caption.copyWith(
-                      color: current ? palette.base : palette.deep,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 11,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                  Text(
-                    HomeCopy.levelName(l10n, level.id),
-                    maxLines: 2,
-                    style: AppTypography.title.copyWith(
-                      color: fg,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      height: 1.15,
-                    ),
-                  ),
-                  const Spacer(),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: 46,
-                        height: 46,
-                        child: AnimatedFraction(
-                          value: p,
-                          delay: AppMotion.stagger(
-                            i,
-                            base: const Duration(milliseconds: 300),
+                        builder: (BuildContext context, double v) => CustomPaint(
+                          painter: RingPainter(
+                            progress: v,
+                            track: current
+                                ? AppColors.textOnPrimary.withValues(
+                                    alpha: 0.15,
+                                  )
+                                : AppColors.ink.withValues(alpha: 0.1),
+                            fill: current ? palette.base : AppColors.ink,
+                            stroke: 5,
                           ),
-                          builder: (BuildContext context, double v) =>
-                              CustomPaint(
-                            painter: RingPainter(
-                              progress: v,
-                              track: current
-                                  ? AppColors.textOnPrimary.withValues(alpha: 0.15)
-                                  : AppColors.ink.withValues(alpha: 0.1),
-                              fill: current ? palette.base : AppColors.ink,
-                              stroke: 5,
-                            ),
-                            child: Center(
-                              child: done
-                                  ? const Icon(
-                                      Icons.check_rounded,
-                                      size: 20,
-                                      color: AppColors.ink,
-                                    )
-                                  : (locked
+                          child: Center(
+                            child: done
+                                ? const Icon(
+                                    Icons.check_rounded,
+                                    size: 20,
+                                    color: AppColors.ink,
+                                  )
+                                : (locked
                                       ? Icon(
                                           level.id > 1 && !isPremium
                                               ? Icons.workspace_premium_outlined
@@ -663,33 +662,33 @@ class _LevelRings extends StatelessWidget {
                                           color: palette.deep,
                                         )
                                       : null),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            l10n.h1Percent((p * 100).round()),
+                            style: AppTypography.caption.copyWith(
+                              color: current
+                                  ? AppColors.textOnPrimary
+                                  : palette.deep,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              l10n.h1Percent((p * 100).round()),
-                              style: AppTypography.caption.copyWith(
-                                color: current
-                                    ? AppColors.textOnPrimary
-                                    : palette.deep,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            );
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
           return Reveal(
             from: RevealFrom.right,
             delay: AppMotion.stagger(i, base: const Duration(milliseconds: 80)),
@@ -832,7 +831,9 @@ class _LevelCard extends StatelessWidget {
               if (isNext) ...[
                 const SizedBox(height: 4),
                 Text(
-                  unlockReady ? l10n.h2StatusUnlocked : l10n.h2StatusUnlocksWhen,
+                  unlockReady
+                      ? l10n.h2StatusUnlocked
+                      : l10n.h2StatusUnlocksWhen,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.ink,
                     fontWeight: FontWeight.w800,
@@ -889,8 +890,9 @@ class _LevelCard extends StatelessWidget {
             doneDays: doneDays,
             totalDays: total,
             progress: progress,
-            sentence:
-                completed ? _achieved(l10n, level.id) : _focus(l10n, level.id),
+            sentence: completed
+                ? _achieved(l10n, level.id)
+                : _focus(l10n, level.id),
             durationSeconds: _dayDuration(),
             onOpen: () => onOpenDay(completed ? first : dayInLevel),
           ),
@@ -952,24 +954,23 @@ class _LevelCard extends StatelessWidget {
   }
 }
 
-
 /// What a level trains (current) — training facts, never health outcomes.
 String _focus(AppLocalizations l10n, int level) => switch (level) {
-      1 => l10n.h2FocusL1,
-      2 => l10n.h2FocusL2,
-      3 => l10n.h2FocusL3,
-      4 => l10n.h2FocusL4,
-      _ => l10n.h2FocusL5,
-    };
+  1 => l10n.h2FocusL1,
+  2 => l10n.h2FocusL2,
+  3 => l10n.h2FocusL3,
+  4 => l10n.h2FocusL4,
+  _ => l10n.h2FocusL5,
+};
 
 /// What the user completed in a level.
 String _achieved(AppLocalizations l10n, int level) => switch (level) {
-      1 => l10n.h2AchievedL1,
-      2 => l10n.h2AchievedL2,
-      3 => l10n.h2AchievedL3,
-      4 => l10n.h2AchievedL4,
-      _ => l10n.h2AchievedL5,
-    };
+  1 => l10n.h2AchievedL1,
+  2 => l10n.h2AchievedL2,
+  3 => l10n.h2AchievedL3,
+  4 => l10n.h2AchievedL4,
+  _ => l10n.h2AchievedL5,
+};
 
 /// Cover panel for an open level, in the level's own colour: status tag on
 /// its top edge, the level number and name large, days and the current day,
@@ -1028,7 +1029,11 @@ class _LevelHeroPanel extends StatelessWidget {
     final double figureHeight = wide ? 92 : 290;
     final double figureWidth = wide ? 176 : 148;
     final Color panelTop = palette.base;
-    final Color panelBottom = Color.lerp(palette.base, AppColors.surface, 0.45)!;
+    final Color panelBottom = Color.lerp(
+      palette.base,
+      AppColors.surface,
+      0.45,
+    )!;
 
     return SizedBox(
       height: _height,
@@ -1242,8 +1247,9 @@ class _LevelHeroPanel extends StatelessWidget {
             height: _button,
             child: PressScale(
               onTap: onOpen,
-              semanticLabel:
-                  completed ? l10n.h2ReviewDays : l10n.h2StartDay(day),
+              semanticLabel: completed
+                  ? l10n.h2ReviewDays
+                  : l10n.h2StartDay(day),
               child: Container(
                 decoration: BoxDecoration(
                   color: AppColors.ink,
@@ -1425,8 +1431,10 @@ class _DayStrip extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
         itemBuilder: (BuildContext context, int i) {
           final int? day = entries[i];
-          final Duration delay =
-              AppMotion.stagger(i, base: const Duration(milliseconds: 260));
+          final Duration delay = AppMotion.stagger(
+            i,
+            base: const Duration(milliseconds: 260),
+          );
           if (day == null) {
             return Reveal(
               from: RevealFrom.right,
@@ -2007,9 +2015,7 @@ class _RestGlass extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surface.withValues(alpha: 0.6),
             borderRadius: AppRadii.pillAll,
-            border: Border.all(
-              color: AppColors.surface.withValues(alpha: 0.9),
-            ),
+            border: Border.all(color: AppColors.surface.withValues(alpha: 0.9)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

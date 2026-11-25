@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Session haptics (also merged from vibration / flutter_local_notifications). -->
     <uses-permission android:name="android.permission.VIBRATE"/>
     <!-- Reschedule local reminders after reboot (flutter_local_notifications). -->
@@ -25,6 +26,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- Email confirm / password reset / Google browser OAuth. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="kegel" android:host="auth-callback"/>
             </intent-filter>
         </activity>
         <!-- Scheduled local notifications + restore after reboot / replace. -->

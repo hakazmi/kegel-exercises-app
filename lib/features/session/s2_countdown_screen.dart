@@ -14,10 +14,7 @@ import 'session_exit.dart';
 
 /// S2 Countdown — "Get ready", 5 seconds, tap to skip.
 class S2CountdownScreen extends ConsumerStatefulWidget {
-  const S2CountdownScreen({
-    super.key,
-    this.itemId,
-  });
+  const S2CountdownScreen({super.key, this.itemId});
 
   final String? itemId;
 
@@ -52,9 +49,16 @@ class _S2CountdownScreenState extends ConsumerState<S2CountdownScreen> {
       return;
     }
     _navigating = true;
-    context.go(
-      '${AppRoutes.player}?itemId=${Uri.encodeComponent(widget.itemId ?? 'strength_1')}',
-    );
+    // After this frame: called from a provider listener that can fire
+    // mid-build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      context.go(
+        '${AppRoutes.player}?itemId=${Uri.encodeComponent(widget.itemId ?? 'strength_1')}',
+      );
+    });
   }
 
   void _onSkip() {
@@ -81,8 +85,10 @@ class _S2CountdownScreenState extends ConsumerState<S2CountdownScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
-    ref.listen<SessionPlayState?>(sessionControllerProvider,
-        (SessionPlayState? prev, SessionPlayState? next) {
+    ref.listen<SessionPlayState?>(sessionControllerProvider, (
+      SessionPlayState? prev,
+      SessionPlayState? next,
+    ) {
       if (next == null || _navigating) {
         return;
       }
@@ -95,7 +101,8 @@ class _S2CountdownScreenState extends ConsumerState<S2CountdownScreen> {
     });
 
     final SessionPlayState? play = ref.watch(sessionControllerProvider);
-    final int seconds = play?.engineState.machine == EngineMachineState.countdown
+    final int seconds =
+        play?.engineState.machine == EngineMachineState.countdown
         ? play!.engineState.secondsRemaining
         : 5;
 
@@ -184,14 +191,15 @@ class _CountdownNumber extends StatelessWidget {
       duration: const Duration(milliseconds: 380),
       transitionBuilder: (Widget child, Animation<double> animation) =>
           FadeTransition(
-        opacity: animation,
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 1.6, end: 1)
-              .chain(CurveTween(curve: Curves.easeOutBack))
-              .animate(animation),
-          child: child,
-        ),
-      ),
+            opacity: animation,
+            child: ScaleTransition(
+              scale: Tween<double>(
+                begin: 1.6,
+                end: 1,
+              ).chain(CurveTween(curve: Curves.easeOutBack)).animate(animation),
+              child: child,
+            ),
+          ),
       child: text,
     );
   }

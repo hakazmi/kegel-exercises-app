@@ -1,8 +1,11 @@
+import 'dart:math' as math;
+
 import 'package:material_ui/material_ui.dart';
 
 import '../../app/theme/tokens.dart';
 import '../../core/motion/app_motion.dart';
 import '../onboarding/widgets/onboarding_stage.dart';
+import 'side_pelvic_demo.dart';
 
 /// "Where the muscles are": the man lying on his back, a glowing band at
 /// the pelvis, and a round inset of the pelvic floor linked to it.
@@ -88,7 +91,8 @@ class MusclesScene extends StatelessWidget {
   }
 }
 
-/// "How to find them": side-view X-ray squeeze ↔ relax cycle.
+/// "How to find them": the side X-ray of the pelvis, with the pelvic
+/// floor drawn live as it lifts on Squeeze and lowers on Relax.
 class FindScene extends StatelessWidget {
   const FindScene({super.key, required this.semanticLabel});
 
@@ -99,36 +103,10 @@ class FindScene extends StatelessWidget {
     return Semantics(
       label: semanticLabel,
       image: true,
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: AppRadii.xlAll,
-            border: Border.all(color: AppColors.border),
-            boxShadow: AppElevation.level2,
-          ),
-          child: ClipRRect(
-            borderRadius: AppRadii.xlAll,
-            child: ColoredBox(
-              color: const Color(0xFF111111),
-              child: Image.asset(
-                OnboardingArt.sideSqueezeRelaxGif,
-                fit: BoxFit.cover,
-                gaplessPlayback: true,
-                errorBuilder: (
-                  BuildContext context,
-                  Object error,
-                  StackTrace? stackTrace,
-                ) {
-                  return Image.asset(
-                    OnboardingArt.sideSqueeze,
-                    fit: BoxFit.cover,
-                  );
-                },
-              ),
-            ),
-          ),
+      excludeSemantics: true,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints box) => Center(
+          child: SidePelvicDemoLoop(size: math.min(box.maxWidth, 340)),
         ),
       ),
     );
@@ -168,20 +146,20 @@ class _PulseGlowState extends State<PulseGlow>
   }
 
   Widget _glow(double t) => IgnorePointer(
-        child: Container(
-          width: widget.size,
-          height: widget.size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: <Color>[
-                widget.color.withValues(alpha: 0.35 + 0.3 * t),
-                widget.color.withValues(alpha: 0),
-              ],
-            ),
-          ),
+    child: Container(
+      width: widget.size,
+      height: widget.size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: <Color>[
+            widget.color.withValues(alpha: 0.35 + 0.3 * t),
+            widget.color.withValues(alpha: 0),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {

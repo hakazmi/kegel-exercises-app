@@ -34,9 +34,8 @@ abstract class NotificationGateway {
 
 /// Real plugin-backed gateway for Android and iOS.
 class FlutterNotificationGateway implements NotificationGateway {
-  FlutterNotificationGateway({
-    FlutterLocalNotificationsPlugin? plugin,
-  }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+  FlutterNotificationGateway({FlutterLocalNotificationsPlugin? plugin})
+    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   final FlutterLocalNotificationsPlugin _plugin;
   bool _initialized = false;
@@ -50,8 +49,9 @@ class FlutterNotificationGateway implements NotificationGateway {
     final String zone = await currentTimeZoneId();
     await setLocalTimeZone(zone);
 
-    const AndroidInitializationSettings android =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings android = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const DarwinInitializationSettings darwin = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -71,7 +71,8 @@ class FlutterNotificationGateway implements NotificationGateway {
     );
     await _plugin
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.createNotificationChannel(channel);
 
     _initialized = true;
@@ -102,14 +103,16 @@ class FlutterNotificationGateway implements NotificationGateway {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final AndroidFlutterLocalNotificationsPlugin? android = _plugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       final bool? granted = await android?.requestNotificationsPermission();
       return granted ?? true;
     }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       final IOSFlutterLocalNotificationsPlugin? ios = _plugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>();
+            IOSFlutterLocalNotificationsPlugin
+          >();
       final bool? granted = await ios?.requestPermissions(
         alert: true,
         badge: true,
@@ -162,7 +165,10 @@ class FlutterNotificationGateway implements NotificationGateway {
 
 /// In-memory gateway for unit tests.
 class FakeNotificationGateway implements NotificationGateway {
-  FakeNotificationGateway({this.timeZoneId = 'UTC', this.permissionGranted = true});
+  FakeNotificationGateway({
+    this.timeZoneId = 'UTC',
+    this.permissionGranted = true,
+  });
 
   String timeZoneId;
   bool permissionGranted;

@@ -69,8 +69,10 @@ class SessionDefinition {
   final int? sessionNumber;
   final int sessionsToday;
 
-  int get durationSeconds =>
-      blocks.fold<int>(0, (int sum, SessionBlockDef b) => sum + b.durationSeconds);
+  int get durationSeconds => blocks.fold<int>(
+    0,
+    (int sum, SessionBlockDef b) => sum + b.durationSeconds,
+  );
 
   int get partCount => blocks.length;
 
@@ -191,7 +193,8 @@ abstract final class SessionDefinitionBuilder {
         label: '',
         durationSeconds: estimateStrengtheningSeconds(
           slowReps: level.slowHolds['reps'] as int? ?? 5,
-          holdSec: level.slowHolds['holdSec'] as int? ??
+          holdSec:
+              level.slowHolds['holdSec'] as int? ??
               level.slowHolds['holdSecMin'] as int? ??
               3,
           relaxSec: level.slowHolds['relaxSec'] as int? ?? 3,
@@ -215,7 +218,8 @@ abstract final class SessionDefinitionBuilder {
     Map<String, ExerciseContent>? exercisesById,
   }) {
     int slowReps = level.slowHolds['reps'] as int? ?? 5;
-    int holdSec = level.slowHolds['holdSec'] as int? ??
+    int holdSec =
+        level.slowHolds['holdSec'] as int? ??
         level.slowHolds['holdSecMin'] as int? ??
         3;
     int relaxSec = level.slowHolds['relaxSec'] as int? ?? 3;
@@ -272,9 +276,7 @@ abstract final class SessionDefinitionBuilder {
       if (ex == null) {
         continue;
       }
-      blocks.add(
-        movementBlockFromExercise(ex),
-      );
+      blocks.add(movementBlockFromExercise(ex));
     }
 
     return SessionDefinition(
@@ -455,7 +457,8 @@ abstract final class SessionDefinitionBuilder {
   static int strengtheningDurationForLevel(LevelContent level) {
     return estimateStrengtheningSeconds(
       slowReps: level.slowHolds['reps'] as int? ?? 5,
-      holdSec: level.slowHolds['holdSec'] as int? ??
+      holdSec:
+          level.slowHolds['holdSec'] as int? ??
           level.slowHolds['holdSecMin'] as int? ??
           3,
       relaxSec: level.slowHolds['relaxSec'] as int? ?? 3,

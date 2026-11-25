@@ -20,6 +20,10 @@ import 'engine/engine_models.dart';
 import 'engine/session_engine.dart';
 import 'session_voice.dart';
 
+/// The paywall after the very first session is off until the real paywall
+/// screen exists (it is only a placeholder for now).
+const bool showPaywallAfterFirstSession = false;
+
 /// Snapshot for the live session UI (S2–S4).
 class SessionPlayState {
   const SessionPlayState({
@@ -96,8 +100,9 @@ class SessionController extends Notifier<SessionPlayState?> {
     );
     final TodayItem item = _resolveItem(plan, itemId);
     final List<TrackContent> tracks = await ref.read(tracksProvider.future);
-    final List<ExerciseContent> exercises =
-        await ref.read(exercisesProvider.future);
+    final List<ExerciseContent> exercises = await ref.read(
+      exercisesProvider.future,
+    );
     TrackContent? trackContent;
     for (final TrackContent t in tracks) {
       if (t.id == profile.track.contentId) {
@@ -111,12 +116,12 @@ class SessionController extends Notifier<SessionPlayState?> {
     };
     final SessionDefinition definition =
         SessionDefinitionBuilder.fromLevelAndItem(
-      level: level,
-      item: item,
-      sessionsToday: profile.sessionsPerDay.clamp(1, 3),
-      track: trackContent,
-      exercisesById: byId,
-    );
+          level: level,
+          item: item,
+          sessionsToday: profile.sessionsPerDay.clamp(1, 3),
+          track: trackContent,
+          exercisesById: byId,
+        );
 
     final SessionEngine engine = SessionEngine(
       definition: definition,
@@ -130,9 +135,7 @@ class SessionController extends Notifier<SessionPlayState?> {
     _eventSub = engine.events.listen(_onEvent);
 
     // Fire-and-forget: platform channel can hang in tests without a plugin.
-    unawaited(
-      WakelockPlus.enable().catchError((Object _) {}),
-    );
+    unawaited(WakelockPlus.enable().catchError((Object _) {}));
 
     state = SessionPlayState(
       itemId: item.id,
@@ -160,16 +163,16 @@ class SessionController extends Notifier<SessionPlayState?> {
 
   void setVibration(bool value) {
     final UserProfile profile = ref.read(userProfileProvider);
-    ref.read(userProfileProvider.notifier).save(
-          profile.copyWith(vibrationOn: value),
-        );
+    ref
+        .read(userProfileProvider.notifier)
+        .save(profile.copyWith(vibrationOn: value));
   }
 
   void setVoice(bool value) {
     final UserProfile profile = ref.read(userProfileProvider);
-    ref.read(userProfileProvider.notifier).save(
-          profile.copyWith(voiceOn: value),
-        );
+    ref
+        .read(userProfileProvider.notifier)
+        .save(profile.copyWith(voiceOn: value));
   }
 
   /// Exit mid-session without saving a completed row.
@@ -219,8 +222,9 @@ class SessionController extends Notifier<SessionPlayState?> {
     ref.invalidate(sessionsProvider);
     ref.invalidate(todayPlanProvider);
 
-    final List<SessionRecord> sessions =
-        await ref.read(sessionRepositoryProvider).getAll();
+    final List<SessionRecord> sessions = await ref
+        .read(sessionRepositoryProvider)
+        .getAll();
     final bool suggestStepDown = PlanRules.shouldSuggestStepDown(sessions);
 
     // Re-show unlock card after the next session if it was snoozed.
@@ -236,8 +240,9 @@ class SessionController extends Notifier<SessionPlayState?> {
       sessions: sessions,
       today: now,
     );
-    final int? nextLevel =
-        unlockReady ? LevelProgression.offeredLevel(fresh) : null;
+    final int? nextLevel = unlockReady
+        ? LevelProgression.offeredLevel(fresh)
+        : null;
 
     unawaited(
       ref.read(reminderServiceProvider).reschedule().catchError((Object _) {}),
@@ -252,7 +257,9 @@ class SessionController extends Notifier<SessionPlayState?> {
       );
     }
 
-    if (summary.wasFirstEver && !profile.paywallSeen) {
+    if (showPaywallAfterFirstSession &&
+        summary.wasFirstEver &&
+        !profile.paywallSeen) {
       return SessionSaveResult(
         goTo: SessionNext.goPaywall,
         suggestStepDown: suggestStepDown,
@@ -273,9 +280,9 @@ class SessionController extends Notifier<SessionPlayState?> {
   Future<void> confirmPainTrack() async {
     final UserProfile profile = ref.read(userProfileProvider);
     final AppClock clock = ref.read(appClockProvider);
-    await ref.read(userProfileProvider.notifier).save(
-          PlanRules.applyPainTrack(profile, clock.now()),
-        );
+    await ref
+        .read(userProfileProvider.notifier)
+        .save(PlanRules.applyPainTrack(profile, clock.now()));
   }
 
   Future<void> clear() async {
@@ -324,10 +331,10 @@ class SessionController extends Notifier<SessionPlayState?> {
       },
     );
 
-    final List<SessionRecord> prior =
-        await ref.read(sessionRepositoryProvider).getAll();
-    final bool wasFirstEver =
-        !prior.any((SessionRecord s) => s.completed);
+    final List<SessionRecord> prior = await ref
+        .read(sessionRepositoryProvider)
+        .getAll();
+    final bool wasFirstEver = !prior.any((SessionRecord s) => s.completed);
 
     final UserProfile profile = ref.read(userProfileProvider);
     final AppClock clock = ref.read(appClockProvider);
@@ -344,8 +351,12 @@ class SessionController extends Notifier<SessionPlayState?> {
       longestHoldSeconds: next.longestHoldSeconds,
       completed: true,
     );
+    final List<SessionRecord> planPrior = PlanRules.sessionsForActivePlan(
+      profile: profile,
+      sessions: prior,
+    );
     final int streak = PlanRules.streak(
-      <SessionRecord>[...prior, pending],
+      <SessionRecord>[...planPrior, pending],
       now,
       restWeekday: profile.restWeekday,
     );
@@ -366,9 +377,7 @@ class SessionController extends Notifier<SessionPlayState?> {
       nextItem = null;
     }
 
-    unawaited(
-      WakelockPlus.disable().catchError((Object _) {}),
-    );
+    unawaited(WakelockPlus.disable().catchError((Object _) {}));
 
     state = SessionPlayState(
       itemId: current.itemId,
@@ -389,10 +398,9 @@ class SessionController extends Notifier<SessionPlayState?> {
   void _onEvent(EngineEvent event) {
     final UserProfile profile = ref.read(userProfileProvider);
     unawaited(
-      ref.read(hapticsServiceProvider).playSessionEvent(
-            event,
-            vibrationOn: profile.vibrationOn,
-          ),
+      ref
+          .read(hapticsServiceProvider)
+          .playSessionEvent(event, vibrationOn: profile.vibrationOn),
     );
     unawaited(_voice.speak(event, voiceOn: profile.voiceOn));
   }
@@ -411,13 +419,15 @@ class SessionController extends Notifier<SessionPlayState?> {
       summary: current.summary,
     );
     unawaited(
-      ref.read(analyticsServiceProvider).logEvent(
-        'session_start',
-        parameters: <String, Object?>{
-          'level': current.definition.level,
-          'session_number_today': current.definition.sessionNumber ?? 1,
-        },
-      ),
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            'session_start',
+            parameters: <String, Object?>{
+              'level': current.definition.level,
+              'session_number_today': current.definition.sessionNumber ?? 1,
+            },
+          ),
     );
   }
 
@@ -455,9 +465,7 @@ class SessionController extends Notifier<SessionPlayState?> {
     _engine?.dispose();
     _engine = null;
     await _voice.dispose();
-    unawaited(
-      WakelockPlus.disable().catchError((Object _) {}),
-    );
+    unawaited(WakelockPlus.disable().catchError((Object _) {}));
   }
 }
 
@@ -482,5 +490,5 @@ class SessionSaveResult {
 /// Active session controller for S2–S4.
 final sessionControllerProvider =
     NotifierProvider<SessionController, SessionPlayState?>(
-  SessionController.new,
-);
+      SessionController.new,
+    );

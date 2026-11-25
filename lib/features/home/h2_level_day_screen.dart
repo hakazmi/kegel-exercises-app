@@ -8,6 +8,7 @@ import '../../app/router.dart';
 import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
 import '../../core/content/content_models.dart';
+import '../../core/content/exercise_media.dart';
 import '../../core/content/info_copy.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/enums.dart';
@@ -41,14 +42,19 @@ class H2LevelDayScreen extends ConsumerWidget {
         ref.watch(exercisesProvider).asData?.value ?? const <ExerciseContent>[];
     final List<TrackContent> tracks =
         ref.watch(tracksProvider).asData?.value ?? const <TrackContent>[];
-    final List<SessionRecord> sessions =
-        ref.watch(sessionsProvider).asData?.value ?? const <SessionRecord>[];
+    final List<SessionRecord> sessions = PlanRules.sessionsForActivePlan(
+      profile: profile,
+      sessions:
+          ref.watch(sessionsProvider).asData?.value ?? const <SessionRecord>[],
+    );
     final TodayPlan? today = ref.watch(todayPlanProvider).asData?.value;
 
     if (levels.isEmpty) {
       return const Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
       );
     }
 
@@ -66,8 +72,10 @@ class H2LevelDayScreen extends ConsumerWidget {
       for (final ExerciseContent e in exercises) e.id: e,
     };
 
-    final int dayInLevel =
-        PlanRules.dayInLevel(profile: profile, sessions: sessions);
+    final int dayInLevel = PlanRules.dayInLevel(
+      profile: profile,
+      sessions: sessions,
+    );
     final bool isToday = level == profile.level && day == dayInLevel;
     final List<TodayItem> items = isToday && today != null
         ? today.items
@@ -93,8 +101,10 @@ class H2LevelDayScreen extends ConsumerWidget {
           ),
         ),
     ];
-    final int totalSeconds =
-        parts.fold<int>(0, (int s, _DayPart p) => s + p.definition.durationSeconds);
+    final int totalSeconds = parts.fold<int>(
+      0,
+      (int s, _DayPart p) => s + p.definition.durationSeconds,
+    );
     TodayItem? nextItem;
     if (isToday) {
       for (final TodayItem item in items) {
@@ -110,7 +120,8 @@ class H2LevelDayScreen extends ConsumerWidget {
     final int exerciseCount = parts.fold<int>(
       0,
       (int s, _DayPart p) =>
-          s + p.definition.blocks.where((SessionBlockDef b) => !b.isRest).length,
+          s +
+          p.definition.blocks.where((SessionBlockDef b) => !b.isRest).length,
     );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -337,7 +348,9 @@ class H2LevelDayScreen extends ConsumerWidget {
     final bool relaxationOnly = profile.track == TrackId.relaxationFirst;
     final List<TodayItem> items = <TodayItem>[];
     if (!relaxationOnly) {
-      final int planned = PlanRules.plannedStrengtheningSlots(profile.sessionsPerDay);
+      final int planned = PlanRules.plannedStrengtheningSlots(
+        profile.sessionsPerDay,
+      );
       for (int i = 1; i <= planned; i++) {
         items.add(
           TodayItem(
@@ -345,23 +358,28 @@ class H2LevelDayScreen extends ConsumerWidget {
             kind: SessionKind.strengthening,
             label: 'Session $i',
             durationSeconds:
-                SessionDefinitionBuilder.strengtheningDurationForLevel(levelContent),
+                SessionDefinitionBuilder.strengtheningDurationForLevel(
+                  levelContent,
+                ),
             done: true,
             optional: planned == 3 && i == 3,
             sessionNumber: i,
           ),
         );
       }
-      final List<String> body =
-          levelContent.bodyExercisesForTrack(profile.track.contentId);
+      final List<String> body = levelContent.bodyExercisesForTrack(
+        profile.track.contentId,
+      );
       if (body.isNotEmpty && levelContent.id >= 2) {
         items.add(
           TodayItem(
             id: 'body_1',
             kind: SessionKind.body,
             label: 'Body and function',
-            durationSeconds:
-                SessionDefinitionBuilder.estimateBodyDuration(body, byId),
+            durationSeconds: SessionDefinitionBuilder.estimateBodyDuration(
+              body,
+              byId,
+            ),
             done: true,
             locked: !isPremium,
             exerciseIds: body,
@@ -406,27 +424,27 @@ class _DayPart {
 ({Color color, Color deep, IconData icon}) _partStyle(SessionKind kind) =>
     switch (kind) {
       SessionKind.strengthening => (
-          color: AppColors.lavender,
-          deep: LevelPalette.levels[0].deep,
-          icon: Icons.adjust_rounded,
-        ),
+        color: AppColors.lavender,
+        deep: LevelPalette.levels[0].deep,
+        icon: Icons.adjust_rounded,
+      ),
       SessionKind.body => (
-          color: AppColors.peach,
-          deep: LevelPalette.levels[1].deep,
-          icon: Icons.accessibility_new_rounded,
-        ),
+        color: AppColors.peach,
+        deep: LevelPalette.levels[1].deep,
+        icon: Icons.accessibility_new_rounded,
+      ),
       SessionKind.breathing || SessionKind.relaxation => (
-          color: AppColors.pistachio,
-          deep: LevelPalette.levels[4].deep,
-          icon: Icons.air_rounded,
-        ),
+        color: AppColors.pistachio,
+        deep: LevelPalette.levels[4].deep,
+        icon: Icons.air_rounded,
+      ),
     };
 
 String _partTitle(AppLocalizations l10n, TodayItem item) => switch (item.kind) {
-      SessionKind.strengthening => l10n.h1SessionLabel(item.sessionNumber ?? 1),
-      SessionKind.body => l10n.h1BodyCardTitle,
-      SessionKind.breathing || SessionKind.relaxation => l10n.h1SectionBreathe,
-    };
+  SessionKind.strengthening => l10n.h1SessionLabel(item.sessionNumber ?? 1),
+  SessionKind.body => l10n.h1BodyCardTitle,
+  SessionKind.breathing || SessionKind.relaxation => l10n.h1SectionBreathe,
+};
 
 /// Day cover card in the level's colour: "Day N" large, the position, and
 /// the day's 3D figure standing in the card with its head rising above the
@@ -627,10 +645,7 @@ class _StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: AppRadii.lgAll,
-      ),
+      decoration: BoxDecoration(color: color, borderRadius: AppRadii.lgAll),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -712,10 +727,10 @@ class _TimeSplit extends StatelessWidget {
                         for (int i = 0; i < parts.length; i++) ...[
                           if (i > 0) const SizedBox(width: 3),
                           Expanded(
-                            flex: parts[i]
-                                .definition
-                                .durationSeconds
-                                .clamp(1, 1 << 20),
+                            flex: parts[i].definition.durationSeconds.clamp(
+                              1,
+                              1 << 20,
+                            ),
                             child: ColoredBox(
                               color: _partStyle(parts[i].item.kind).color,
                             ),
@@ -799,8 +814,9 @@ class _PartRowState extends State<_PartRow> {
     final _DayPart part = widget.part;
     final TodayItem item = part.item;
     final bool locked = item.locked;
-    final ({Color color, Color deep, IconData icon}) style =
-        _partStyle(item.kind);
+    final ({Color color, Color deep, IconData icon}) style = _partStyle(
+      item.kind,
+    );
     const Color line = AppColors.border;
 
     return IntrinsicHeight(
@@ -939,8 +955,9 @@ class _PartRowState extends State<_PartRow> {
                                           l10n,
                                           part.definition.durationSeconds,
                                         ),
-                                        color: style.color
-                                            .withValues(alpha: 0.45),
+                                        color: style.color.withValues(
+                                          alpha: 0.45,
+                                        ),
                                       ),
                                       if (item.optional)
                                         _Chip(
@@ -1035,13 +1052,13 @@ class _BlockLine extends StatelessWidget {
   final Color deep;
 
   String? get _exerciseId => switch (block.titleKey) {
-        'slowHolds' => 'slow_hold',
-        'quickSqueezes' => 'quick_squeeze',
-        'breathing' => 'diaphragmatic_breathing',
-        'reverseKegel' => 'reverse_kegel',
-        'rest' => null,
-        _ => block.exerciseId ?? block.titleKey,
-      };
+    'slowHolds' => 'slow_hold',
+    'quickSqueezes' => 'quick_squeeze',
+    'breathing' => 'diaphragmatic_breathing',
+    'reverseKegel' => 'reverse_kegel',
+    'rest' => null,
+    _ => block.exerciseId ?? block.titleKey,
+  };
 
   String _name() {
     switch (block.titleKey) {
@@ -1061,14 +1078,14 @@ class _BlockLine extends StatelessWidget {
   }
 
   IconData get _icon => switch (block.type) {
-        'hold' => Icons.hourglass_bottom_rounded,
-        'quick' => Icons.bolt_rounded,
-        'rest' => Icons.pause_rounded,
-        'breathing' => Icons.air_rounded,
-        'reverse_kegel' => Icons.south_rounded,
-        'stretch' => Icons.self_improvement_rounded,
-        _ => Icons.accessibility_new_rounded,
-      };
+    'hold' => Icons.hourglass_bottom_rounded,
+    'quick' => Icons.bolt_rounded,
+    'rest' => Icons.pause_rounded,
+    'breathing' => Icons.air_rounded,
+    'reverse_kegel' => Icons.south_rounded,
+    'stretch' => Icons.self_improvement_rounded,
+    _ => Icons.accessibility_new_rounded,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -1077,14 +1094,20 @@ class _BlockLine extends StatelessWidget {
     final int? reps = block.reps;
     final int? squeeze = block.squeezeSec;
     final int? relax = block.relaxSec;
-    final bool rhythm = reps != null &&
+    final bool rhythm =
+        reps != null &&
         reps > 0 &&
         squeeze != null &&
         relax != null &&
         squeeze > 0;
     final bool rest = block.isRest;
 
-    return Container(
+    // Exercises with a demo video open their instruction screen on tap.
+    final String exerciseId =
+        ExerciseMedia.idForBlock(block.exerciseId ?? block.titleKey);
+    final bool hasDemo = !rest && ExerciseMedia.hasVideo(exerciseId);
+
+    final Widget card = Container(
       margin: const EdgeInsets.only(top: AppSpacing.xs),
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.sm,
@@ -1101,7 +1124,11 @@ class _BlockLine extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(_icon, size: 18, color: rest ? AppColors.textSecondary : deep),
+              Icon(
+                hasDemo ? Icons.play_circle_fill_rounded : _icon,
+                size: 18,
+                color: rest ? AppColors.textSecondary : deep,
+              ),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
@@ -1115,7 +1142,9 @@ class _BlockLine extends StatelessWidget {
               Text(
                 rhythm
                     ? '×$reps'
-                    : l10n.s1BlockRestDetail(block.sec ?? block.durationSeconds),
+                    : l10n.s1BlockRestDetail(
+                        block.sec ?? block.durationSeconds,
+                      ),
                 style: AppTypography.caption.copyWith(
                   color: AppColors.ink,
                   fontWeight: FontWeight.w900,
@@ -1129,23 +1158,20 @@ class _BlockLine extends StatelessWidget {
           ),
           if (rhythm) ...[
             const SizedBox(height: AppSpacing.xs),
-            _Rhythm(
-              reps: reps,
-              squeeze: squeeze,
-              relax: relax,
-              color: deep,
-            ),
+            _Rhythm(reps: reps, squeeze: squeeze, relax: relax, color: deep),
             const SizedBox(height: 6),
             Wrap(
               spacing: AppSpacing.sm,
               children: [
                 _Legend(
                   color: deep,
-                  label: '${l10n.h2RhythmSqueeze} ${l10n.s1BlockRestDetail(squeeze)}',
+                  label:
+                      '${l10n.h2RhythmSqueeze} ${l10n.s1BlockRestDetail(squeeze)}',
                 ),
                 _Legend(
                   color: deep.withValues(alpha: 0.25),
-                  label: '${l10n.h2RhythmRelax} ${l10n.s1BlockRestDetail(relax)}',
+                  label:
+                      '${l10n.h2RhythmRelax} ${l10n.s1BlockRestDetail(relax)}',
                 ),
                 Text(
                   l10n.h2RhythmReps(reps),
@@ -1182,6 +1208,16 @@ class _BlockLine extends StatelessWidget {
           ],
         ],
       ),
+    );
+    if (!hasDemo) {
+      return card;
+    }
+    return PressScale(
+      onTap: () => context.push(
+        '${AppRoutes.exercise}?id=${Uri.encodeComponent(exerciseId)}',
+      ),
+      semanticLabel: _name(),
+      child: card,
     );
   }
 }
@@ -1300,11 +1336,11 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: AppRadii.pillAll,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: 2,
       ),
+      decoration: BoxDecoration(color: color, borderRadius: AppRadii.pillAll),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1327,7 +1363,6 @@ class _Chip extends StatelessWidget {
     );
   }
 }
-
 
 /// Encouragement for a plan day: a set of short lines that cycle, with a
 /// special line on the last day of a level.

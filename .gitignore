@@ -30,6 +30,7 @@ android/.gradle/
 .env.*
 google-services.json
 GoogleService-Info.plist
+lib/core/cloud/cloud_secrets.dart
 
 # iOS
 **/ios/Pods/
@@ -63,9 +64,37 @@ assets/images/onboarding/*_src.jpg
 assets/images/onboarding/*_clean.jpg
 assets/position_*.jpg
 
+# Unused root video dumps (app ships exercises/ + where_muscles + pf_* only)
+/assets/videos/bridge_with_hold.mp4
+/assets/videos/childs_pose.mp4
+/assets/videos/diaphragmatic_breathing.mp4
+/assets/videos/happy_baby.mp4
+/assets/videos/pillow_squeeze_lift.mp4
+/assets/videos/quick_squeeze.mp4
+/assets/videos/reverse_kegel.mp4
+/assets/videos/sit_to_stand_squeeze.mp4
+/assets/videos/slow_hold.mp4
+/assets/videos/squat_with_coordination.mp4
+/assets/videos/standing_walking_holds.mp4
+/assets/videos/strong_hold.mp4
+/assets/videos/supported_back_release.mp4
+/assets/videos/the_knack.mp4
+/assets/videos/where the muscels are.mp4
+/assets/videos/clip-A.mp4
+/assets/videos/clip-B.mp4
+
+# Local Gradle / IDE noise
+**/.gradle/
+**/captures/
+*.hprof
+
 # Misc
 *.log
 *.tmp
 *.temp
 .cursor/
 agent-transcripts/
+*.orig
+*.bak
+.DS_Store
+Thumbs.db

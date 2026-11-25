@@ -23,10 +23,7 @@ abstract class HapticsService {
   Future<void> vibrate();
 
   /// Maps engine events to cues. No-op when [vibrationOn] is false.
-  Future<void> playSessionEvent(
-    EngineEvent event, {
-    required bool vibrationOn,
-  });
+  Future<void> playSessionEvent(EngineEvent event, {required bool vibrationOn});
 
   /// Reads [Vibration.hasVibrator] / [Vibration.hasCustomVibrationsSupport] for debug UI.
   Future<HapticsCapabilities> probe();

@@ -96,10 +96,7 @@ class BreathePlayerView extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _Stat(
-                  value: '${state.totalReps ?? '–'}',
-                  label: l10n.brCycles,
-                ),
+                _Stat(value: '${state.totalReps ?? '–'}', label: l10n.brCycles),
                 Expanded(
                   child: Text(
                     formatSessionElapsed(state.elapsedSeconds),
@@ -125,8 +122,10 @@ class BreathePlayerView extends StatelessWidget {
           Expanded(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints c) {
-                final double size =
-                    math.min(280, math.min(c.maxWidth - 64, c.maxHeight - 24));
+                final double size = math.min(
+                  280,
+                  math.min(c.maxWidth - 64, c.maxHeight - 24),
+                );
                 return Center(
                   child: _BreathRing(
                     size: math.max(160, size),
@@ -135,8 +134,9 @@ class BreathePlayerView extends StatelessWidget {
                     exhale: exhale,
                     paused: paused,
                     word: phaseLabel,
-                    secondsLeft:
-                        formatPhaseSecondsRemaining(state.secondsRemaining),
+                    secondsLeft: formatPhaseSecondsRemaining(
+                      state.secondsRemaining,
+                    ),
                   ),
                 );
               },
@@ -207,7 +207,11 @@ class BreathePlayerView extends StatelessWidget {
 }
 
 class _Stat extends StatelessWidget {
-  const _Stat({required this.value, required this.label, this.alignEnd = false});
+  const _Stat({
+    required this.value,
+    required this.label,
+    this.alignEnd = false,
+  });
 
   final String value;
   final String label;
@@ -218,8 +222,9 @@ class _Stat extends StatelessWidget {
     return SizedBox(
       width: 64,
       child: Column(
-        crossAxisAlignment:
-            alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: alignEnd
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Text(
             value,
@@ -282,7 +287,9 @@ class _BreathRing extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                    color: AppColors.accent.withValues(alpha: paused ? 0.15 : 0.35),
+                    color: AppColors.accent.withValues(
+                      alpha: paused ? 0.15 : 0.35,
+                    ),
                     blurRadius: 48,
                     spreadRadius: 4,
                   ),

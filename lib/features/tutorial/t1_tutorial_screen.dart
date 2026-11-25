@@ -10,6 +10,7 @@ import '../../app/l10n/app_localizations.dart';
 import '../../app/router.dart';
 import '../../app/theme/system_ui.dart';
 import '../../app/theme/tokens.dart';
+import '../../core/content/exercise_media.dart';
 import '../../core/data/providers.dart';
 import '../../core/domain/user_profile.dart';
 import '../../core/services/analytics_service.dart';
@@ -20,11 +21,7 @@ import 'tutorial_scenes.dart';
 
 /// T1 muscle-finding tutorial: 3 cards, practice, then felt-lift check.
 class T1TutorialScreen extends ConsumerStatefulWidget {
-  const T1TutorialScreen({
-    super.key,
-    this.replay = false,
-    this.nextPath,
-  });
+  const T1TutorialScreen({super.key, this.replay = false, this.nextPath});
 
   /// When true, finishing does not write [UserProfile.tutorialDone].
   final bool replay;
@@ -53,9 +50,7 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
     final AnalyticsService analytics = ref.read(analyticsServiceProvider);
     await analytics.logEvent(
       'tutorial_done',
-      parameters: <String, Object?>{
-        'felt_lift': feltLift ? 'yes' : 'not_sure',
-      },
+      parameters: <String, Object?>{'felt_lift': feltLift ? 'yes' : 'not_sure'},
     );
 
     // Ticks "How to do a Kegel" on today's plan.
@@ -63,9 +58,9 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
 
     if (!widget.replay) {
       final UserProfile profile = ref.read(userProfileProvider);
-      await ref.read(userProfileProvider.notifier).save(
-            profile.copyWith(tutorialDone: true),
-          );
+      await ref
+          .read(userProfileProvider.notifier)
+          .save(profile.copyWith(tutorialDone: true));
     }
 
     if (!mounted) {
@@ -77,8 +72,8 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
       return;
     }
 
-    final String next = widget.nextPath ??
-        '${AppRoutes.before}?itemId=strength_1';
+    final String next =
+        widget.nextPath ?? '${AppRoutes.before}?itemId=strength_1';
     context.go(next);
   }
 
@@ -133,61 +128,59 @@ class _T1TutorialScreenState extends ConsumerState<T1TutorialScreen> {
         body: SafeArea(
           child: switch (_step) {
             _T1Step.cards => _CardsStep(
-                cardIndex: _cardIndex,
-                l10n: l10n,
-                onBack: () {
-                  if (_cardIndex == 0) {
-                    if (context.canPop()) {
-                      context.pop();
-                    } else {
-                      context.go(AppRoutes.today);
-                    }
+              cardIndex: _cardIndex,
+              l10n: l10n,
+              onBack: () {
+                if (_cardIndex == 0) {
+                  if (context.canPop()) {
+                    context.pop();
                   } else {
-                    setState(() => _cardIndex -= 1);
+                    context.go(AppRoutes.today);
                   }
-                },
-                onSkip: () => _finish(feltLift: false),
-                onNext: () {
-                  if (_cardIndex < _cardCount - 1) {
-                    setState(() => _cardIndex += 1);
-                  } else {
-                    _startPractice(reset: true);
-                  }
-                },
-              ),
+                } else {
+                  setState(() => _cardIndex -= 1);
+                }
+              },
+              onSkip: () => _finish(feltLift: false),
+              onNext: () {
+                if (_cardIndex < _cardCount - 1) {
+                  setState(() => _cardIndex += 1);
+                } else {
+                  _startPractice(reset: true);
+                }
+              },
+            ),
             _T1Step.practice => _PracticeStep(
-                key: ValueKey<int>(_practiceKey),
-                l10n: l10n,
-                rep: _rep,
-                totalReps: _practiceReps,
-                isSqueeze: _isSqueeze,
-                duration: _phaseDuration,
-                onPhaseDone: () {
-                  final bool enteringSqueeze = _isSqueeze == false;
-                  _onPracticePhaseDone();
-                  if (mounted &&
-                      _step == _T1Step.practice &&
-                      enteringSqueeze) {
-                    _pulseIfEnabled();
-                  }
-                },
-                onBack: () => setState(() {
-                  _step = _T1Step.cards;
-                  _cardIndex = _cardCount - 1;
-                }),
-              ),
+              key: ValueKey<int>(_practiceKey),
+              l10n: l10n,
+              rep: _rep,
+              totalReps: _practiceReps,
+              isSqueeze: _isSqueeze,
+              duration: _phaseDuration,
+              onPhaseDone: () {
+                final bool enteringSqueeze = _isSqueeze == false;
+                _onPracticePhaseDone();
+                if (mounted && _step == _T1Step.practice && enteringSqueeze) {
+                  _pulseIfEnabled();
+                }
+              },
+              onBack: () => setState(() {
+                _step = _T1Step.cards;
+                _cardIndex = _cardCount - 1;
+              }),
+            ),
             _T1Step.feltLift => _FeltLiftStep(
-                l10n: l10n,
-                onYes: () => _finish(feltLift: true),
-                onNotSure: () => setState(() => _step = _T1Step.notSure),
-                onBack: () => _startPractice(reset: true),
-              ),
+              l10n: l10n,
+              onYes: () => _finish(feltLift: true),
+              onNotSure: () => setState(() => _step = _T1Step.notSure),
+              onBack: () => _startPractice(reset: true),
+            ),
             _T1Step.notSure => _NotSureStep(
-                l10n: l10n,
-                onTryAgain: () => _startPractice(reset: true),
-                onContinue: () => _finish(feltLift: false),
-                onBack: () => setState(() => _step = _T1Step.feltLift),
-              ),
+              l10n: l10n,
+              onTryAgain: () => _startPractice(reset: true),
+              onContinue: () => _finish(feltLift: false),
+              onBack: () => setState(() => _step = _T1Step.feltLift),
+            ),
           },
         ),
       ),
@@ -233,7 +226,13 @@ class _CardsStep extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       if (cardIndex == 0) ...<Widget>[
-                        MusclesScene(semanticLabel: l10n.t1AnatomySemantic),
+                        // 3D anatomy: from the whole body down to the
+                        // pubic bone, bladder and pelvic floor muscles.
+                        ExerciseVideo(
+                          asset: ExerciseMedia.whereMuscles,
+                          poster: ExerciseMedia.whereMusclesPoster,
+                          semanticLabel: l10n.t1AnatomySemantic,
+                        ),
                         const SizedBox(height: AppSpacing.md),
                       ],
                       if (cardIndex == 1) ...<Widget>[
@@ -249,8 +248,9 @@ class _CardsStep extends StatelessWidget {
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         _cardBody(l10n, cardIndex),
-                        style: AppTypography.body
-                            .copyWith(color: AppColors.textSecondary),
+                        style: AppTypography.body.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       if (cardIndex == 0) ...<Widget>[
                         const SizedBox(height: AppSpacing.lg),
@@ -347,7 +347,9 @@ class _TipCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTypography.body.copyWith(fontWeight: FontWeight.w800),
+                  style: AppTypography.body.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
@@ -393,26 +395,14 @@ class _AvoidCard extends StatelessWidget {
                   children: [
                     const SizedBox(height: AppSpacing.sm),
                     // The real movement: squeeze and lift, hold, let go.
-                    const PelvicFloorDemoLoop(height: 210),
+                    const PelvicFloorDemoLoop(height: 240),
                     const SizedBox(height: AppSpacing.lg),
                     Text(l10n.t1Card3Title, style: AppTypography.display),
                     const SizedBox(height: AppSpacing.md),
-                    _AvoidRow(
-                      positive: true,
-                      text: l10n.t1AvoidCheckRelaxed,
-                    ),
-                    _AvoidRow(
-                      positive: true,
-                      text: l10n.t1AvoidCheckBreathing,
-                    ),
-                    _AvoidRow(
-                      positive: false,
-                      text: l10n.t1AvoidCrossButtocks,
-                    ),
-                    _AvoidRow(
-                      positive: false,
-                      text: l10n.t1AvoidCrossBreath,
-                    ),
+                    _AvoidRow(positive: true, text: l10n.t1AvoidCheckRelaxed),
+                    _AvoidRow(positive: true, text: l10n.t1AvoidCheckBreathing),
+                    _AvoidRow(positive: false, text: l10n.t1AvoidCrossButtocks),
+                    _AvoidRow(positive: false, text: l10n.t1AvoidCrossBreath),
                   ],
                 ),
               ),
@@ -432,8 +422,7 @@ class _AvoidRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color =
-        positive ? AppColors.primary : AppColors.goalGeneralFg;
+    final Color color = positive ? AppColors.primary : AppColors.goalGeneralFg;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
@@ -479,8 +468,9 @@ class _PracticeStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SessionPhase phase =
-        isSqueeze ? SessionPhase.squeeze : SessionPhase.relax;
+    final SessionPhase phase = isSqueeze
+        ? SessionPhase.squeeze
+        : SessionPhase.relax;
     return Column(
       children: [
         _TutorialHeader(
@@ -586,7 +576,7 @@ class _FeltLiftStep extends StatelessWidget {
                 const Expanded(
                   child: Center(
                     child: SingleChildScrollView(
-                      child: PelvicFloorDemoLoop(height: 220),
+                      child: PelvicFloorDemoLoop(height: 240),
                     ),
                   ),
                 ),
@@ -632,15 +622,36 @@ class _NotSureStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Spacer(),
-                Text(l10n.t1FeltLiftNotSure, style: AppTypography.display),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  l10n.t1NotSureTip,
-                  style: AppTypography.body
-                      .copyWith(color: AppColors.textSecondary),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Lying down, relaxed: the easiest way to feel it.
+                        ExerciseVideo(
+                          asset: ExerciseMedia.video('supported_back_release')!,
+                          poster: ExerciseMedia.poster(
+                            'supported_back_release',
+                          )!,
+                          semanticLabel: l10n.t1NotSureTip,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        Text(
+                          l10n.t1FeltLiftNotSure,
+                          style: AppTypography.display,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          l10n.t1NotSureTip,
+                          style: AppTypography.body.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(height: AppSpacing.md),
                 PrimaryButton(
                   label: l10n.commonTryAgain,
                   onPressed: onTryAgain,
