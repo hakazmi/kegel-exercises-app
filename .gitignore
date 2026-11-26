@@ -92,7 +92,8 @@ assets/position_*.jpg
 **/captures/
 *.hprof
 
-# Docs export tooling (keep generator + .docx; ignore npm junk / previews)
+# Docs export tooling (local only; keep .docx if committed separately)
+docs/exports/generate_app_documentation.js
 docs/exports/node_modules/
 docs/exports/package.json
 docs/exports/package-lock.json
@@ -102,6 +103,9 @@ docs/exports/page-*.jpg
 docs/exports/page-*.png
 docs/exports/~$*
 ~$*
+
+# Local Supabase handoff notes (not for public repo)
+docs/supabase-handoffs/
 
 # Misc
 *.log
