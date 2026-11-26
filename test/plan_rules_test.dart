@@ -189,9 +189,14 @@ void main() {
   group('level unlock', () {
     test('unlocks when span complete and 5 of last 7 days at level', () {
       final DateTime today = DateTime(2026, 11, 12);
+      // Six training days (day 7 is rest inside the week).
       final List<SessionRecord> sessions = <SessionRecord>[
-        for (int i = 0; i < 7; i++)
-          _session(at: today.subtract(Duration(days: i)), level: 1),
+        for (int i = 0; i < 6; i++)
+          _session(
+            at: today.subtract(Duration(days: i)),
+            level: 1,
+            dayInLevel: 6 - i,
+          ),
       ];
       expect(
         PlanRules.canUnlockNextLevel(
@@ -323,6 +328,45 @@ void main() {
       ];
       expect(
         PlanRules.dayInLevel(profile: profile, sessions: sessions),
+        2,
+      );
+    });
+
+    test('same calendar day keeps activePlanDay on Day 1 after strength done',
+        () {
+      final UserProfile profile = _profile(sessionsPerDay: 1);
+      final DateTime day = DateTime(2026, 11, 16, 10);
+      final List<SessionRecord> afterDay1 = <SessionRecord>[
+        _session(at: day, dayInLevel: 1),
+      ];
+      expect(
+        PlanRules.dayInLevel(profile: profile, sessions: afterDay1),
+        2,
+      );
+      expect(
+        PlanRules.activePlanDay(
+          profile: profile,
+          sessions: afterDay1,
+          today: day,
+        ),
+        1,
+      );
+      expect(
+        PlanRules.strengtheningCountForPlanDay(
+          sessions: afterDay1,
+          level: 1,
+          dayInLevel: 1,
+        ),
+        1,
+      );
+
+      final DateTime nextDay = day.add(const Duration(days: 1));
+      expect(
+        PlanRules.activePlanDay(
+          profile: profile,
+          sessions: afterDay1,
+          today: nextDay,
+        ),
         2,
       );
     });
@@ -517,21 +561,101 @@ void main() {
       );
     });
 
-    test('allDone when required items finished', () {
+    test('finishing Day 1 same calendar day is allDone and previews tomorrow',
+        () {
       final FakeClock clock = FakeClock(DateTime(2026, 11, 10, 20));
       final PlanService service = PlanService(clock: clock);
       final DateTime day = DateTime(2026, 11, 10);
       final TodayPlan plan = service.todayPlan(
         profile: _profile(sessionsPerDay: 1),
         sessions: <SessionRecord>[
-          _session(at: day.add(const Duration(hours: 9))),
+          _session(at: day.add(const Duration(hours: 9)), dayInLevel: 1),
           _session(
             at: day.add(const Duration(hours: 10)),
             kind: SessionKind.breathing,
+            dayInLevel: 1,
           ),
         ],
       );
+      expect(plan.dayInLevel, 1);
       expect(plan.state, TodayPlanState.allDone);
+      expect(plan.highlightIsTomorrow, isTrue);
+      expect(plan.displayDayInLevel, 2);
+      final TodayItem strength = plan.items.firstWhere(
+        (TodayItem i) => i.kind == SessionKind.strengthening,
+      );
+      expect(strength.done, isTrue);
+      final TodayItem breathe = plan.items.firstWhere(
+        (TodayItem i) =>
+            i.kind == SessionKind.breathing || i.kind == SessionKind.relaxation,
+      );
+      expect(breathe.done, isTrue);
+    });
+
+    test('next calendar day opens Day 2 fresh after Day 1', () {
+      final FakeClock clock = FakeClock(DateTime(2026, 11, 11, 9));
+      final PlanService service = PlanService(clock: clock);
+      final DateTime day1 = DateTime(2026, 11, 10);
+      final TodayPlan plan = service.todayPlan(
+        profile: _profile(sessionsPerDay: 1),
+        sessions: <SessionRecord>[
+          _session(at: day1.add(const Duration(hours: 9)), dayInLevel: 1),
+          _session(
+            at: day1.add(const Duration(hours: 10)),
+            kind: SessionKind.breathing,
+            dayInLevel: 1,
+          ),
+        ],
+      );
+      expect(plan.dayInLevel, 2);
+      expect(plan.state, TodayPlanState.normal);
+      expect(plan.highlightIsTomorrow, isFalse);
+      final TodayItem strength = plan.items.firstWhere(
+        (TodayItem i) => i.kind == SessionKind.strengthening,
+      );
+      expect(strength.done, isFalse);
+      final TodayItem breathe = plan.items.firstWhere(
+        (TodayItem i) =>
+            i.kind == SessionKind.breathing || i.kind == SessionKind.relaxation,
+      );
+      expect(breathe.done, isFalse);
+    });
+
+    test('breathing after Day 1 strength stays on Day 1 stamps', () {
+      final FakeClock clock = FakeClock(DateTime(2026, 11, 10, 18));
+      final PlanService service = PlanService(clock: clock);
+      final DateTime day = DateTime(2026, 11, 10);
+      // Strength finished → progress day 2, but active day stays 1.
+      final TodayPlan mid = service.todayPlan(
+        profile: _profile(sessionsPerDay: 2),
+        sessions: <SessionRecord>[
+          _session(at: day.add(const Duration(hours: 9)), dayInLevel: 1),
+          _session(at: day.add(const Duration(hours: 12)), dayInLevel: 1),
+        ],
+      );
+      expect(mid.dayInLevel, 1);
+      expect(mid.state, isNot(TodayPlanState.allDone));
+      final TodayItem breathe = mid.items.firstWhere(
+        (TodayItem i) =>
+            i.kind == SessionKind.breathing || i.kind == SessionKind.relaxation,
+      );
+      expect(breathe.done, isFalse);
+    });
+
+    test('allDone when current plan day items are finished at daily cap', () {
+      final FakeClock clock = FakeClock(DateTime(2026, 11, 10, 20));
+      final PlanService service = PlanService(clock: clock);
+      final DateTime day = DateTime(2026, 11, 10);
+      // Three calendar strengthening sessions already done → daily cap.
+      final TodayPlan plan = service.todayPlan(
+        profile: _profile(sessionsPerDay: 1),
+        sessions: <SessionRecord>[
+          _session(at: day.add(const Duration(hours: 8)), dayInLevel: 1),
+          _session(at: day.add(const Duration(hours: 12)), dayInLevel: 2),
+          _session(at: day.add(const Duration(hours: 16)), dayInLevel: 3),
+        ],
+      );
+      expect(plan.state, TodayPlanState.dailyCapReached);
     });
 
     test('stepDown mutates level only via service', () {

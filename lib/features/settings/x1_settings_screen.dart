@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,9 +21,13 @@ import '../../core/cloud/sync_coordinator.dart';
 import '../../core/cloud/sync_metadata_store.dart';
 import '../../core/constants/links.dart';
 import '../../core/data/providers.dart';
+import '../../core/diagnostics/crash_reporting.dart';
+import '../../core/diagnostics/performance_traces.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/user_profile.dart';
+import '../../core/entitlements/app_entitlements.dart';
 import '../../core/plan/goal_routing.dart';
+import '../../core/services/analytics_service.dart';
 import '../../core/services/reminder_service.dart';
 import '../../core/content/info_copy.dart';
 import '../../core/motion/app_motion.dart';
@@ -77,13 +82,24 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
     final ReminderService reminders = ref.read(reminderServiceProvider);
     final UserProfile next = profile.copyWith(reminderEnabled: enabled);
     await _save(next);
-    if (enabled) {
-      await reminders.enableReminder(
-        minutesFromMidnight: next.reminderTime,
-        days: next.reminderDays,
-      );
-    } else {
-      await reminders.disableReminder();
+    try {
+      if (enabled) {
+        await reminders.enableReminder(
+          minutesFromMidnight: next.reminderTime,
+          days: next.reminderDays,
+        );
+      } else {
+        await reminders.disableReminder();
+      }
+      CrashReporting.log('reminder: ${enabled ? 'on' : 'off'}');
+      await ref.read(analyticsServiceProvider).logEvent(
+            'reminder_change',
+            parameters: <String, Object?>{'on': enabled},
+          );
+    } on Object catch (e, st) {
+      CrashReporting.log('reminder: schedule fail');
+      await CrashReporting.record(e, stackTrace: st);
+      rethrow;
     }
   }
 
@@ -102,9 +118,13 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
     if (!ok) {
       return;
     }
+    final Trace? actionTrace = PerfTraces.start('account_action');
+    PerfTraces.putAttribute(actionTrace, 'action', 'reset');
+    CrashReporting.log('account: reset start');
     if (signedIn) {
       final result = await ref.read(syncRepositoryProvider).resetCloudData();
       if (!result.ok && mounted) {
+        PerfTraces.abandon(actionTrace);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result.errorMessage ?? 'Couldn’t erase cloud data.'),
@@ -119,6 +139,8 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
     ref.invalidate(sessionsProvider);
     ref.invalidate(checkInsProvider);
     await ref.read(userProfileProvider.notifier).reload();
+    CrashReporting.log('account: reset done');
+    await PerfTraces.stop(actionTrace);
     if (!mounted) {
       return;
     }
@@ -205,8 +227,12 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
     if (typed != true) {
       return;
     }
+    final Trace? actionTrace = PerfTraces.start('account_action');
+    PerfTraces.putAttribute(actionTrace, 'action', 'delete');
+    CrashReporting.log('account: delete start');
     final result = await ref.read(syncRepositoryProvider).deleteAccount();
     if (!result.ok && mounted) {
+      PerfTraces.abandon(actionTrace);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.errorMessage ?? 'Couldn’t delete account.'),
@@ -224,6 +250,9 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
     ref.invalidate(sessionsProvider);
     ref.invalidate(checkInsProvider);
     await ref.read(userProfileProvider.notifier).reload();
+    CrashReporting.setKey('signed_in', false);
+    CrashReporting.log('account: delete done');
+    await PerfTraces.stop(actionTrace);
     if (!mounted) {
       return;
     }
@@ -665,39 +694,41 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
-            Reveal(
-              from: RevealFrom.right,
-              delay: next(),
-              child: _Section(
-                title: l10n.x1SectionSubscription,
-                icon: Icons.workspace_premium_outlined,
-                children: [
-                  _SettingsTile(
-                    icon: Icons.storefront_outlined,
-                    color: AppColors.goalEjaculationFg,
-                    background: AppColors.goalEjaculationBg,
-                    label: _storeManageLabel(l10n),
-                    value: premium ? l10n.x1Premium : l10n.x1Free,
-                    onTap: _openStore,
-                  ),
-                  _SettingsTile(
-                    icon: Icons.restore_rounded,
-                    color: AppColors.goalEjaculationFg,
-                    background: AppColors.goalEjaculationBg,
-                    label: l10n.x1Restore,
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.x1RestoreStub),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                  ),
-                ],
+            if (!kAppFullyFree) ...[
+              const SizedBox(height: AppSpacing.md),
+              Reveal(
+                from: RevealFrom.right,
+                delay: next(),
+                child: _Section(
+                  title: l10n.x1SectionSubscription,
+                  icon: Icons.workspace_premium_outlined,
+                  children: [
+                    _SettingsTile(
+                      icon: Icons.storefront_outlined,
+                      color: AppColors.goalEjaculationFg,
+                      background: AppColors.goalEjaculationBg,
+                      label: _storeManageLabel(l10n),
+                      value: premium ? l10n.x1Premium : l10n.x1Free,
+                      onTap: _openStore,
+                    ),
+                    _SettingsTile(
+                      icon: Icons.restore_rounded,
+                      color: AppColors.goalEjaculationFg,
+                      background: AppColors.goalEjaculationBg,
+                      label: l10n.x1Restore,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.x1RestoreStub),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: AppSpacing.md),
             Reveal(
               from: RevealFrom.left,
@@ -733,18 +764,21 @@ class _X1SettingsScreenState extends ConsumerState<X1SettingsScreen> {
                   title: l10n.x1SectionTesting,
                   icon: Icons.bug_report_outlined,
                   children: [
-                    _SettingsTile(
-                      icon: Icons.workspace_premium_outlined,
-                      color: AppColors.goalEjaculationFg,
-                      background: AppColors.goalEjaculationBg,
-                      label: l10n.x1TestingPremium,
-                      trailing: _AnimatedSwitch(
-                        value: premium,
-                        onChanged: (bool value) {
-                          ref.read(isPremiumOverrideProvider.notifier).set(value);
-                        },
+                    if (!kAppFullyFree)
+                      _SettingsTile(
+                        icon: Icons.workspace_premium_outlined,
+                        color: AppColors.goalEjaculationFg,
+                        background: AppColors.goalEjaculationBg,
+                        label: l10n.x1TestingPremium,
+                        trailing: _AnimatedSwitch(
+                          value: premium,
+                          onChanged: (bool value) {
+                            ref
+                                .read(isPremiumOverrideProvider.notifier)
+                                .set(value);
+                          },
+                        ),
                       ),
-                    ),
                     _SettingsTile(
                       icon: Icons.storage_rounded,
                       color: AppColors.textSecondary,
@@ -979,12 +1013,13 @@ class _PlanHero extends StatelessWidget {
                             profile.sessionsPerDay,
                           ),
                         ),
-                        _HeroChip(
-                          icon: premium
-                              ? Icons.workspace_premium_rounded
-                              : Icons.lock_open_rounded,
-                          label: premium ? l10n.x1Premium : l10n.x1Free,
-                        ),
+                        if (!kAppFullyFree)
+                          _HeroChip(
+                            icon: premium
+                                ? Icons.workspace_premium_rounded
+                                : Icons.lock_open_rounded,
+                            label: premium ? l10n.x1Premium : l10n.x1Free,
+                          ),
                       ],
                     ),
                   ],

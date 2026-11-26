@@ -127,6 +127,7 @@ class _G1ProgressScreenState extends ConsumerState<G1ProgressScreen> {
                 l10n: l10n,
                 stats: stats,
                 today: today,
+                restWeekday: profile.restWeekday,
               ),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -269,22 +270,28 @@ class _StreakHero extends StatelessWidget {
     required this.l10n,
     required this.stats,
     required this.today,
+    required this.restWeekday,
   });
 
   final AppLocalizations l10n;
   final ProgressStats stats;
   final DateTime today;
+  final int restWeekday;
 
+  /// Unique Mon–Sun training days this week. The weekly rest day never counts
+  /// toward the 6-day ring, matching the calendar.
   int _trainedDaysThisWeek() {
     final DateTime todayDate = dateOnly(today);
     final DateTime start = todayDate.subtract(
       Duration(days: todayDate.weekday - DateTime.monday),
     );
     return stats.completedDays
-        .where(
-          (DateTime d) =>
-              !d.isBefore(start) && d.isBefore(start.add(const Duration(days: 7))),
-        )
+        .where((DateTime d) {
+          if (d.isBefore(start) || !d.isBefore(start.add(const Duration(days: 7)))) {
+            return false;
+          }
+          return d.weekday != restWeekday;
+        })
         .length;
   }
 

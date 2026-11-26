@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import '../core/cloud/cloud_providers.dart';
 import '../core/cloud/sync_coordinator.dart';
 import '../core/constants/app_constants.dart';
+import '../core/diagnostics/crash_reporting.dart';
 import '../core/motion/app_motion.dart';
 import '../core/services/reminder_service.dart';
 import '../features/shell/splash_overlay.dart';
@@ -73,8 +74,10 @@ class _KegelAppState extends ConsumerState<KegelApp>
       final ReminderService reminders = ref.read(reminderServiceProvider);
       await reminders.initialize();
       await reminders.reschedule();
-    } on Object catch (error) {
+    } on Object catch (error, st) {
       debugPrint('Reminder setup skipped: $error');
+      CrashReporting.log('reminder: bootstrap fail');
+      unawaited(CrashReporting.record(error, stackTrace: st));
     }
   }
 

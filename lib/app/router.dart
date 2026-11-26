@@ -7,6 +7,7 @@ import '../core/cloud/cloud_config.dart';
 import '../core/cloud/cloud_providers.dart';
 import '../core/data/providers.dart';
 import '../core/domain/user_profile.dart';
+import '../core/entitlements/app_entitlements.dart';
 import '../features/auth/auth_screen.dart';
 import '../features/exercise/exercise_detail_screen.dart';
 import '../features/holdtest/hold_test_screen.dart';
@@ -264,6 +265,13 @@ final routerProvider = Provider<GoRouter>((Ref ref) {
       ),
       GoRoute(
         path: AppRoutes.paywall,
+        redirect: (BuildContext context, GoRouterState state) {
+          // Fully free build: never show a paywall surface.
+          if (kAppFullyFree) {
+            return AppRoutes.today;
+          }
+          return null;
+        },
         builder: (BuildContext context, GoRouterState state) {
           final String source =
               state.uri.queryParameters['source'] ?? 'unknown';

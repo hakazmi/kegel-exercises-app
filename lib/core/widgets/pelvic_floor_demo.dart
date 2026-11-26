@@ -87,9 +87,11 @@ class _PelvicFloorVideoState extends State<PelvicFloorVideo> {
   Future<void> _init() async {
     final VideoPlayerController a = VideoPlayerController.asset(
       PfDemoAssets.squeeze,
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
     final VideoPlayerController b = VideoPlayerController.asset(
       PfDemoAssets.relax,
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
     _squeeze = a;
     _relax = b;

@@ -10,13 +10,14 @@ import 'package:kegelexercisesapp/core/time/app_clock.dart';
 SessionRecord _session({
   required DateTime at,
   int level = 1,
+  int dayInLevel = 1,
   SessionKind kind = SessionKind.strengthening,
 }) {
   return SessionRecord(
     startedAt: at,
     completedAt: at,
     level: level,
-    dayInLevel: 1,
+    dayInLevel: dayInLevel,
     track: TrackId.generalBladder,
     kind: kind,
     durationSeconds: 60,
@@ -40,11 +41,15 @@ UserProfile _profile({
   );
 }
 
-/// Seven training days ending on [end], plus enough history for span complete.
-List<SessionRecord> _sevenDaySpanEnding(DateTime end, {int level = 1}) {
+/// Six training days (a full L1/L2 week excluding rest) ending on [end].
+List<SessionRecord> _sixDaySpanEnding(DateTime end, {int level = 1}) {
   return <SessionRecord>[
-    for (int i = 6; i >= 0; i--)
-      _session(at: end.subtract(Duration(days: i)), level: level),
+    for (int i = 5; i >= 0; i--)
+      _session(
+        at: end.subtract(Duration(days: i)),
+        level: level,
+        dayInLevel: 6 - i,
+      ),
   ];
 }
 
@@ -52,7 +57,7 @@ void main() {
   group('PlanRules unlock', () {
     test('unlocks at 5 of 7 when level span is complete', () {
       final DateTime today = DateTime(2026, 11, 12);
-      final List<SessionRecord> sessions = _sevenDaySpanEnding(today);
+      final List<SessionRecord> sessions = _sixDaySpanEnding(today);
       expect(
         PlanRules.canUnlockNextLevel(
           level: 1,
@@ -75,7 +80,7 @@ void main() {
       // Span complete on days 1–7; today day 10 → only 4 days in the last 7.
       final DateTime spanEnd = DateTime(2026, 11, 7);
       final DateTime today = DateTime(2026, 11, 10);
-      final List<SessionRecord> sessions = _sevenDaySpanEnding(spanEnd);
+      final List<SessionRecord> sessions = _sixDaySpanEnding(spanEnd);
       expect(
         PlanRules.isLevelSpanComplete(level: 1, sessions: sessions),
         isTrue,
@@ -103,7 +108,7 @@ void main() {
       final PlanService service = PlanService(clock: clock);
       final UserProfile profile = _profile();
       final List<SessionRecord> sessions =
-          _sevenDaySpanEnding(DateTime(2026, 11, 7));
+          _sixDaySpanEnding(DateTime(2026, 11, 7));
       expect(
         PlanRules.canUnlockNextLevel(
           level: 1,
@@ -120,7 +125,7 @@ void main() {
 
     test('relaxation-first never unlocks', () {
       final DateTime today = DateTime(2026, 11, 12);
-      final List<SessionRecord> sessions = _sevenDaySpanEnding(today);
+      final List<SessionRecord> sessions = _sixDaySpanEnding(today);
       expect(
         PlanRules.canUnlockNextLevel(
           level: 1,
@@ -143,7 +148,7 @@ void main() {
     test('partial day does not count toward unlock when 2 sessions/day', () {
       final DateTime today = DateTime(2026, 11, 12);
       // One strengthening session per calendar day — incomplete for 2/day.
-      final List<SessionRecord> partial = _sevenDaySpanEnding(today);
+      final List<SessionRecord> partial = _sixDaySpanEnding(today);
       expect(
         PlanRules.canUnlockNextLevel(
           level: 1,
@@ -163,16 +168,18 @@ void main() {
       );
 
       final List<SessionRecord> full = <SessionRecord>[
-        for (int i = 6; i >= 0; i--) ...<SessionRecord>[
+        for (int i = 5; i >= 0; i--) ...<SessionRecord>[
           _session(
             at: today.subtract(Duration(days: i)).add(const Duration(hours: 8)),
             level: 1,
+            dayInLevel: 6 - i,
           ),
           _session(
             at: today
                 .subtract(Duration(days: i))
                 .add(const Duration(hours: 18)),
             level: 1,
+            dayInLevel: 6 - i,
           ),
         ],
       ];
@@ -197,10 +204,10 @@ void main() {
   });
 
   group('LevelProgression start / stay', () {
-    test('free user going to Level 2 needs premium paywall', () {
+    test('fully free build advances Level 2 without paywall', () {
       expect(
         LevelProgression.startOutcome(nextLevel: 2, isPremium: false),
-        LevelStartOutcome.needsPremium,
+        LevelStartOutcome.advanced,
       );
       expect(
         LevelProgression.startOutcome(nextLevel: 2, isPremium: true),
@@ -222,7 +229,7 @@ void main() {
 
     test('stay on this level hides the card until cleared', () {
       final DateTime today = DateTime(2026, 11, 12);
-      final List<SessionRecord> sessions = _sevenDaySpanEnding(today);
+      final List<SessionRecord> sessions = _sixDaySpanEnding(today);
       final UserProfile snoozed =
           LevelProgression.snooze(_profile());
       expect(

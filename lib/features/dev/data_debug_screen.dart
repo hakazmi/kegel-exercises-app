@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../app/theme/tokens.dart';
 import '../../core/data/providers.dart';
+import '../../core/diagnostics/crash_reporting.dart';
+import '../../core/diagnostics/firebase_bootstrap.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
@@ -275,6 +278,40 @@ class _DataDebugScreenState extends ConsumerState<DataDebugScreen> {
               _toolsLog,
               style: AppTypography.caption.copyWith(color: AppColors.textPrimary),
             ),
+          const SizedBox(height: AppSpacing.xl),
+          const Text('Firebase', style: AppTypography.title),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Firebase ready: ${FirebaseBootstrap.isReady}',
+            style: AppTypography.caption,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              SecondaryButton(
+                label: 'Test non-fatal',
+                expand: false,
+                onPressed: FirebaseBootstrap.isReady
+                    ? () async {
+                        await CrashReporting.recordTestNonFatal();
+                        setState(
+                          () => _toolsLog = 'Sent Crashlytics test non-fatal.',
+                        );
+                      }
+                    : null,
+              ),
+              if (kDebugMode)
+                SecondaryButton(
+                  label: 'Force test crash',
+                  expand: false,
+                  onPressed: FirebaseBootstrap.isReady
+                      ? () => CrashReporting.forceTestFatalCrash()
+                      : null,
+                ),
+            ],
+          ),
           const SizedBox(height: AppSpacing.xl),
           const Text('Haptics', style: AppTypography.title),
           const SizedBox(height: AppSpacing.xs),

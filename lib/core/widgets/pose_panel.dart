@@ -28,11 +28,16 @@ enum DayPose {
   bool get isWide => this == lyingOnBack || this == gluteBridge;
 
   /// Training day: 1 standing, 2 sitting, 3 lying, 4 bridge, 5 squat,
-  /// 6 kneeling, repeating. Calm breathing is only for rest days
-  /// ([restBreathing]), which sit between every six training days.
-  static DayPose forDay(int day) => values[(math.max(day, 1) - 1) % 6];
+  /// 6 kneeling; day 7 (and 14, 21…) is rest breathing inside the week.
+  static DayPose forDay(int day) {
+    final int d = math.max(day, 1);
+    if (d % 7 == 0) {
+      return restBreathing;
+    }
+    return values[(d - 1) % 7];
+  }
 
-  /// Training days shown before each rest-day card in a level's strip.
+  /// Training days in each 7-day plan week (day 7 is rest).
   static const int trainingDaysPerWeek = 6;
 
   String label(AppLocalizations l10n) => switch (this) {

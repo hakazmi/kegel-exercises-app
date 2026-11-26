@@ -113,7 +113,7 @@ void main() {
 
   final DateTime wednesday = DateTime(2026, 11, 11, 12);
 
-  testWidgets('H1 all done shows rest-is-training copy and disables start',
+  testWidgets('H1 finishing Day 1 shows allDone and tomorrow preview',
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(
@@ -145,7 +145,7 @@ void main() {
       find.text('Done for today. Rest is part of the training.'),
       findsOneWidget,
     );
-    expect(find.text('Start session'), findsOneWidget);
+    expect(find.text('TOMORROW'), findsOneWidget);
     final Finder start = find.widgetWithText(PrimaryButton, 'Start session');
     expect(start, findsOneWidget);
     expect(tester.widget<PrimaryButton>(start).enabled, isFalse);
@@ -397,7 +397,7 @@ void main() {
     expect(find.textContaining('3 s holds'), findsOneWidget);
   });
 
-  testWidgets('H2 locked level opens paywall with locked_content source',
+  testWidgets('H2 locked level shows unlock note without paywall',
       (WidgetTester tester) async {
     final FakeClock clock = FakeClock(wednesday);
     final ProviderContainer container = await _container(tester, clock: clock);
@@ -440,11 +440,15 @@ void main() {
     );
     await tester.pump();
     expect(find.text('Your levels'), findsOneWidget);
+    expect(find.text('CURRENT'), findsWidgets);
+    expect(find.text('Locked'), findsWidgets);
 
     await tester.tap(find.text('Build'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
-    expect(find.text('Paywall (locked_content)'), findsOneWidget);
+    // Fully free: Levels 2–5 are premium-unlocked; plan lock still shows a
+    // snackbar, never the paywall placeholder.
+    expect(find.text('Paywall (locked_content)'), findsNothing);
   });
 
   testWidgets('shell back from Progress returns to Today',

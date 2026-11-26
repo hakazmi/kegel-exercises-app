@@ -1498,6 +1498,12 @@ abstract class AppLocalizations {
   /// **'Level {level} · Day {day} of {total}'**
   String h1LevelDayOf(int level, int day, int total);
 
+  /// No description provided for @h1Tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get h1Tomorrow;
+
   /// No description provided for @h1RelaxationDayOf.
   ///
   /// In en, this message translates to:
@@ -1801,7 +1807,7 @@ abstract class AppLocalizations {
   /// No description provided for @h2UnlockNote.
   ///
   /// In en, this message translates to:
-  /// **'The next level unlocks when you complete 5 of the last 7 days. Missed a few days? Your plan simply waits for you.'**
+  /// **'Each level week is 6 training days and 1 rest day. The next level unlocks when you finish this level\'s training days and have trained on at least 5 of the last 7 days. Missed a few days? Your plan simply waits for you.'**
   String get h2UnlockNote;
 
   /// No description provided for @h2UnlockNoteRelaxation.
@@ -1819,8 +1825,20 @@ abstract class AppLocalizations {
   /// No description provided for @h2StatusUnlocksWhen.
   ///
   /// In en, this message translates to:
-  /// **'Unlocks when you complete 5 of the last 7 days'**
+  /// **'Unlocks when you finish this level and train on 5 of the last 7 days'**
   String get h2StatusUnlocksWhen;
+
+  /// No description provided for @h2StatusUnlocksTrainingLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Unlocks after 1 more training day} other{Unlocks after {count} more training days}}'**
+  String h2StatusUnlocksTrainingLeft(int count);
+
+  /// No description provided for @h2StatusUnlocksWindowLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Unlocks after 1 more trained day in the last 7} other{Unlocks after {count} more trained days in the last 7}}'**
+  String h2StatusUnlocksWindowLeft(int count);
 
   /// No description provided for @h2StartLevel.
   ///
@@ -3337,7 +3355,7 @@ abstract class AppLocalizations {
   /// No description provided for @infoLevelsBody.
   ///
   /// In en, this message translates to:
-  /// **'Each level adds longer holds or more reps. The next level unlocks when you finish this level\'s days and trained on at least 5 of the last 7 days. You can repeat or step down a level any time.'**
+  /// **'Each level adds longer holds or more reps. A plan week is 6 training days and 1 rest day inside the week. The next level unlocks when you finish this level\'s training days and have trained on at least 5 of the last 7 days. You can repeat or step down a level any time.'**
   String get infoLevelsBody;
 
   /// No description provided for @infoCheckInTitle.
@@ -3585,6 +3603,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completed'**
   String get h2TagCompleted;
+
+  /// No description provided for @h2TagLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get h2TagLocked;
+
+  /// No description provided for @h2TagTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get h2TagTomorrow;
+
+  /// No description provided for @h2DayAvailableTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Available tomorrow'**
+  String get h2DayAvailableTomorrow;
 
   /// No description provided for @h2StartDay.
   ///

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/providers.dart';
+import '../../core/diagnostics/crash_reporting.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/user_profile.dart';
 import '../../core/services/analytics_service.dart';
@@ -97,6 +98,7 @@ class OnboardingController extends Notifier<OnboardingDraft> {
   }
 
   Future<void> completeStep(String step) {
+    CrashReporting.log('onboarding: step=$step');
     return ref.read(analyticsServiceProvider).logEvent(
           'onboarding_step',
           parameters: <String, Object?>{'step': step},
@@ -130,6 +132,15 @@ class OnboardingController extends Notifier<OnboardingDraft> {
     );
 
     await ref.read(userProfileProvider.notifier).save(profile);
+
+    CrashReporting.setKey('onboarding_done', true);
+    CrashReporting.setKey('track', track.contentId);
+    CrashReporting.setKey('level', 1);
+    CrashReporting.log(
+      catheterExit
+          ? 'onboarding: complete catheter_exit'
+          : 'onboarding: complete',
+    );
 
     // Schedule after profile is saved so loadInput sees reminderEnabled.
     // Reminders are best-effort: a notification failure must never stop the

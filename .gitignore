@@ -24,12 +24,15 @@ desktop.ini
 android/key.properties
 android/local.properties
 android/.gradle/
+android/.kotlin/
 *.jks
 *.keystore
 .env
 .env.*
 google-services.json
 GoogleService-Info.plist
+**/google-services.json
+**/GoogleService-Info.plist
 lib/core/cloud/cloud_secrets.dart
 
 # iOS
@@ -42,8 +45,8 @@ lib/core/cloud/cloud_secrets.dart
 **/ios/Flutter/flutter_export_environment.sh
 **/ios/Flutter/ephemeral/
 **/macos/Flutter/ephemeral/
-**/linux/flutter/ephemeral/
-**/windows/flutter/ephemeral/
+**/linux/Flutter/ephemeral/
+**/windows/Flutter/ephemeral/
 
 # Build artifacts / packages
 *.apk
@@ -51,6 +54,7 @@ lib/core/cloud/cloud_secrets.dart
 *.ipa
 *.app.dSYM.zip
 *.symbols
+build_apk_log.txt
 
 # Python / image tooling (local only)
 tools/
@@ -87,6 +91,17 @@ assets/position_*.jpg
 **/.gradle/
 **/captures/
 *.hprof
+
+# Docs export tooling (keep generator + .docx; ignore npm junk / previews)
+docs/exports/node_modules/
+docs/exports/package.json
+docs/exports/package-lock.json
+docs/exports/preview.txt
+docs/exports/*.pdf
+docs/exports/page-*.jpg
+docs/exports/page-*.png
+docs/exports/~$*
+~$*
 
 # Misc
 *.log

@@ -382,6 +382,8 @@
       "total": {"type": "int"}
     }
   },
+  "h1Tomorrow": "Tomorrow",
+
   "h1RelaxationDayOf": "Relaxation · Day {day} of {total}",
   "@h1RelaxationDayOf": {
     "placeholders": {
@@ -531,10 +533,22 @@
   "h2PositionStanding": "standing",
   "h2PositionAny": "everyday moves",
   "h2PositionExtras": "bridge and squat",
-  "h2UnlockNote": "The next level unlocks when you complete 5 of the last 7 days. Missed a few days? Your plan simply waits for you.",
+  "h2UnlockNote": "Each level week is 6 training days and 1 rest day. The next level unlocks when you finish this level's training days and have trained on at least 5 of the last 7 days. Missed a few days? Your plan simply waits for you.",
   "h2UnlockNoteRelaxation": "Strengthening levels stay below until the relaxation weeks are done. If the pain has settled and a clinician agrees, you can start Level 1.",
   "h2StatusUnlocked": "Unlocked",
-  "h2StatusUnlocksWhen": "Unlocks when you complete 5 of the last 7 days",
+  "h2StatusUnlocksWhen": "Unlocks when you finish this level and train on 5 of the last 7 days",
+  "h2StatusUnlocksTrainingLeft": "{count, plural, =1{Unlocks after 1 more training day} other{Unlocks after {count} more training days}}",
+  "@h2StatusUnlocksTrainingLeft": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "h2StatusUnlocksWindowLeft": "{count, plural, =1{Unlocks after 1 more trained day in the last 7} other{Unlocks after {count} more trained days in the last 7}}",
+  "@h2StatusUnlocksWindowLeft": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
   "h2StartLevel": "Start Level {level}",
   "@h2StartLevel": {
     "placeholders": {
@@ -968,7 +982,7 @@
   "infoWeekRingBody": "Sessions completed since Monday. The ring on the streak card shows training days this week out of 6; the 7th day is for rest.",
   "infoHoldBody": "The longest hold the app has guided you through. A phone cannot measure your muscles, so this is the programmed hold you completed, not a measurement.",
   "infoLevelsTitle": "How levels work",
-  "infoLevelsBody": "Each level adds longer holds or more reps. The next level unlocks when you finish this level's days and trained on at least 5 of the last 7 days. You can repeat or step down a level any time.",
+  "infoLevelsBody": "Each level adds longer holds or more reps. A plan week is 6 training days and 1 rest day inside the week. The next level unlocks when you finish this level's training days and have trained on at least 5 of the last 7 days. You can repeat or step down a level any time.",
   "infoCheckInTitle": "About check-ins",
   "infoCheckInBody": "One question about your goal, answered now and again every 4 weeks, so you can compare your own answers side by side. There are no predictions or scores from other people.",
 
@@ -1034,6 +1048,9 @@
   "h2DoneTab": "Done",
   "h2TagCurrent": "Current",
   "h2TagCompleted": "Completed",
+  "h2TagLocked": "Locked",
+  "h2TagTomorrow": "Tomorrow",
+  "h2DayAvailableTomorrow": "Available tomorrow",
   "h2StartDay": "Start day {day}",
   "@h2StartDay": {
     "placeholders": {

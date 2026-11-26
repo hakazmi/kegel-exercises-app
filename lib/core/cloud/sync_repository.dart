@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
@@ -8,6 +9,8 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide Session;
 import '../data/database/app_database.dart';
 import '../data/repositories/hold_test_repository.dart';
 import '../data/repositories/settings_repository.dart';
+import '../diagnostics/crash_reporting.dart';
+import '../diagnostics/performance_traces.dart';
 import '../domain/user_profile.dart';
 import '../time/app_clock.dart';
 import 'cloud_config.dart';
@@ -120,8 +123,12 @@ class SyncRepository {
         errorMessage: 'Account changed. Sync skipped.',
       );
     }
+    final Trace? pushTrace = PerfTraces.start('sync_push');
+    CrashReporting.log('sync: push start');
     try {
       await _db.ensureSyncBackfill();
+      final int pending = await pendingCount();
+      PerfTraces.putMetric(pushTrace, 'row_count', pending);
 
       if (_meta.profileDirty) {
         final int sentAt = _meta.profileUpdatedAtMillis;
@@ -162,9 +169,14 @@ class SyncRepository {
 
       await _meta.setLastError(null);
       await _meta.setLastSync(_clock.now());
+      CrashReporting.log('sync: push ok');
+      await PerfTraces.stop(pushTrace);
       return const SyncResult();
-    } on Object catch (e) {
+    } on Object catch (e, st) {
+      PerfTraces.abandon(pushTrace);
       debugPrint('Sync push failed: $e');
+      CrashReporting.log('sync: push fail');
+      unawaited(CrashReporting.record(e, stackTrace: st));
       final String msg = CloudErrors.fromSync(e);
       await _meta.setLastError(msg);
       return SyncResult(ok: false, errorMessage: msg);
@@ -183,6 +195,8 @@ class SyncRepository {
         errorMessage: 'Account changed. Sync skipped.',
       );
     }
+    final Trace? pullTrace = PerfTraces.start('sync_pull');
+    CrashReporting.log('sync: pull start');
     try {
       await _db.ensureSyncBackfill();
 
@@ -252,9 +266,14 @@ class SyncRepository {
       await _meta.setPullCursor(DateTime.now().toUtc().toIso8601String());
       await _meta.setLastError(null);
       await _meta.setLastSync(_clock.now());
+      CrashReporting.log('sync: pull ok');
+      await PerfTraces.stop(pullTrace);
       return const SyncResult();
-    } on Object catch (e) {
+    } on Object catch (e, st) {
+      PerfTraces.abandon(pullTrace);
       debugPrint('Sync pull failed: $e');
+      CrashReporting.log('sync: pull fail');
+      unawaited(CrashReporting.record(e, stackTrace: st));
       final String msg = CloudErrors.fromSync(e);
       await _meta.setLastError(msg);
       return SyncResult(ok: false, errorMessage: msg);

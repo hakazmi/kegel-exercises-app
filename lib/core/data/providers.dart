@@ -7,6 +7,7 @@ import '../content/content_repository.dart';
 import '../domain/enums.dart';
 import '../domain/session_record.dart';
 import '../domain/user_profile.dart';
+import '../entitlements/app_entitlements.dart';
 import '../plan/plan_models.dart';
 import '../plan/plan_service.dart';
 import '../plan/session_definition.dart';
@@ -58,7 +59,10 @@ class DebugDayOffsetNotifier extends Notifier<int> {
 }
 
 /// Premium entitlement stub until RevenueCat (Prompt 10).
-/// Debug builds default to unlocked so Levels 2–5 can be tested; toggle in Settings.
+///
+/// While [kAppFullyFree] is true the override is ignored and everything is
+/// unlocked. When paywalls return, debug builds still default unlocked so
+/// Levels 2–5 can be tested from Settings.
 final isPremiumOverrideProvider =
     NotifierProvider<PremiumOverrideNotifier, bool>(
       PremiumOverrideNotifier.new,
@@ -67,13 +71,22 @@ final isPremiumOverrideProvider =
 /// Holds the debug Premium override.
 class PremiumOverrideNotifier extends Notifier<bool> {
   @override
-  bool build() => kDebugMode;
+  bool build() => kAppFullyFree || kDebugMode;
 
-  void set(bool value) => state = value;
+  void set(bool value) {
+    if (kAppFullyFree) {
+      state = true;
+      return;
+    }
+    state = value;
+  }
 }
 
 /// Whether Premium features are unlocked.
 final isPremiumProvider = Provider<bool>((Ref ref) {
+  if (kAppFullyFree) {
+    return true;
+  }
   return ref.watch(isPremiumOverrideProvider);
 });
 
@@ -134,6 +147,7 @@ final dataResetServiceProvider = Provider<DataResetService>((Ref ref) {
     walking: ref.watch(walkingRepositoryProvider),
     holdTests: ref.watch(holdTestRepositoryProvider),
     syncMeta: SyncMetadataStore(ref.watch(sharedPreferencesProvider)),
+    prefs: ref.watch(sharedPreferencesProvider),
   );
 });
 

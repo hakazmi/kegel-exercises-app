@@ -18,13 +18,16 @@ import '../../core/motion/app_motion.dart';
 import '../../core/plan/plan_models.dart';
 import '../../core/plan/plan_rules.dart';
 import '../../core/plan/session_definition.dart';
+import '../../core/time/app_clock.dart';
 import '../../core/widgets/widgets.dart';
 import 'home_copy.dart';
 
 /// One day of a level: what it contains, as a connected plan.
 ///
-/// The current day of the current level shows today's real items (done
-/// ticks, Start). Earlier days are view-only and shown as completed.
+/// The current plan day of the current level shows live items (done ticks,
+/// Start). Earlier plan days are view-only and shown as completed. The next
+/// plan day after finishing today is previewable (open to read, Start locked
+/// until tomorrow). Later days stay locked.
 class H2LevelDayScreen extends ConsumerWidget {
   const H2LevelDayScreen({super.key, required this.level, required this.day});
 
@@ -72,12 +75,26 @@ class H2LevelDayScreen extends ConsumerWidget {
       for (final ExerciseContent e in exercises) e.id: e,
     };
 
-    final int dayInLevel = PlanRules.dayInLevel(
+    final DateTime calendarToday = dateOnly(ref.watch(appClockProvider).now());
+    final int progressDay = PlanRules.dayInLevel(
       profile: profile,
       sessions: sessions,
     );
-    final bool isToday = level == profile.level && day == dayInLevel;
-    final List<TodayItem> items = isToday && today != null
+    final int activeDay = PlanRules.activePlanDay(
+      profile: profile,
+      sessions: sessions,
+      today: calendarToday,
+    );
+    // Current = the day still open on today's calendar. Past = finished
+    // progress days that are not still active. Preview = next plan day after
+    // finishing today (viewable, training starts tomorrow).
+    final bool isCurrentPlanDay = level == profile.level && day == activeDay;
+    final bool isPastPlanDay = level < profile.level ||
+        (level == profile.level && day < progressDay && day != activeDay);
+    final bool isPreviewPlanDay = level == profile.level &&
+        day > activeDay &&
+        day <= progressDay;
+    final List<TodayItem> items = isCurrentPlanDay && today != null
         ? today.items
         : _itemsForDay(
             levelContent: levelContent,
@@ -91,7 +108,11 @@ class H2LevelDayScreen extends ConsumerWidget {
       for (final TodayItem item in items)
         _DayPart(
           item: item,
-          done: isToday ? item.done : true,
+          // Past plan days are complete; the current plan day uses live
+          // ticks; preview / future days stay unchecked.
+          done: isCurrentPlanDay
+              ? item.done
+              : (isPastPlanDay ? true : false),
           definition: SessionDefinitionBuilder.fromLevelAndItem(
             level: levelContent,
             item: item,
@@ -106,7 +127,7 @@ class H2LevelDayScreen extends ConsumerWidget {
       (int s, _DayPart p) => s + p.definition.durationSeconds,
     );
     TodayItem? nextItem;
-    if (isToday) {
+    if (isCurrentPlanDay) {
       for (final TodayItem item in items) {
         if (!item.done && !item.locked) {
           nextItem = item;
@@ -202,7 +223,7 @@ class H2LevelDayScreen extends ConsumerWidget {
                             palette: palette,
                             pose: pose,
                             day: day,
-                            completed: !isToday,
+                            completed: isPastPlanDay,
                             motivation: _motivation(
                               l10n,
                               day,
@@ -272,7 +293,9 @@ class H2LevelDayScreen extends ConsumerWidget {
                         ],
                         const SizedBox(height: AppSpacing.lg),
                         Text(
-                          isToday ? l10n.h1JourneyTitle : l10n.h2DayPlanTitle,
+                          isCurrentPlanDay
+                              ? l10n.h1JourneyTitle
+                              : l10n.h2DayPlanTitle,
                           style: AppTypography.title.copyWith(
                             fontWeight: FontWeight.w800,
                           ),
@@ -323,6 +346,14 @@ class H2LevelDayScreen extends ConsumerWidget {
                             onPressed: () => context.push(
                               '${AppRoutes.before}?itemId=${Uri.encodeComponent(nextItem!.id)}',
                             ),
+                          ),
+                        ] else if (isPreviewPlanDay) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          PrimaryButton(
+                            label: l10n.h2DayAvailableTomorrow,
+                            icon: Icons.lock_rounded,
+                            enabled: false,
+                            onPressed: () {},
                           ),
                         ],
                       ],

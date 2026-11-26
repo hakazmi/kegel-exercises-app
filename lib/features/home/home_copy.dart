@@ -1,6 +1,8 @@
 import '../../app/l10n/app_localizations.dart';
 import '../../core/content/content_models.dart';
 import '../../core/domain/enums.dart';
+import '../../core/domain/session_record.dart';
+import '../../core/domain/user_profile.dart';
 import '../../core/plan/plan_models.dart';
 import '../../core/plan/plan_rules.dart';
 
@@ -60,6 +62,46 @@ abstract final class HomeCopy {
       return PlanRules.levelUnlockWindowDays;
     }
     return (level.dayEnd! - level.dayStart + 1).clamp(1, 365);
+  }
+
+  /// Live unlock hint for the next level: remaining training days first, then
+  /// remaining days in the 5-of-7 window, else the generic unlock line.
+  static String unlockStatus({
+    required AppLocalizations l10n,
+    required UserProfile profile,
+    required List<SessionRecord> sessions,
+    required DateTime today,
+    int? daySpan,
+  }) {
+    if (PlanRules.canUnlockNextLevel(
+      level: profile.level,
+      sessions: sessions,
+      today: today,
+      track: profile.track,
+      sessionsPerDay: profile.sessionsPerDay,
+      daySpan: daySpan,
+    )) {
+      return l10n.h2StatusUnlocked;
+    }
+    final int trainingLeft = PlanRules.trainingDaysLeftInSpan(
+      level: profile.level,
+      sessions: sessions,
+      sessionsPerDay: profile.sessionsPerDay,
+      daySpan: daySpan,
+    );
+    if (trainingLeft > 0) {
+      return l10n.h2StatusUnlocksTrainingLeft(trainingLeft);
+    }
+    final int windowLeft = PlanRules.unlockWindowDaysLeft(
+      level: profile.level,
+      sessions: sessions,
+      today: today,
+      sessionsPerDay: profile.sessionsPerDay,
+    );
+    if (windowLeft > 0) {
+      return l10n.h2StatusUnlocksWindowLeft(windowLeft);
+    }
+    return l10n.h2StatusUnlocksWhen;
   }
 
   /// Total days shown on Today / Levels for the active plan segment.

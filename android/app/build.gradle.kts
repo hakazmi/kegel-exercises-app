@@ -2,6 +2,22 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services") apply false
+    id("com.google.firebase.crashlytics") apply false
+}
+
+// google-services.json is gitignored; apply Firebase plugins only when present.
+// Performance: Flutter firebase_performance only (no Gradle bytecode plugin —
+// AGP 9 removed Transform, which firebase-perf still needs).
+val googleServicesFile = file("google-services.json")
+if (googleServicesFile.exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
+} else {
+    logger.warn(
+        "app/google-services.json not found: Firebase Crashlytics " +
+            "Gradle plugins disabled for this build.",
+    )
 }
 
 android {
@@ -35,6 +51,9 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+            // Keep R8 off until store signing — minify was hanging local release builds.
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("debug")
         }
     }

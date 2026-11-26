@@ -55,14 +55,29 @@ class TodayPlan {
     required this.level,
     required this.track,
     this.habits = const <TodayHabitItem>[],
+    this.highlightDayInLevel,
+    this.highlightIsTomorrow = false,
   });
 
   final TodayPlanState state;
   final List<TodayItem> items;
+
+  /// Plan day used for today’s items and session stamps ([PlanRules.activePlanDay]).
   final int dayInLevel;
   final int level;
   final TrackId track;
   final List<TodayHabitItem> habits;
+
+  /// Day shown on the Today hero. When [highlightIsTomorrow] is true this is
+  /// the next plan day after a finished day, so the figure and “Day N of T”
+  /// preview tomorrow without opening that day’s sessions yet.
+  final int? highlightDayInLevel;
+
+  /// True when the hero is previewing the next plan day as tomorrow.
+  final bool highlightIsTomorrow;
+
+  /// Day number for the level card figure and progress line.
+  int get displayDayInLevel => highlightDayInLevel ?? dayInLevel;
 
   /// Timed items that can open S1 (excludes locked body).
   List<TodayItem> get playableItems =>

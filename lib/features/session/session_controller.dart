@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../core/content/content_models.dart';
 import '../../core/data/providers.dart';
+import '../../core/diagnostics/crash_reporting.dart';
+import '../../core/diagnostics/performance_traces.dart';
 import '../../core/domain/enums.dart';
 import '../../core/domain/session_record.dart';
 import '../../core/domain/user_profile.dart';
@@ -20,8 +23,8 @@ import 'engine/engine_models.dart';
 import 'engine/session_engine.dart';
 import 'session_voice.dart';
 
-/// The paywall after the very first session is off until the real paywall
-/// screen exists (it is only a placeholder for now).
+/// Paywall after the first session stays off while the app is fully free
+/// and until the real RevenueCat paywall ships.
 const bool showPaywallAfterFirstSession = false;
 
 /// Snapshot for the live session UI (S2–S4).
@@ -76,6 +79,8 @@ class SessionController extends Notifier<SessionPlayState?> {
   final SessionVoice _voice = SessionVoice();
   DateTime? _startedAt;
   bool _completing = false;
+  Trace? _sessionPlayTrace;
+  int _pauseCount = 0;
 
   @override
   SessionPlayState? build() {
@@ -89,61 +94,86 @@ class SessionController extends Notifier<SessionPlayState?> {
   Future<void> begin(String itemId) async {
     await _tearDown();
     _completing = false;
+    _pauseCount = 0;
 
-    final UserProfile profile = ref.read(userProfileProvider);
-    final AppClock clock = ref.read(appClockProvider);
-    final TodayPlan plan = await ref.read(todayPlanProvider.future);
-    final List<LevelContent> levels = await ref.read(levelsProvider.future);
-    final LevelContent level = levels.firstWhere(
-      (LevelContent l) => l.id == profile.level,
-      orElse: () => levels.first,
-    );
-    final TodayItem item = _resolveItem(plan, itemId);
-    final List<TrackContent> tracks = await ref.read(tracksProvider.future);
-    final List<ExerciseContent> exercises = await ref.read(
-      exercisesProvider.future,
-    );
-    TrackContent? trackContent;
-    for (final TrackContent t in tracks) {
-      if (t.id == profile.track.contentId) {
-        trackContent = t;
-        break;
+    final Trace? buildTrace = PerfTraces.start('session_engine_build');
+    try {
+      final UserProfile profile = ref.read(userProfileProvider);
+      final AppClock clock = ref.read(appClockProvider);
+      final TodayPlan plan = await ref.read(todayPlanProvider.future);
+      final List<LevelContent> levels = await ref.read(levelsProvider.future);
+      final LevelContent level = levels.firstWhere(
+        (LevelContent l) => l.id == profile.level,
+        orElse: () => levels.first,
+      );
+      final TodayItem item = _resolveItem(plan, itemId);
+      final List<TrackContent> tracks = await ref.read(tracksProvider.future);
+      final List<ExerciseContent> exercises = await ref.read(
+        exercisesProvider.future,
+      );
+      TrackContent? trackContent;
+      for (final TrackContent t in tracks) {
+        if (t.id == profile.track.contentId) {
+          trackContent = t;
+          break;
+        }
       }
+      trackContent ??= tracks.isEmpty ? null : tracks.first;
+      final Map<String, ExerciseContent> byId = <String, ExerciseContent>{
+        for (final ExerciseContent e in exercises) e.id: e,
+      };
+      final SessionDefinition definition =
+          SessionDefinitionBuilder.fromLevelAndItem(
+            level: level,
+            item: item,
+            sessionsToday: profile.sessionsPerDay.clamp(1, 3),
+            track: trackContent,
+            exercisesById: byId,
+          );
+
+      PerfTraces.putAttribute(buildTrace, 'level', '${definition.level}');
+      PerfTraces.putAttribute(buildTrace, 'kind', definition.kind.name);
+      PerfTraces.putMetric(
+        buildTrace,
+        'block_count',
+        definition.blocks.length,
+      );
+      await PerfTraces.stop(buildTrace);
+
+      final SessionEngine engine = SessionEngine(
+        definition: definition,
+        clock: clock,
+        countdownSeconds: 5,
+      );
+      _engine = engine;
+      _startedAt = clock.now();
+
+      _stateSub = engine.states.listen(_onState);
+      _eventSub = engine.events.listen(_onEvent);
+
+      CrashReporting.setKey('session_kind', definition.kind.name);
+      CrashReporting.setKey('level', definition.level);
+      CrashReporting.setKey('voice_on', profile.voiceOn);
+      CrashReporting.setKey('vibration_on', profile.vibrationOn);
+      CrashReporting.log(
+        'session: begin kind=${definition.kind.name} level=${definition.level}',
+      );
+
+      // Fire-and-forget: platform channel can hang in tests without a plugin.
+      unawaited(WakelockPlus.enable().catchError((Object _) {}));
+
+      state = SessionPlayState(
+        itemId: item.id,
+        definition: definition,
+        dayInLevel: plan.dayInLevel,
+        engineState: EngineState.idle,
+      );
+      engine.start();
+    } on Object catch (e, st) {
+      PerfTraces.abandon(buildTrace);
+      await CrashReporting.record(e, stackTrace: st);
+      rethrow;
     }
-    trackContent ??= tracks.isEmpty ? null : tracks.first;
-    final Map<String, ExerciseContent> byId = <String, ExerciseContent>{
-      for (final ExerciseContent e in exercises) e.id: e,
-    };
-    final SessionDefinition definition =
-        SessionDefinitionBuilder.fromLevelAndItem(
-          level: level,
-          item: item,
-          sessionsToday: profile.sessionsPerDay.clamp(1, 3),
-          track: trackContent,
-          exercisesById: byId,
-        );
-
-    final SessionEngine engine = SessionEngine(
-      definition: definition,
-      clock: clock,
-      countdownSeconds: 5,
-    );
-    _engine = engine;
-    _startedAt = clock.now();
-
-    _stateSub = engine.states.listen(_onState);
-    _eventSub = engine.events.listen(_onEvent);
-
-    // Fire-and-forget: platform channel can hang in tests without a plugin.
-    unawaited(WakelockPlus.enable().catchError((Object _) {}));
-
-    state = SessionPlayState(
-      itemId: item.id,
-      definition: definition,
-      dayInLevel: plan.dayInLevel,
-      engineState: EngineState.idle,
-    );
-    engine.start();
   }
 
   void skipCountdown() {
@@ -151,7 +181,10 @@ class SessionController extends Notifier<SessionPlayState?> {
     _logSessionStartIfNeeded();
   }
 
-  void pause() => _engine?.pause();
+  void pause() {
+    _pauseCount += 1;
+    _engine?.pause();
+  }
 
   void resume() => _engine?.resume();
 
@@ -180,6 +213,14 @@ class SessionController extends Notifier<SessionPlayState?> {
     final SessionPlayState? current = state;
     final EngineState? before = current?.engineState;
     _engine?.exit();
+    CrashReporting.log(
+      'session: exit level=${current?.definition.level ?? 0} '
+      'phase=${before?.phaseWord ?? ''}',
+    );
+    _stopSessionPlayTrace(
+      completed: false,
+      elapsedSec: before?.elapsedSeconds ?? 0,
+    );
     final AnalyticsService analytics = ref.read(analyticsServiceProvider);
     await analytics.logEvent(
       'session_exit',
@@ -322,6 +363,14 @@ class SessionController extends Notifier<SessionPlayState?> {
     SessionPlayState current,
     EngineState next,
   ) async {
+    CrashReporting.log(
+      'session: done level=${current.definition.level} '
+      'seconds=${next.elapsedSeconds}',
+    );
+    _stopSessionPlayTrace(
+      completed: true,
+      elapsedSec: next.elapsedSeconds,
+    );
     final AnalyticsService analytics = ref.read(analyticsServiceProvider);
     await analytics.logEvent(
       'session_done',
@@ -418,6 +467,21 @@ class SessionController extends Notifier<SessionPlayState?> {
       sessionStartLogged: true,
       summary: current.summary,
     );
+    _sessionPlayTrace ??= PerfTraces.start('session_play');
+    PerfTraces.putAttribute(
+      _sessionPlayTrace,
+      'level',
+      '${current.definition.level}',
+    );
+    PerfTraces.putAttribute(
+      _sessionPlayTrace,
+      'kind',
+      current.definition.kind.name,
+    );
+    CrashReporting.log(
+      'session: play start level=${current.definition.level} '
+      'kind=${current.definition.kind.name}',
+    );
     unawaited(
       ref
           .read(analyticsServiceProvider)
@@ -429,6 +493,21 @@ class SessionController extends Notifier<SessionPlayState?> {
             },
           ),
     );
+  }
+
+  void _stopSessionPlayTrace({
+    required bool completed,
+    required int elapsedSec,
+  }) {
+    final Trace? trace = _sessionPlayTrace;
+    if (trace == null) {
+      return;
+    }
+    _sessionPlayTrace = null;
+    PerfTraces.putMetric(trace, 'elapsed_sec', elapsedSec);
+    PerfTraces.putMetric(trace, 'completed', completed ? 1 : 0);
+    PerfTraces.putMetric(trace, 'pause_count', _pauseCount);
+    unawaited(PerfTraces.stop(trace));
   }
 
   TodayItem _resolveItem(TodayPlan plan, String? id) {
@@ -458,6 +537,11 @@ class SessionController extends Notifier<SessionPlayState?> {
   }
 
   Future<void> _tearDown() async {
+    if (_sessionPlayTrace != null) {
+      PerfTraces.abandon(_sessionPlayTrace);
+      _sessionPlayTrace = null;
+    }
+    CrashReporting.setKey('session_kind', '');
     await _stateSub?.cancel();
     await _eventSub?.cancel();
     _stateSub = null;

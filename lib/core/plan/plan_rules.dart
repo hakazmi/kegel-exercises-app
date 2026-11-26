@@ -129,6 +129,10 @@ abstract final class PlanRules {
   /// is finished ([requiredStrengtheningSlots]) — so Session 2 of Day 1 stays Day 1.
   /// Unlock / span helpers use the same rule. Relaxation-first counts days with a
   /// completed relaxation or breathing session.
+  ///
+  /// This is the **progress** pointer (next plan day after finished strengthening).
+  /// Today’s playable day is [activePlanDay] — it stays on a plan day until the
+  /// next calendar day so breathing is not stamped onto Day N+1 early.
   static int dayInLevel({
     required UserProfile profile,
     required List<SessionRecord> sessions,
@@ -158,7 +162,102 @@ abstract final class PlanRules {
         1;
   }
 
-  /// Training-day span for a level (matches `assets/content/levels.json`).
+  /// Plan day the user trains on [today]'s calendar date.
+  ///
+  /// If the previous progress day finished its strengthening today, keep that
+  /// day active so breathing/relax still belong to it and Day N+1 waits until
+  /// tomorrow. Otherwise matches [dayInLevel].
+  static int activePlanDay({
+    required UserProfile profile,
+    required List<SessionRecord> sessions,
+    required DateTime today,
+  }) {
+    final DateTime calendarDay = dateOnly(today);
+    final int progressDay = dayInLevel(profile: profile, sessions: sessions);
+    final int previous = progressDay - 1;
+    if (previous < 1) {
+      return progressDay;
+    }
+
+    if (profile.track == TrackId.relaxationFirst) {
+      if (_relaxationPlanDayTouchedOn(
+        sessions: sessions,
+        planDay: previous,
+        calendarDay: calendarDay,
+      )) {
+        return previous;
+      }
+      return progressDay;
+    }
+
+    if (strengthPlanDayFinishedOn(
+      sessions: sessions,
+      level: profile.level,
+      planDay: previous,
+      calendarDay: calendarDay,
+      sessionsPerDay: profile.sessionsPerDay,
+    )) {
+      return previous;
+    }
+    return progressDay;
+  }
+
+  /// True when [planDay] has its required strengthening and at least one of
+  /// those sessions was completed on [calendarDay].
+  static bool strengthPlanDayFinishedOn({
+    required List<SessionRecord> sessions,
+    required int level,
+    required int planDay,
+    required DateTime calendarDay,
+    int sessionsPerDay = 1,
+  }) {
+    final int required = requiredStrengtheningSlots(sessionsPerDay);
+    final List<SessionRecord> matching = sessions
+        .where(
+          (SessionRecord s) =>
+              s.completed &&
+              s.kind == SessionKind.strengthening &&
+              s.level == level &&
+              s.dayInLevel == planDay,
+        )
+        .toList(growable: false);
+    if (matching.length < required) {
+      return false;
+    }
+    final DateTime day = dateOnly(calendarDay);
+    return matching.any(
+      (SessionRecord s) =>
+          isSameDay(dateOnly(s.completedAt ?? s.startedAt), day),
+    );
+  }
+
+  static bool _relaxationPlanDayTouchedOn({
+    required List<SessionRecord> sessions,
+    required int planDay,
+    required DateTime calendarDay,
+  }) {
+    // Relaxation-first stamps dayInLevel from calendar-day counts, so "previous"
+    // progress days completed today stay active until midnight.
+    final DateTime day = dateOnly(calendarDay);
+    final Set<DateTime> trainingDays = <DateTime>{};
+    for (final SessionRecord s in sessions) {
+      if (!s.completed) {
+        continue;
+      }
+      if (s.kind != SessionKind.relaxation && s.kind != SessionKind.breathing) {
+        continue;
+      }
+      trainingDays.add(dateOnly(s.completedAt ?? s.startedAt));
+    }
+    final List<DateTime> sorted = trainingDays.toList()..sort();
+    if (planDay < 1 || planDay > sorted.length) {
+      return false;
+    }
+    return isSameDay(sorted[planDay - 1], day);
+  }
+
+  /// Calendar / plan-day span for a level (matches `assets/content/levels.json`).
+  /// Includes the weekly rest day (every 7th day).
   static int levelDaySpan(int level) {
     switch (level) {
       case 1:
@@ -175,27 +274,54 @@ abstract final class PlanRules {
     }
   }
 
-  /// Unique calendar days at [level] with a full day's required strengthening.
+  /// True for plan days 7, 14, 21… — rest sits inside the week, not beside it.
+  static bool isPlanRestDay(int dayInLevel) =>
+      dayInLevel > 0 && dayInLevel % 7 == 0;
+
+  /// Strengthening days needed to finish a level span (excludes rest days).
   ///
-  /// Matches [dayInLevel]: a day counts only when session count ≥
-  /// [requiredStrengtheningSlots] for [sessionsPerDay].
+  /// A 7-day level needs 6 training days; a 14-day level needs 12.
+  static int trainingDaysRequiredForSpan(int span) => span - (span ~/ 7);
+
+  /// Unique plan days at [level] with a full day's required strengthening.
+  ///
+  /// Counts by [SessionRecord.dayInLevel] (not calendar date) so finishing
+  /// Day 1 and starting Day 2 on the same calendar day does not collapse
+  /// both into one training day or mark Day 2 slots as already done.
   static int completedTrainingDaysAtLevel({
     required int level,
     required List<SessionRecord> sessions,
     int sessionsPerDay = 1,
   }) {
     final int required = requiredStrengtheningSlots(sessionsPerDay);
-    final Map<DateTime, int> byDay = <DateTime, int>{};
+    final Map<int, int> byPlanDay = <int, int>{};
     for (final SessionRecord s in sessions) {
       if (!s.completed ||
           s.level != level ||
-          s.kind != SessionKind.strengthening) {
+          s.kind != SessionKind.strengthening ||
+          s.dayInLevel < 1) {
         continue;
       }
-      final DateTime day = dateOnly(s.completedAt ?? s.startedAt);
-      byDay[day] = (byDay[day] ?? 0) + 1;
+      byPlanDay[s.dayInLevel] = (byPlanDay[s.dayInLevel] ?? 0) + 1;
     }
-    return byDay.values.where((int count) => count >= required).length;
+    return byPlanDay.values.where((int count) => count >= required).length;
+  }
+
+  /// Strengthening sessions completed for one plan day index at [level].
+  static int strengtheningCountForPlanDay({
+    required List<SessionRecord> sessions,
+    required int level,
+    required int dayInLevel,
+  }) {
+    return sessions
+        .where(
+          (SessionRecord s) =>
+              s.completed &&
+              s.kind == SessionKind.strengthening &&
+              s.level == level &&
+              s.dayInLevel == dayInLevel,
+        )
+        .length;
   }
 
   /// True when the level's day span is finished (enough training days done).
@@ -206,12 +332,48 @@ abstract final class PlanRules {
     int? daySpan,
   }) {
     final int span = daySpan ?? levelDaySpan(level);
+    final int needed = trainingDaysRequiredForSpan(span);
     return completedTrainingDaysAtLevel(
           level: level,
           sessions: sessions,
           sessionsPerDay: sessionsPerDay,
         ) >=
-        span;
+        needed;
+  }
+
+  /// How many training days are still needed to finish the level span.
+  static int trainingDaysLeftInSpan({
+    required int level,
+    required List<SessionRecord> sessions,
+    int sessionsPerDay = 1,
+    int? daySpan,
+  }) {
+    final int span = daySpan ?? levelDaySpan(level);
+    final int needed = trainingDaysRequiredForSpan(span);
+    final int done = completedTrainingDaysAtLevel(
+      level: level,
+      sessions: sessions,
+      sessionsPerDay: sessionsPerDay,
+    );
+    final int left = needed - done;
+    return left < 0 ? 0 : left;
+  }
+
+  /// How many more trained calendar days are needed in the last 7 to unlock.
+  static int unlockWindowDaysLeft({
+    required int level,
+    required List<SessionRecord> sessions,
+    required DateTime today,
+    int sessionsPerDay = 1,
+  }) {
+    final int done = completedDaysInUnlockWindow(
+      level: level,
+      sessions: sessions,
+      today: today,
+      sessionsPerDay: sessionsPerDay,
+    );
+    final int left = levelUnlockMinCompletedDays - done;
+    return left < 0 ? 0 : left;
   }
 
   /// Fully completed training days at [level] inside the last

@@ -78,13 +78,14 @@ SessionRecord _session({
   required DateTime day,
   SessionKind kind = SessionKind.strengthening,
   int longestHoldSeconds = 3,
+  int dayInLevel = 1,
   TrackId track = TrackId.generalBladder,
 }) {
   return SessionRecord(
     startedAt: day,
     completedAt: day,
     level: 1,
-    dayInLevel: 1,
+    dayInLevel: dayInLevel,
     track: track,
     kind: kind,
     durationSeconds: 55,
@@ -150,6 +151,53 @@ void main() {
       expect(stats.completedDays, contains(DateTime(2026, 11, 10)));
       expect(stats.completedDays, contains(DateTime(2026, 11, 11)));
       expect(stats.isRelaxationFirst, isFalse);
+    });
+
+    test('longest hold ignores non-strengthening sessions', () {
+      final UserProfile profile = UserProfile.initial().copyWith(
+        onboardingDone: true,
+        goal: Goal.bladderControl,
+        track: TrackId.generalBladder,
+        restWeekday: DateTime.sunday,
+      );
+      final ProgressStats stats = ProgressStats.from(
+        profile: profile,
+        sessions: <SessionRecord>[
+          _session(day: DateTime(2026, 11, 10), longestHoldSeconds: 4),
+          _session(
+            day: DateTime(2026, 11, 11),
+            kind: SessionKind.breathing,
+            longestHoldSeconds: 99,
+          ),
+        ],
+        today: wednesday,
+      );
+      expect(stats.longestHoldSeconds, 4);
+      expect(stats.sessionsThisWeek, 2);
+    });
+
+    test('streak skips rest weekday and does not break', () {
+      // Rest = Sunday. Train Fri + Sat; today Monday with no session yet.
+      final DateTime monday = DateTime(2026, 11, 16, 12);
+      final UserProfile profile = UserProfile.initial().copyWith(
+        onboardingDone: true,
+        goal: Goal.bladderControl,
+        track: TrackId.generalBladder,
+        restWeekday: DateTime.sunday,
+      );
+      final ProgressStats stats = ProgressStats.from(
+        profile: profile,
+        sessions: <SessionRecord>[
+          _session(day: DateTime(2026, 11, 13)), // Fri
+          _session(day: DateTime(2026, 11, 14)), // Sat
+          _session(
+            day: DateTime(2026, 11, 15),
+            kind: SessionKind.breathing,
+          ), // Sun rest
+        ],
+        today: monday,
+      );
+      expect(stats.streakDays, 2);
     });
   });
 
@@ -383,9 +431,9 @@ void main() {
         restWeekday: DateTime.sunday,
       ),
       sessions: <SessionRecord>[
-        _session(day: DateTime(2026, 11, 9)),
-        _session(day: DateTime(2026, 11, 10)),
-        _session(day: DateTime(2026, 11, 11)),
+        _session(day: DateTime(2026, 11, 9), dayInLevel: 1),
+        _session(day: DateTime(2026, 11, 10), dayInLevel: 2),
+        _session(day: DateTime(2026, 11, 11), dayInLevel: 3),
       ],
     );
     addTearDown(container.dispose);

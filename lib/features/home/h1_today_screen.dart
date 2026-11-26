@@ -749,11 +749,16 @@ class _LevelHero extends StatelessWidget {
     // bar shows this week and starts again each new week.
     final bool maintenance =
         !relaxation && levelContent != null && levelContent!.dayEnd == null;
-    final int maintenanceWeek = (plan.dayInLevel - 1) ~/ totalDays + 1;
+    final int displayDay = plan.displayDayInLevel;
+    final int maintenanceWeek = (displayDay - 1) ~/ totalDays + 1;
     final int dayInCycle = maintenance
-        ? (plan.dayInLevel - 1) % totalDays + 1
-        : plan.dayInLevel;
-    final int doneDays = (dayInCycle - 1).clamp(0, totalDays);
+        ? (displayDay - 1) % totalDays + 1
+        : displayDay;
+    // Progress bar still counts finished training days from the active day
+    // when not previewing tomorrow; tomorrow preview uses displayDay - 1.
+    final int doneDays = plan.highlightIsTomorrow
+        ? (displayDay - 1).clamp(0, totalDays)
+        : (dayInCycle - 1).clamp(0, totalDays);
     final int percent = totalDays == 0
         ? 0
         : (doneDays / totalDays * 100).round().clamp(0, 100);
@@ -767,25 +772,27 @@ class _LevelHero extends StatelessWidget {
         ? l10n.h1MaintenanceDay(maintenanceWeek, dayInCycle, totalDays)
         : l10n.h1LevelDayOf(
             plan.level,
-            plan.dayInLevel.clamp(1, totalDays == 0 ? 1 : totalDays),
+            displayDay.clamp(1, totalDays == 0 ? 1 : totalDays),
             totalDays,
           );
     final String badge =
-        (maintenance
-                ? l10n.h1ProgramComplete
-                : l10n.o6TrackBadge(HomeCopy.trackName(l10n, plan.track)))
+        (plan.highlightIsTomorrow
+                ? l10n.h1Tomorrow
+                : (maintenance
+                      ? l10n.h1ProgramComplete
+                      : l10n.o6TrackBadge(HomeCopy.trackName(l10n, plan.track))))
             .toUpperCase();
     final LevelPalette palette = relaxation
         ? LevelPalette.rest
         : LevelPalette.of(plan.level);
     final DayPose pose = relaxation
         ? DayPose.restBreathing
-        : DayPose.forDay(plan.dayInLevel);
+        : DayPose.forDay(displayDay);
     final bool wide = pose.isWide || pose == DayPose.restBreathing;
     final String motivation = HomeCopy.motivation(
       l10n,
       level: plan.level,
-      dayInLevel: plan.dayInLevel,
+      dayInLevel: displayDay,
       relaxation: relaxation,
     );
 

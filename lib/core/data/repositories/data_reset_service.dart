@@ -1,4 +1,7 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../cloud/sync_metadata_store.dart';
+import '../../diagnostics/crash_reporting.dart';
 import 'checkin_repository.dart';
 import 'habit_repository.dart';
 import 'hold_test_repository.dart';
@@ -15,6 +18,7 @@ class DataResetService {
     required this.walking,
     this.holdTests,
     this.syncMeta,
+    this.prefs,
   });
 
   final SettingsRepository settings;
@@ -28,6 +32,9 @@ class DataResetService {
 
   final SyncMetadataStore? syncMeta;
 
+  /// Used to rotate the anonymous Crashlytics install id after wipe.
+  final SharedPreferences? prefs;
+
   Future<void> deleteEverything({bool clearAuthHint = false}) async {
     await sessions.clear();
     await checkIns.clear();
@@ -39,6 +46,10 @@ class DataResetService {
       await syncMeta?.clearAllIncludingAuthHint();
     } else {
       await syncMeta?.clearSyncState();
+    }
+    final SharedPreferences? localPrefs = prefs;
+    if (localPrefs != null) {
+      await CrashReporting.resetInstallationId(localPrefs);
     }
   }
 }

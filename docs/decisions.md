@@ -13,6 +13,7 @@ One line per decision the product spec does not cover. Format: `YYYY-MM-DD — D
 2026-11-12 — Primary CTA fill is ink `#0E1412` (matches screenshots); brand/primary green remains `#0B7A4B`. Squeeze/hold ring accent is `#1AAE68`.
 2026-11-12 — Light scaffold background set to `#F5F7F6` and borders to `#DCE3E0` from screenshots (pending token approval in docs/design/tokens.md).
 2026-11-12 — Remove firebase_core / firebase_analytics / firebase_crashlytics until Prompt 11 (unused; heavy iOS firebase-ios-sdk). Keep purchases_flutter.
+2026-11-26 — Prompt 11: re-add firebase_core, firebase_analytics, firebase_crashlytics, plus firebase_performance (FocusFlow/PoseCoach pattern). Config files gitignored; Gradle plugins apply only when google-services.json exists.
 2026-11-12 — Contrast AA: textSecondary `#66706B` kept. Disabled controls and decorative ring track are WCAG-exempt: buttonDisabled `#CBD2D0`, textDisabledLabel `#6F7974`, textDisabled `#9AA39F` (icons), sessionRingTrack `#2A3430`.
 2026-11-12 — Drift codegen helpers allowed: `drift_dev`, `build_runner`, `path`, `path_provider`, `sqlite3_flutter_libs` (dev deps where appropriate).
 2026-11-12 — Sessions table includes `kind` (strengthening|breathing|relaxation) in addition to the spec column list so the daily strengthening cap can be enforced.

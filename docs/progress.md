@@ -14,6 +14,6 @@ Checklist for Prompts 0–13. Tick each step when it ships.
 - [x] **Prompt 9** — Reminders
 - [x] **Prompt 9b** — Level unlock offer (manual Start / Stay; paywall for free Levels 2–5)
 - [ ] **Prompt 10** — Paywall and RevenueCat
-- [ ] **Prompt 11** — Analytics, Crashlytics, privacy (re-add firebase_core, firebase_analytics, firebase_crashlytics)
+- [x] **Prompt 11** — Analytics, Crashlytics, Performance, privacy (firebase_core, firebase_analytics, firebase_crashlytics, firebase_performance; place `google-services.json` locally — see `docs/firebase-setup.md`)
 - [ ] **Prompt 12** — QA hardening
 - [ ] **Prompt 13** — Android release build

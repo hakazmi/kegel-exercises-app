@@ -52,10 +52,13 @@ class ProgressStats {
       }
       final DateTime day = dateOnly(session.completedAt ?? session.startedAt);
       completed.add(day);
+      // Count every completed session this calendar week (Mon–Sun).
       if (!day.isBefore(weekStart) && !day.isAfter(weekEnd)) {
         sessionsThisWeek += 1;
       }
-      if (session.longestHoldSeconds > longestHold) {
+      // Longest prescribed hold completed in a finished strengthening session.
+      if (session.kind == SessionKind.strengthening &&
+          session.longestHoldSeconds > longestHold) {
         longestHold = session.longestHoldSeconds;
       }
     }

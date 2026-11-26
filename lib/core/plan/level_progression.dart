@@ -1,5 +1,6 @@
 import '../domain/session_record.dart';
 import '../domain/user_profile.dart';
+import '../entitlements/app_entitlements.dart';
 import '../time/app_clock.dart';
 import 'plan_rules.dart';
 
@@ -79,6 +80,9 @@ abstract final class LevelProgression {
     required int nextLevel,
     required bool isPremium,
   }) {
+    if (kAppFullyFree) {
+      return LevelStartOutcome.advanced;
+    }
     if (nextLevel >= 2 && !isPremium) {
       return LevelStartOutcome.needsPremium;
     }

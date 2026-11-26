@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../diagnostics/crash_reporting.dart';
 import 'cloud_config.dart';
 import 'cloud_errors.dart';
 
@@ -75,22 +76,29 @@ class AuthRepository {
         errorMessage: 'Sign-in isn’t set up in this build.',
       );
     }
+    CrashReporting.log('auth: email sign-in start');
     try {
       final AuthResponse res = await client.auth.signInWithPassword(
         email: email.trim(),
         password: password,
       );
       if (res.session == null) {
+        CrashReporting.log('auth: email sign-in no session');
         return const AuthResult(
           errorMessage: 'Couldn’t sign in. Check your email and password.',
         );
       }
+      CrashReporting.setKey('signed_in', true);
+      CrashReporting.log('auth: email sign-in ok');
       return AuthResult(session: res.session);
     } on AuthException catch (e) {
       debugPrint('Email sign-in AuthException: ${e.message} code=${e.code}');
+      CrashReporting.log('auth: email sign-in fail code=${e.code}');
       return AuthResult(errorMessage: CloudErrors.fromAuth(e));
-    } on Object catch (e) {
+    } on Object catch (e, st) {
       debugPrint('Email sign-in error: $e');
+      CrashReporting.log('auth: email sign-in error');
+      unawaited(CrashReporting.record(e, stackTrace: st));
       return AuthResult(errorMessage: CloudErrors.fromAuth(e));
     }
   }
@@ -152,6 +160,7 @@ class AuthRepository {
   }
 
   Future<AuthResult> signInWithGoogle() async {
+    CrashReporting.log('auth: google sign-in start');
     final SupabaseClient? client = _client;
     if (client == null) {
       return const AuthResult(
@@ -185,12 +194,16 @@ class AuthRepository {
         nonce: _googleRawNonce,
       );
       if (res.session == null) {
+        CrashReporting.log('auth: google sign-in no session');
         return const AuthResult(
           errorMessage: 'Google sign-in failed. Please try again.',
         );
       }
+      CrashReporting.setKey('signed_in', true);
+      CrashReporting.log('auth: google sign-in ok');
       return AuthResult(session: res.session);
     } on GoogleSignInException catch (e) {
+      CrashReporting.log('auth: google exception code=${e.code}');
       debugPrint(
         'GoogleSignInException: code=${e.code} desc=${e.description} $e',
       );
@@ -302,6 +315,7 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
+    CrashReporting.log('auth: sign-out');
     try {
       if (_googleReady) {
         await GoogleSignIn.instance.signOut();
@@ -310,6 +324,7 @@ class AuthRepository {
       // ignore
     }
     await _client?.auth.signOut();
+    CrashReporting.setKey('signed_in', false);
   }
 
   Future<void> updatePassword(String newPassword) async {

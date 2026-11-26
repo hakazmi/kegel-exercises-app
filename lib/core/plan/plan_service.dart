@@ -35,9 +35,16 @@ class PlanService {
       profile: profile,
       sessions: sessions,
     );
-    final int day = PlanRules.dayInLevel(
+    final int progressDay = PlanRules.dayInLevel(
       profile: profile,
       sessions: planSessions,
+    );
+    // Keep today’s playable day on the plan day finished this calendar day
+    // so breathing is not stamped onto the next day early.
+    final int day = PlanRules.activePlanDay(
+      profile: profile,
+      sessions: planSessions,
+      today: today,
     );
     final TrackId track = profile.track;
     final String trackKey = track.contentId;
@@ -67,9 +74,12 @@ class PlanService {
       final int planned = PlanRules.plannedStrengtheningSlots(
         profile.sessionsPerDay,
       );
-      final int doneCount = PlanRules.strengtheningCountOnDay(
-        planSessions,
-        today,
+      // Count only sessions stamped for this plan day — Day 1 work done
+      // earlier today must not mark Day 2 slots complete.
+      final int doneCount = PlanRules.strengtheningCountForPlanDay(
+        sessions: planSessions,
+        level: profile.level,
+        dayInLevel: day,
       );
       for (int i = 1; i <= planned; i++) {
         final bool optional = planned == 3 && i == 3;
@@ -94,7 +104,7 @@ class PlanService {
           (SessionRecord s) =>
               s.completed &&
               s.kind == SessionKind.body &&
-              isSameDay(dateOnly(s.completedAt ?? s.startedAt), today),
+              s.dayInLevel == day,
         );
         final bool locked = !isPremium;
         items.add(
@@ -133,7 +143,7 @@ class PlanService {
               (SessionRecord s) =>
                   s.completed &&
                   s.kind == SessionKind.relaxation &&
-                  isSameDay(dateOnly(s.completedAt ?? s.startedAt), today),
+                  s.dayInLevel == day,
             ),
           ),
         );
@@ -147,7 +157,7 @@ class PlanService {
               (SessionRecord s) =>
                   s.completed &&
                   s.kind == SessionKind.breathing &&
-                  isSameDay(dateOnly(s.completedAt ?? s.startedAt), today),
+                  s.dayInLevel == day,
             ),
           ),
         );
@@ -162,7 +172,7 @@ class PlanService {
               exercisesById,
               breathingSec,
             ),
-            done: _breatheDoneToday(planSessions, today),
+            done: _breatheDoneForPlanDay(planSessions, day),
             exerciseIds: breatheIds,
           ),
         );
@@ -179,7 +189,7 @@ class PlanService {
               (SessionRecord s) =>
                   s.completed &&
                   s.kind == SessionKind.breathing &&
-                  isSameDay(dateOnly(s.completedAt ?? s.startedAt), today),
+                  s.dayInLevel == day,
             ),
           ),
         );
@@ -194,7 +204,7 @@ class PlanService {
               exercisesById,
               breathingSec,
             ),
-            done: _breatheDoneToday(planSessions, today),
+            done: _breatheDoneForPlanDay(planSessions, day),
             exerciseIds: breatheIds,
           ),
         );
@@ -223,6 +233,16 @@ class PlanService {
       items: items,
     );
 
+    final int span = relaxationOnly
+        ? PlanRules.relaxationFirstDays
+        : PlanRules.levelDaySpan(profile.level);
+    final bool previewTomorrow = state == TodayPlanState.allDone &&
+        progressDay > day &&
+        day < span;
+    final int? highlight = previewTomorrow
+        ? progressDay.clamp(1, span == 0 ? 1 : span)
+        : null;
+
     return TodayPlan(
       state: state,
       items: items,
@@ -230,16 +250,18 @@ class PlanService {
       dayInLevel: day,
       level: profile.level,
       track: track,
+      highlightDayInLevel: highlight,
+      highlightIsTomorrow: previewTomorrow,
     );
   }
 
-  bool _breatheDoneToday(List<SessionRecord> sessions, DateTime today) {
+  bool _breatheDoneForPlanDay(List<SessionRecord> sessions, int dayInLevel) {
     return sessions.any(
       (SessionRecord s) =>
           s.completed &&
           (s.kind == SessionKind.breathing ||
               s.kind == SessionKind.relaxation) &&
-          isSameDay(dateOnly(s.completedAt ?? s.startedAt), today),
+          s.dayInLevel == dayInLevel,
     );
   }
 
